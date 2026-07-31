@@ -6,11 +6,11 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Language, defaultLanguage } from '@/i18n/config';
 import { translations } from '@/i18n/translations';
-import RegistrationForm from '../components/auth/RegistrationForm';
+import RegistrationFormRefactored from '../components/auth/RegistrationFormRefactored';
 import LoginForm from '../components/auth/LoginForm';
-import AdminLoginForm from '../components/auth/AdminLoginForm';
-import ForgotPinForm from '../components/auth/ForgotPinForm';
-import GuestOverview from '../components/auth/GuestOverview';
+import AdminLoginFormRefactored from '../components/auth/AdminLoginFormRefactored';
+import ForgotPinFormRefactored from '../components/auth/ForgotPinFormRefactored';
+import GuestOverviewRefactored from '../components/auth/GuestOverviewRefactored';
 import { ToastContainer, useToast } from '../components/notifications/Toast';
 
 function AuthContent() {
@@ -85,19 +85,19 @@ function AuthContent() {
 
           {/* Forms */}
           {mode === 'guest' && (
-            <GuestOverview lang={lang} />
+            <GuestOverviewRefactored lang={lang} />
           )}
           {mode === 'register' && (
-            <RegistrationForm lang={lang} onSuccess={success} onError={error} />
+            <RegistrationFormRefactored lang={lang} onSuccess={success} onError={error} />
           )}
           {mode === 'login' && (
             <LoginForm lang={lang} onSuccess={success} onError={error} />
           )}
           {mode === 'forgot' && (
-            <ForgotPinForm onSuccess={success} onError={error} />
+            <ForgotPinFormRefactored onSuccess={success} onError={error} />
           )}
           {mode === 'admin' && (
-            <AdminLoginForm onSuccess={success} onError={error} />
+            <AdminLoginFormRefactored onSuccess={success} onError={error} />
           )}
         </div>
       </div>
