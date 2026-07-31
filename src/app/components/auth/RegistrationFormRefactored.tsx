@@ -69,6 +69,14 @@ export default function RegistrationFormRefactored({
   const handlePhoneContinue = async () => {
     setLoading(true);
     try {
+      // Validate phone
+      if (!phoneNumber) {
+        throw new Error('Phone number is required');
+      }
+      if (!phoneNumber.match(/^\+?[1-9]\d{1,14}$/)) {
+        throw new Error('Invalid phone number format');
+      }
+
       // Simulate API delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
       onSuccess?.('SMS Sent', `Verification code sent to ${phoneNumber}`, 3000);
@@ -105,6 +113,20 @@ export default function RegistrationFormRefactored({
     setLoading(true);
     try {
       if (!selectedEqub) throw new Error('Equb selection missing');
+
+      // Validate all fields before registration
+      if (!fullName || fullName.length < 3) {
+        throw new Error('Full name must be at least 3 characters');
+      }
+      if (!pin || pin.length !== 4) {
+        throw new Error('PIN must be exactly 4 digits');
+      }
+      if (pin !== confirmPin) {
+        throw new Error('PINs do not match');
+      }
+      if (!faydaNumber || !/^\d{6,12}$/.test(faydaNumber)) {
+        throw new Error('Fayda number must be 6-12 digits');
+      }
 
       const registrationData: RegistrationData = {
         equbId: selectedEqub.id,
