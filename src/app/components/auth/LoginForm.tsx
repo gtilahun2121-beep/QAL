@@ -221,12 +221,16 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
             </button>
           </div>
 
-          {/* Forgot PIN Section */}
+            {/* Forgot PIN Section */}
           <div className="mt-6 pt-6 border-t border-[#d4af37]">
             <p className="text-center text-sm text-[#5a5a5a] mb-3">
               Forgot your PIN?
             </p>
             <motion.button
+              onClick={() => {
+                const forgotTab = document.querySelector('button:nth-of-type(4)') as HTMLButtonElement;
+                forgotTab?.click();
+              }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="w-full py-2 border-2 border-[#d4af37] text-[#0d7e4d] font-bold rounded-lg hover:bg-[#d4af37]/10 transition-all"
