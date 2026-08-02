@@ -17,9 +17,11 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    phoneNumber: '',
+    phoneNumber: '+2519',
     email: '',
     fayda: '',
+    faydaOtp: '',
+    faydaVerified: false,
     password: '',
     confirmPassword: '',
     pin: '',
@@ -73,9 +75,11 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
   const validateStep3 = () => {
     const newErrors: Record<string, string> = {};
     
-    // Fayda: exactly 16 digits
-    if (!/^\d{16}$/.test(formData.fayda)) {
-      newErrors.fayda = 'Fayda number must be exactly 16 digits';
+    if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    }
+    if (!/^\d{4,}$/.test(formData.pin)) {
+      newErrors.pin = 'PIN must be at least 4 digits';
     }
 
     setErrors(newErrors);
@@ -85,17 +89,26 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
   const validateStep4 = () => {
     const newErrors: Record<string, string> = {};
     
-    if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+    // Fayda: exactly 16 digits
+    if (!/^\d{16}$/.test(formData.fayda)) {
+      newErrors.fayda = 'Fayda number must be exactly 16 digits';
     }
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep5 = () => {
+    const newErrors: Record<string, string> = {};
+    
+    // Fayda OTP: exactly 6 digits
+    if (!/^\d{6}$/.test(formData.faydaOtp)) {
+      newErrors.faydaOtp = 'Fayda OTP must be exactly 6 digits';
     }
-    if (!/^\d{4,}$/.test(formData.pin)) {
-      newErrors.pin = 'PIN must be at least 4 digits';
-    }
-    if (!/^\d{5}$/.test(formData.otp)) {
-      newErrors.otp = 'OTP must be exactly 5 digits';
+    
+    // Fayda must be verified
+    if (!formData.faydaVerified) {
+      newErrors.faydaVerified = 'Please verify your Fayda';
     }
 
     setErrors(newErrors);
@@ -108,9 +121,10 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
     else if (step === 2) isValid = validateStep2();
     else if (step === 3) isValid = validateStep3();
     else if (step === 4) isValid = validateStep4();
+    else if (step === 5) isValid = validateStep5();
 
     if (isValid) {
-      if (step < 4) {
+      if (step < 5) {
         setStep(step + 1);
       } else {
         handleSubmit();
@@ -143,10 +157,10 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
 
   return (
     <div className="w-full">
-      {/* Step Indicator */}
+      {/* Step Indicator - 5 Steps */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
-          {[1, 2, 3, 4].map((s) => (
+          {[1, 2, 3, 4, 5].map((s) => (
             <div key={s} className="flex items-center">
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
@@ -157,7 +171,7 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
               >
                 {s}
               </div>
-              {s < 4 && (
+              {s < 5 && (
                 <div
                   className={`h-1 flex-grow mx-2 transition-all ${
                     s < step ? 'bg-[#0d7e4d]' : 'bg-gray-200'
@@ -168,7 +182,7 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
           ))}
         </div>
         <p className="text-center text-sm font-semibold text-gray-600">
-          Step {step} of 4
+          Step {step} of 5
         </p>
       </div>
 
@@ -246,34 +260,8 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
         </div>
       )}
 
-      {/* Step 3: Identity Verification (Fayda) */}
+      {/* Step 3: Security (Password, PIN) */}
       {step === 3 && (
-        <div>
-          <h3 className="text-2xl font-bold mb-6 text-gray-900">Identity Verification (Fayda)</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Fayda Number</label>
-              <input
-                type="text"
-                name="fayda"
-                value={formData.fayda}
-                onChange={handleChange}
-                placeholder="Enter 16-digit Fayda number"
-                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-all ${
-                  errors.fayda ? 'border-red-500' : 'border-gray-200 focus:border-[#0d7e4d]'
-                }`}
-              />
-              {errors.fayda && <p className="text-red-500 text-sm mt-1">{errors.fayda}</p>}
-            </div>
-            <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4 text-center">
-              <p className="text-green-700 font-semibold">✅ Identity Confirmed</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Step 4: Security (Password, PIN, OTP) */}
-      {step === 4 && (
         <div>
           <h3 className="text-2xl font-bold mb-6 text-gray-900">Security</h3>
           <div className="space-y-4">
@@ -292,20 +280,6 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
               {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Confirm your password"
-                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-all ${
-                  errors.confirmPassword ? 'border-red-500' : 'border-gray-200 focus:border-[#0d7e4d]'
-                }`}
-              />
-              {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
-            </div>
-            <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Create PIN</label>
               <input
                 type="text"
@@ -319,20 +293,74 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
               />
               {errors.pin && <p className="text-red-500 text-sm mt-1">{errors.pin}</p>}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Step 4: Identity Verification (Fayda) */}
+      {step === 4 && (
+        <div>
+          <h3 className="text-2xl font-bold mb-6 text-gray-900">Identity Verification (Fayda)</h3>
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">OTP Verification</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Fayda Number</label>
               <input
                 type="text"
-                name="otp"
-                value={formData.otp}
+                name="fayda"
+                value={formData.fayda}
                 onChange={handleChange}
-                placeholder="Enter 5-digit OTP"
+                placeholder="Enter 16-digit Fayda number"
                 className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-all ${
-                  errors.otp ? 'border-red-500' : 'border-gray-200 focus:border-[#0d7e4d]'
+                  errors.fayda ? 'border-red-500' : 'border-gray-200 focus:border-[#0d7e4d]'
                 }`}
               />
-              {errors.otp && <p className="text-red-500 text-sm mt-1">{errors.otp}</p>}
+              {errors.fayda && <p className="text-red-500 text-sm mt-1">{errors.fayda}</p>}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Step 5: Fayda OTP Verification */}
+      {step === 5 && (
+        <div>
+          <h3 className="text-2xl font-bold mb-6 text-gray-900">OTP Verification</h3>
+          <p className="text-gray-600 mb-6">Verify your Fayda account with OTP</p>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Fayda OTP</label>
+              <p className="text-xs text-gray-500 mb-2">Enter the 6-digit OTP sent to your Fayda account</p>
+              <input
+                type="text"
+                name="faydaOtp"
+                value={formData.faydaOtp}
+                onChange={handleChange}
+                placeholder="Enter 6-digit OTP"
+                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-all ${
+                  errors.faydaOtp ? 'border-red-500' : 'border-gray-200 focus:border-[#0d7e4d]'
+                }`}
+              />
+              {errors.faydaOtp && <p className="text-red-500 text-sm mt-1">{errors.faydaOtp}</p>}
+              
+              <button
+                onClick={() => {
+                  if (/^\d{16}$/.test(formData.fayda) && /^\d{6}$/.test(formData.faydaOtp)) {
+                    setFormData(prev => ({ ...prev, faydaVerified: true }));
+                    setErrors({});
+                  } else {
+                    setErrors({ faydaOtp: 'Invalid Fayda or OTP format' });
+                  }
+                }}
+                className="w-full mt-3 px-4 py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all"
+              >
+                Verify Fayda
+              </button>
+            </div>
+
+            {formData.faydaVerified && (
+              <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4 text-center">
+                <p className="text-green-700 font-semibold">✅ Identity Confirmed</p>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -360,7 +388,7 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
           disabled={submitting}
           className="flex-1 px-6 py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all disabled:opacity-50"
         >
-          {submitting ? '⏳ Processing...' : step === 4 ? '🎉 Create Account' : 'Next →'}
+          {submitting ? '⏳ Processing...' : step === 5 ? '🎉 Create Account' : 'Next →'}
         </button>
       </div>
     </div>

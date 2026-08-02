@@ -19,7 +19,6 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
   const navItems = [
     { label: t.home, href: '/' },
     { label: t.features, href: '/features' },
-    { label: 'Roadmap', href: '/roadmap' },
     { label: t.docs, href: '/docs' },
   ];
 
