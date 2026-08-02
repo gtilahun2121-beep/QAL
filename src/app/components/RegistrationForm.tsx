@@ -13,6 +13,13 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [passwordValidation, setPasswordValidation] = useState({
+    uppercase: false,
+    lowercase: false,
+    digit: false,
+    specialChar: false,
+    minLength: false,
+  });
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -31,6 +38,18 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // Real-time password validation
+    if (name === 'password') {
+      setPasswordValidation({
+        uppercase: /[A-Z]/.test(value),
+        lowercase: /[a-z]/.test(value),
+        digit: /\d/.test(value),
+        specialChar: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value),
+        minLength: value.length >= 8,
+      });
+    }
+    
     // Clear error for this field
     if (errors[name]) {
       setErrors((prev) => {
@@ -43,10 +62,20 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
 
   const validateStep1 = () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
-    if (formData.firstName.length < 2) newErrors.firstName = 'First name must be at least 2 characters';
-    if (formData.lastName.length < 2) newErrors.lastName = 'Last name must be at least 2 characters';
+    const nameRegex = /^[a-zA-Z]{2,}$/; // Only letters, minimum 2 characters
+    
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    } else if (!nameRegex.test(formData.firstName)) {
+      newErrors.firstName = 'First name must be at least 2 letters (no numbers or special characters)';
+    }
+    
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    } else if (!nameRegex.test(formData.lastName)) {
+      newErrors.lastName = 'Last name must be at least 2 letters (no numbers or special characters)';
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -75,9 +104,15 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
   const validateStep3 = () => {
     const newErrors: Record<string, string> = {};
     
-    if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+    // Password validation: 8+ chars, uppercase, lowercase, digit, special char
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+    
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (!passwordRegex.test(formData.password)) {
+      newErrors.password = 'Password must be at least 8 characters with 1 uppercase, 1 lowercase, 1 digit, and 1 special character (!@#$%^&*...)';
     }
+    
     if (!/^\d{4,}$/.test(formData.pin)) {
       newErrors.pin = 'PIN must be at least 4 digits';
     }
@@ -272,12 +307,41 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="At least 8 characters"
+                placeholder="At least 8 characters with uppercase, lowercase, digit, special char"
                 className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-all ${
                   errors.password ? 'border-red-500' : 'border-gray-200 focus:border-[#0d7e4d]'
                 }`}
               />
               {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+              
+              {/* Password Validation Checklist */}
+              {formData.password && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                  <p className="text-xs font-semibold text-gray-700 mb-3">Password Requirements:</p>
+                  <div className="space-y-2">
+                    <div className={`flex items-center gap-2 text-sm ${passwordValidation.minLength ? 'text-green-600' : 'text-gray-600'}`}>
+                      <span>{passwordValidation.minLength ? '✅' : '⭕'}</span>
+                      <span>At least 8 characters</span>
+                    </div>
+                    <div className={`flex items-center gap-2 text-sm ${passwordValidation.uppercase ? 'text-green-600' : 'text-gray-600'}`}>
+                      <span>{passwordValidation.uppercase ? '✅' : '⭕'}</span>
+                      <span>At least 1 uppercase letter</span>
+                    </div>
+                    <div className={`flex items-center gap-2 text-sm ${passwordValidation.lowercase ? 'text-green-600' : 'text-gray-600'}`}>
+                      <span>{passwordValidation.lowercase ? '✅' : '⭕'}</span>
+                      <span>At least 1 lowercase letter</span>
+                    </div>
+                    <div className={`flex items-center gap-2 text-sm ${passwordValidation.digit ? 'text-green-600' : 'text-gray-600'}`}>
+                      <span>{passwordValidation.digit ? '✅' : '⭕'}</span>
+                      <span>At least 1 digit</span>
+                    </div>
+                    <div className={`flex items-center gap-2 text-sm ${passwordValidation.specialChar ? 'text-green-600' : 'text-gray-600'}`}>
+                      <span>{passwordValidation.specialChar ? '✅' : '⭕'}</span>
+                      <span>At least 1 special character (!@#$%^&*...)</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Create PIN</label>
