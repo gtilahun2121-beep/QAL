@@ -12,7 +12,9 @@ import IncomeFilterButtons from './components/IncomeFilterButtons';
 import GuestStatsSection from './components/GuestStatsSection';
 
 interface GuestOverviewRefactoredProps {
-  lang: Language;
+  lang?: Language;
+  onJoinClick?: () => void;
+  onSignInClick?: () => void;
 }
 
 type IncomeLevel = 'all' | 'low' | 'medium' | 'high';
@@ -21,7 +23,7 @@ type IncomeLevel = 'all' | 'low' | 'medium' | 'high';
  * Refactored Guest Overview Component
  * Professional information architecture with proper component composition
  */
-export default function GuestOverviewRefactored({ lang }: GuestOverviewRefactoredProps) {
+export default function GuestOverviewRefactored({ lang = 'en', onJoinClick, onSignInClick }: GuestOverviewRefactoredProps) {
   const t = translations[lang];
   const [selectedIncome, setSelectedIncome] = useState<IncomeLevel>('all');
   const [selectedEqub, setSelectedEqub] = useState<EqubCategory | null>(null);
@@ -48,8 +50,7 @@ export default function GuestOverviewRefactored({ lang }: GuestOverviewRefactore
 
   const handleJoinEqub = (equb: EqubCategory) => {
     localStorage.setItem('selectedEqubId', equb.id);
-    const signUpTab = document.querySelector('button:nth-of-type(2)') as HTMLButtonElement;
-    signUpTab?.click();
+    onJoinClick?.();
     setShowModal(false);
   };
 
@@ -110,10 +111,7 @@ export default function GuestOverviewRefactored({ lang }: GuestOverviewRefactore
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => {
-            const signUpTab = document.querySelector('button:nth-of-type(2)') as HTMLButtonElement;
-            signUpTab?.click();
-          }}
+          onClick={onJoinClick}
           className="w-full py-3 bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300"
         >
           🚀 Start Your Equb Journey

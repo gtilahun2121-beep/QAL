@@ -18,8 +18,10 @@ export class ValidationSchema {
     if (!phone) {
       return { valid: false, error: 'Phone number is required' };
     }
-    if (!phone.match(/^\+?[1-9]\d{1,14}$/)) {
-      return { valid: false, error: 'Invalid phone number format' };
+    // Accept: +251912345678, 0912345678, 9 followed by 8 digits, spaces/dashes allowed
+    const cleanPhone = phone.replace(/[\s\-()]/g, '');
+    if (!cleanPhone.match(/^(\+251|0|251)?9\d{8}$/)) {
+      return { valid: false, error: 'Enter valid Ethiopian phone (9XX XXX XXXX)' };
     }
     return { valid: true };
   }
