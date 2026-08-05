@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
+import { authAPI, APIError } from '@/app/services/api';
 
 export type UserRole = 'guest' | 'member' | 'admin';
 
@@ -48,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedUser = localStorage.getItem('qalnet_user');
-      const storedToken = localStorage.getItem('qalnet_token');
+      const storedToken = localStorage.getItem('authToken');
       
       if (storedUser && storedToken) {
         try {
@@ -58,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch (error) {
           console.error('Failed to parse stored user:', error);
           localStorage.removeItem('qalnet_user');
-          localStorage.removeItem('qalnet_token');
+          localStorage.removeItem('authToken');
         }
       }
       setIsLoading(false);
@@ -68,27 +69,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signin = useCallback(async (phoneNumber: string, pin: string) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Mock successful signin
-      const mockUser: User = {
-        id: `user_${Date.now()}`,
-        firstName: 'Abebe',
-        lastName: 'Tekle',
-        email: 'abebe.tekle@example.com',
-        phoneNumber,
-        profession: 'Tech & Digital Freelancers',
-        role: 'member',
-        createdAt: new Date().toISOString(),
+      // Call backend API
+      const response = await authAPI.signin(phoneNumber, pin);
+      
+      // Extract user data from response
+      const userData: User = response.user || {
+        id: response.user?.id || `user_${Date.now()}`,
+        firstName: response.user?.firstName || 'User',
+        lastName: response.user?.lastName || '',
+        email: response.user?.email || '',
+        phoneNumber: response.user?.phoneNumber || phoneNumber,
+        profession: response.user?.profession || '',
+        role: response.user?.role || 'member',
+        createdAt: response.user?.createdAt || new Date().toISOString(),
       };
 
-      setUser(mockUser);
-      setRole('member');
-      localStorage.setItem('qalnet_user', JSON.stringify(mockUser));
-      localStorage.setItem('qalnet_token', `token_${Date.now()}`);
+      setUser(userData);
+      setRole(userData.role);
+      
+      // Store user and token in localStorage
+      localStorage.setItem('qalnet_user', JSON.stringify(userData));
+      localStorage.setItem('authToken', response.accessToken);
+      
+      // Store refresh token as httpOnly would in production
+      if (response.refreshToken) {
+        localStorage.setItem('refreshToken', response.refreshToken);
+      }
     } catch (error) {
-      throw new Error('Sign in failed');
+      const message = error instanceof APIError 
+        ? error.data?.message || error.message 
+        : error instanceof Error ? error.message : 'Sign in failed';
+      throw new Error(message);
     } finally {
       setIsLoading(false);
     }
@@ -97,27 +108,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signup = useCallback(async (data: SignupData) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Call backend API
+      const response = await authAPI.signup({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+        phoneNumber: data.phoneNumber,
+        profession: data.profession,
+        fayda: data.fayda,
+        guarantor: data.guarantor,
+      });
 
-      // Mock successful signup
-      const mockUser: User = {
-        id: `user_${Date.now()}`,
+      // Extract user data from response
+      const userData: User = response.user || {
+        id: response.user?.id || `user_${Date.now()}`,
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
         phoneNumber: data.phoneNumber,
         profession: data.profession || 'Not specified',
-        role: 'member',
+        role: response.user?.role || 'member',
         createdAt: new Date().toISOString(),
       };
 
-      setUser(mockUser);
-      setRole('member');
-      localStorage.setItem('qalnet_user', JSON.stringify(mockUser));
-      localStorage.setItem('qalnet_token', `token_${Date.now()}`);
+      setUser(userData);
+      setRole(userData.role);
+      
+      // Store user and token in localStorage
+      localStorage.setItem('qalnet_user', JSON.stringify(userData));
+      localStorage.setItem('authToken', response.accessToken);
+      
+      // Store refresh token
+      if (response.refreshToken) {
+        localStorage.setItem('refreshToken', response.refreshToken);
+      }
     } catch (error) {
-      throw new Error('Sign up failed');
+      const message = error instanceof APIError 
+        ? error.data?.message || error.message 
+        : error instanceof Error ? error.message : 'Sign up failed';
+      throw new Error(message);
     } finally {
       setIsLoading(false);
     }
@@ -127,19 +157,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setRole('guest');
     localStorage.removeItem('qalnet_user');
-    localStorage.removeItem('qalnet_token');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
   }, []);
 
   const resetPin = useCallback(async (phoneNumber: string, newPin: string) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
+      // Call backend API to reset PIN
+      await authAPI.resetPin(phoneNumber, '', newPin); // OTP would be sent separately
+      
       // PIN reset successful - user needs to sign in again with new PIN
       signout();
     } catch (error) {
-      throw new Error('PIN reset failed');
+      const message = error instanceof APIError 
+        ? error.data?.message || error.message 
+        : error instanceof Error ? error.message : 'PIN reset failed';
+      throw new Error(message);
     } finally {
       setIsLoading(false);
     }

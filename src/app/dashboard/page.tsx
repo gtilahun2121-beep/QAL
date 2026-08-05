@@ -13,19 +13,30 @@ export default function DashboardPage() {
   const [lang, setLang] = useState<Language>(defaultLanguage);
   const t = translations[lang];
 
+  console.log('🔍 Dashboard Page Loaded');
+  console.log('isAuthenticated:', isAuthenticated);
+  console.log('user:', user);
+
   if (!isAuthenticated || !user) {
+    console.log('❌ Not authenticated, redirecting...');
     return (
       <main className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <p className="text-xl font-bold text-gray-800">
+          <p className="text-xl font-bold text-gray-800 mb-4">
             {lang === 'en' ? 'Please log in first' : 'በመጀመሪያ ግባ'}
           </p>
+          <Link href="/" className="text-blue-600 hover:underline">
+            {lang === 'en' ? 'Go to Home' : 'ወደ ቤት ሂድ'}
+          </Link>
         </div>
       </main>
     );
   }
 
-  const isNewUser = false; // Toggle this to show "Getting Started" for new users
+  console.log('✅ User authenticated, showing dashboard');
+
+  // Check if user is new (first login)
+  const isNewUser = !user.id || user.id.includes('user_');
 
   // Mock data
   const walletBalance = 12500;
@@ -34,295 +45,370 @@ export default function DashboardPage() {
   const nextPayoutMonths = 3;
 
   const equbs = [
-    { id: 1, name: 'Gold Equb', members: 12, position: 3, nextPayout: '3 months', status: '✅ Active' },
-    { id: 2, name: 'Community Fund', members: 8, position: 5, nextPayout: '4 months', status: '✅ Active' },
-    { id: 3, name: 'Business Support', members: 15, position: 7, nextPayout: '6 months', status: '✅ Active' },
+    {
+      id: 1,
+      name: 'Gold Equb',
+      members: 12,
+      position: 3,
+      nextPayout: '3 months',
+      status: 'active',
+      contribution: 500,
+      nextPaymentDate: '2026-08-10',
+    },
+    {
+      id: 2,
+      name: 'Community Fund',
+      members: 8,
+      position: 5,
+      nextPayout: '4 months',
+      status: 'active',
+      contribution: 300,
+      nextPaymentDate: '2026-08-15',
+    },
+    {
+      id: 3,
+      name: 'Business Support',
+      members: 15,
+      position: 7,
+      nextPayout: '6 months',
+      status: 'active',
+      contribution: 1000,
+      nextPaymentDate: '2026-08-20',
+    },
   ];
 
   const notifications = [
-    { icon: '📅', title: lang === 'en' ? 'Payment Due Tomorrow' : 'ክፍያ ነገ ነው', time: '1 day' },
-    { icon: '👥', title: lang === 'en' ? 'New Member Joined' : 'አዲስ አባል ተቀላቀለ', time: '2 hours' },
-    { icon: '💰', title: lang === 'en' ? 'You Received Your Payout' : 'ክፍሌ ተቀበሉ', time: '1 week' },
+    {
+      icon: '📅',
+      title: lang === 'en' ? 'Payment Due Tomorrow' : 'ክፍያ ነገ ነው',
+      time: '1 day',
+      type: 'payment',
+    },
+    {
+      icon: '👥',
+      title: lang === 'en' ? 'New Member Joined' : 'አዲስ አባል ተቀላቀለ',
+      time: '2 hours',
+      type: 'member',
+    },
+    {
+      icon: '💰',
+      title: lang === 'en' ? 'You Received Your Payout' : 'ክፍሌ ተቀበሉ',
+      time: '1 week',
+      type: 'payout',
+    },
   ];
 
   const recentActivity = [
-    { icon: '✅', action: lang === 'en' ? 'Payment Completed' : 'ክፍያ ተጠናቀቀ', time: '2 hours ago' },
-    { icon: '➕', action: lang === 'en' ? 'Joined Gold Equb' : 'Gold Equb ተጠምዱ', time: '1 day ago' },
-    { icon: '📝', action: lang === 'en' ? 'Profile Updated' : 'መገለጫ ተመሳሰለ', time: '3 days ago' },
+    {
+      icon: '✅',
+      action: lang === 'en' ? 'Payment Completed' : 'ክፍያ ተጠናቀቀ',
+      time: '2 hours ago',
+    },
+    {
+      icon: '➕',
+      action: lang === 'en' ? 'Joined Gold Equb' : 'Gold Equb ተጠምዱ',
+      time: '1 day ago',
+    },
+    {
+      icon: '✏️',
+      action: lang === 'en' ? 'Profile Updated' : 'ፕሮፋይል ተዘምነ',
+      time: '3 days ago',
+    },
   ];
 
+  const handleSignOut = () => {
+    signout();
+  };
+
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col">
+    <main className="min-h-screen flex flex-col bg-gray-50">
       <Header
         lang={lang}
-        onLanguageChange={setLang}
+        onLanguageChange={(newLang) => setLang(newLang)}
         isAuthenticated={true}
       />
 
-      <div className="flex-grow py-8 px-4">
-        <div className="max-w-7xl mx-auto">
-          {/* Welcome Section */}
-          <div className="mb-8">
-            <h1 className="text-4xl md:text-5xl font-black text-gray-900">
-              {lang === 'en' ? `Welcome, ${user.firstName}! 👋` : `ሰላም, ${user.firstName}! 👋`}
+      {/* Main Content */}
+      <div className="flex-grow max-w-7xl mx-auto w-full px-4 py-8">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-4xl font-black text-gray-900">
+              {lang === 'en' ? 'Welcome, ' : 'ደህና መጡ, '}{user.firstName} 👋
             </h1>
-            <p className="text-gray-600 mt-2 text-lg">
-              {lang === 'en'
-                ? 'Manage your Equb groups and stay updated'
-                : 'Equb ቡድንዎን ያስተዳድሩ'}
+            <button
+              onClick={handleSignOut}
+              className="px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all"
+            >
+              {lang === 'en' ? 'Sign Out' : 'ወጣ'}
+            </button>
+          </div>
+          <p className="text-gray-600">
+            {lang === 'en'
+              ? 'Here\'s your Equb dashboard. Stay updated with your group savings.'
+              : 'ይህ የእርስዎ Equb ড్ಯಾಶ್ಬೋರ್ಡ್ ነው.'}
+          </p>
+        </div>
+
+        {/* Getting Started for New Users */}
+        {isNewUser && (
+          <div className="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-lg mb-8">
+            <h2 className="text-lg font-bold text-blue-900 mb-4">
+              {lang === 'en' ? '🚀 Getting Started' : '🚀 ለመጀመር'}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="bg-white p-4 rounded-lg text-center hover:shadow-lg transition-all cursor-pointer">
+                <p className="text-2xl mb-2">✅</p>
+                <p className="font-bold text-sm text-blue-900">
+                  {lang === 'en' ? 'Fayda Verified' : 'Fayda ታገዙ'}
+                </p>
+              </div>
+              <div className="bg-white p-4 rounded-lg text-center hover:shadow-lg transition-all cursor-pointer">
+                <p className="text-2xl mb-2">📱</p>
+                <p className="font-bold text-sm text-blue-900">
+                  {lang === 'en' ? 'Phone Verified' : 'ስልክ ታገዙ'}
+                </p>
+              </div>
+              <div className="bg-white p-4 rounded-lg text-center hover:shadow-lg transition-all cursor-pointer">
+                <p className="text-2xl mb-2">➕</p>
+                <p className="font-bold text-sm text-blue-900">
+                  {lang === 'en' ? 'Join First Equb' : 'መጀመሪያ Equb ተጠምዱ'}
+                </p>
+              </div>
+              <div className="bg-white p-4 rounded-lg text-center hover:shadow-lg transition-all cursor-pointer">
+                <p className="text-2xl mb-2">💳</p>
+                <p className="font-bold text-sm text-blue-900">
+                  {lang === 'en' ? 'Add Payment Method' : 'ክፍያ ዘዴ ጨምር'}
+                </p>
+              </div>
+              <div className="bg-white p-4 rounded-lg text-center hover:shadow-lg transition-all cursor-pointer">
+                <p className="text-2xl mb-2">📖</p>
+                <p className="font-bold text-sm text-blue-900">
+                  {lang === 'en' ? 'Learn How Equb Works' : 'Equb መሠራት ይወቁ'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Summary Cards - The 3 Key Questions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Card 1: Wallet Balance */}
+          <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-300 rounded-lg p-6 shadow-md">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-green-700 font-bold text-sm">
+                {lang === 'en' ? 'Wallet Balance' : 'ዋሊት ሚዛን'}
+              </p>
+              <p className="text-2xl">💰</p>
+            </div>
+            <p className="text-3xl font-black text-green-900">
+              ETB {walletBalance.toLocaleString()}
+            </p>
+            <p className="text-xs text-green-700 mt-2">
+              {lang === 'en' ? 'Available balance' : 'ክፍት ሚዛን'}
             </p>
           </div>
 
-          {/* Getting Started (for new users) */}
-          {isNewUser && (
-            <div className="bg-blue-50 border-2 border-blue-300 rounded-2xl p-8 mb-8">
-              <h2 className="text-2xl font-black text-blue-900 mb-6">
-                {lang === 'en' ? '🚀 Getting Started' : '🚀 ጀምር'}
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                {[
-                  { icon: '✅', label: lang === 'en' ? 'Verify Fayda' : 'Fayda አረጋግጡ', done: true },
-                  { icon: '✅', label: lang === 'en' ? 'Complete Profile' : 'መገለጫ ያጠናቅቁ', done: true },
-                  { icon: '➕', label: lang === 'en' ? 'Join First Equb' : 'Equb ይቀላቀሉ', done: false },
-                  { icon: '💳', label: lang === 'en' ? 'Add Payment' : 'ክፍያ ይጨምሩ', done: false },
-                  { icon: '📖', label: lang === 'en' ? 'Learn How It Works' : 'እንዴት ይሠራል', done: false },
-                ].map((step, idx) => (
-                  <button
-                    key={idx}
-                    className={`p-4 rounded-lg font-bold transition-all text-center ${
-                      step.done
-                        ? 'bg-green-100 text-green-900 hover:shadow-md'
-                        : 'bg-white text-gray-700 border-2 border-blue-200 hover:border-blue-400'
-                    }`}
-                  >
-                    <p className="text-2xl mb-2">{step.icon}</p>
-                    <p className="text-sm font-bold">{step.label}</p>
-                  </button>
-                ))}
-              </div>
+          {/* Card 2: Active Equbs */}
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-300 rounded-lg p-6 shadow-md">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-blue-700 font-bold text-sm">
+                {lang === 'en' ? 'Active Equbs' : 'ንቅናቄ Equbs'}
+              </p>
+              <p className="text-2xl">👥</p>
             </div>
-          )}
-
-          {/* QUESTION 1: What is my current Equb status? - Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {/* Wallet Balance */}
-            <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500 hover:shadow-lg transition-all">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 text-sm font-bold">{lang === 'en' ? 'Wallet Balance' : 'ዋሊት ሚዛን'}</h3>
-                <span className="text-3xl">💰</span>
-              </div>
-              <p className="text-4xl font-black text-purple-600">ETB {walletBalance.toLocaleString()}</p>
-              <p className="text-xs text-gray-500 mt-2">{lang === 'en' ? 'Available funds' : 'ሊገኙ የሚችሉ ገንዘብ'}</p>
-            </div>
-
-            {/* Active Equbs */}
-            <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition-all">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 text-sm font-bold">{lang === 'en' ? 'Active Equbs' : 'ንቁ Equbs'}</h3>
-                <span className="text-3xl">👥</span>
-              </div>
-              <p className="text-4xl font-black text-green-600">{activeEqubs}</p>
-              <p className="text-xs text-gray-500 mt-2">{lang === 'en' ? 'Groups you are in' : 'አንተ ነበርክበት ቡድን'}</p>
-            </div>
-
-            {/* Next Payment */}
-            <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-all">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 text-sm font-bold">{lang === 'en' ? 'Next Payment' : 'ቀጣይ ክፍያ'}</h3>
-                <span className="text-3xl">📅</span>
-              </div>
-              <p className="text-4xl font-black text-blue-600">{nextPaymentDays}d</p>
-              <p className="text-xs text-gray-500 mt-2">{lang === 'en' ? 'Days remaining' : 'ቀሪ ቀናት'}</p>
-            </div>
-
-            {/* Next Payout */}
-            <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-amber-500 hover:shadow-lg transition-all">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 text-sm font-bold">{lang === 'en' ? 'Next Payout' : 'ቀጣይ ክፍሌ'}</h3>
-                <span className="text-3xl">🏆</span>
-              </div>
-              <p className="text-4xl font-black text-amber-600">{nextPayoutMonths}m</p>
-              <p className="text-xs text-gray-500 mt-2">{lang === 'en' ? 'Months away' : 'ወሩ ርቁ'}</p>
-            </div>
+            <p className="text-3xl font-black text-blue-900">{activeEqubs}</p>
+            <p className="text-xs text-blue-700 mt-2">
+              {lang === 'en' ? 'Groups you\'re part of' : 'ነዋ ክፍሎች'}
+            </p>
           </div>
 
-          {/* QUESTION 2: What should I do next? - Quick Actions & Profile Status */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            {/* Quick Actions */}
-            <div className="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-2xl font-black text-gray-900 mb-6">
-                {lang === 'en' ? '⚡ Quick Actions' : '⚡ ፈጣን ተግባር'}
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                {[
-                  { icon: '➕', label: lang === 'en' ? 'Join Equb' : 'Equb ይቀላቀሉ', href: '/join-equb' },
-                  { icon: '🏗️', label: lang === 'en' ? 'Create Equb' : 'Equb ይፍጠሩ', href: '#' },
-                  { icon: '💳', label: lang === 'en' ? 'Pay Now' : 'አሁን ይክፈሉ', href: '#' },
-                  { icon: '👛', label: lang === 'en' ? 'Wallet' : 'ዋሊት', href: '/wallet' },
-                  { icon: '🤝', label: lang === 'en' ? 'Invite' : 'ጋብዙ', href: '#' },
-                ].map((action, idx) => (
-                  <Link
-                    key={idx}
-                    href={action.href}
-                    className="bg-gradient-to-br from-[#0d7e4d] to-[#0a5c38] text-white font-bold py-4 px-3 rounded-xl hover:shadow-lg transition-all hover:scale-105 text-center text-sm flex flex-col items-center justify-center"
-                  >
-                    <p className="text-2xl mb-1">{action.icon}</p>
-                    <p className="text-xs font-bold">{action.label}</p>
-                  </Link>
-                ))}
-              </div>
+          {/* Card 3: Next Payment Date */}
+          <div className="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-300 rounded-lg p-6 shadow-md">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-orange-700 font-bold text-sm">
+                {lang === 'en' ? 'Next Payment' : 'ቀጣይ ክፍያ'}
+              </p>
+              <p className="text-2xl">📅</p>
             </div>
+            <p className="text-3xl font-black text-orange-900">{nextPaymentDays} days</p>
+            <p className="text-xs text-orange-700 mt-2">
+              {lang === 'en' ? 'Payment due soon' : 'ክፍያ ቀርቧል'}
+            </p>
+          </div>
 
-            {/* Profile Status */}
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-2xl font-black text-gray-900 mb-4">
-                {lang === 'en' ? '✓ Profile Status' : '✓ መገለጫ ሁኔታ'}
+          {/* Card 4: Next Payout Date */}
+          <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-300 rounded-lg p-6 shadow-md">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-purple-700 font-bold text-sm">
+                {lang === 'en' ? 'Next Payout' : 'ቀጣይ ክፍሌ'}
+              </p>
+              <p className="text-2xl">🏆</p>
+            </div>
+            <p className="text-3xl font-black text-purple-900">{nextPayoutMonths}m away</p>
+            <p className="text-xs text-purple-700 mt-2">
+              {lang === 'en' ? 'When you receive payout' : 'ክፍሌ የሚገኙበት ጊዜ'}
+            </p>
+          </div>
+        </div>
+
+        {/* Three Main Sections */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Section 1: My Equbs - Question: What is my current Equb status? */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                👥 {lang === 'en' ? 'My Equbs' : 'የእኔ Equbs'}
               </h2>
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl text-green-600">✅</span>
-                  <span className="text-sm font-semibold text-gray-700">{lang === 'en' ? 'Fayda Verified' : 'Fayda ታገዩ'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl text-green-600">✅</span>
-                  <span className="text-sm font-semibold text-gray-700">{lang === 'en' ? 'Phone Verified' : 'ስልክ ታገዩ'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl text-green-600">✅</span>
-                  <span className="text-sm font-semibold text-gray-700">{lang === 'en' ? 'Email Verified' : 'ኢሜል ታገዩ'}</span>
-                </div>
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <p className="text-xs text-gray-600 mb-2 font-bold">
-                    {lang === 'en' ? 'Profile Completion' : 'መገለጫ ተጠናቀቀ'}
+
+              {equbs.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-600 mb-4">
+                    {lang === 'en' ? 'You haven\'t joined any Equb yet' : 'አሁንም ሙሉ Equb ተጠምዱ አልነበሩም'}
                   </p>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div className="bg-green-600 h-3 rounded-full" style={{ width: '100%' }}></div>
-                  </div>
-                  <p className="text-sm font-black text-green-600 mt-2">100%</p>
+                  <button className="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all">
+                    {lang === 'en' ? 'Join an Equb' : 'Equb ተጠምዱ'}
+                  </button>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* QUESTION 3: What has happened recently? */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            {/* Recent Activity */}
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-2xl font-black text-gray-900 mb-6">
-                {lang === 'en' ? '📋 Recent Activity' : '📋 ቅርብ ሥራ'}
-              </h2>
-              <div className="space-y-4">
-                {recentActivity.map((activity, idx) => (
-                  <div key={idx} className="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-b-0">
-                    <span className="text-2xl">{activity.icon}</span>
-                    <div>
-                      <p className="font-bold text-gray-900">{activity.action}</p>
-                      <p className="text-xs text-gray-500">{activity.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Notifications */}
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-2xl font-black text-gray-900 mb-6">
-                {lang === 'en' ? '🔔 Notifications' : '🔔 ማስታወቂያ'}
-              </h2>
-              <div className="space-y-4">
-                {notifications.map((notif, idx) => (
-                  <div key={idx} className="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-b-0 bg-blue-50 p-3 rounded-lg">
-                    <span className="text-2xl">{notif.icon}</span>
-                    <div>
-                      <p className="font-bold text-gray-900">{notif.title}</p>
-                      <p className="text-xs text-gray-500">{notif.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* My Equbs Section */}
-          <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-black text-gray-900">
-                {lang === 'en' ? '👥 My Equbs' : '👥 ስሌዎ Equbs'}
-              </h2>
-              <Link href="/my-equbs" className="text-[#0d7e4d] font-bold hover:underline">
-                {lang === 'en' ? 'View All →' : 'ሁሉ ይመልከቱ →'}
-              </Link>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b-2 border-gray-200">
-                    <th className="text-left py-2 px-4 font-bold text-gray-700">{lang === 'en' ? 'Group Name' : 'ቡድን ስም'}</th>
-                    <th className="text-center py-2 px-4 font-bold text-gray-700">{lang === 'en' ? 'Members' : 'አባሎች'}</th>
-                    <th className="text-center py-2 px-4 font-bold text-gray-700">{lang === 'en' ? 'Position' : 'ሥራ'}</th>
-                    <th className="text-center py-2 px-4 font-bold text-gray-700">{lang === 'en' ? 'Next Payout' : 'ቀጣይ ክፍሌ'}</th>
-                    <th className="text-center py-2 px-4 font-bold text-gray-700">{lang === 'en' ? 'Status' : 'ሁኔታ'}</th>
-                  </tr>
-                </thead>
-                <tbody>
+              ) : (
+                <div className="space-y-4">
                   {equbs.map((equb) => (
-                    <tr key={equb.id} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="py-3 px-4 font-semibold text-gray-900">{equb.name}</td>
-                      <td className="py-3 px-4 text-center text-gray-700">{equb.members}</td>
-                      <td className="py-3 px-4 text-center font-bold text-[#0d7e4d]">#{equb.position}</td>
-                      <td className="py-3 px-4 text-center text-gray-700">{equb.nextPayout}</td>
-                      <td className="py-3 px-4 text-center">
-                        <span className="text-xs font-bold text-green-600 bg-green-100 px-3 py-1 rounded-full">
-                          {equb.status}
+                    <div
+                      key={equb.id}
+                      className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-all"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h3 className="font-bold text-gray-900 text-lg">{equb.name}</h3>
+                          <p className="text-sm text-gray-600">
+                            {equb.members} {lang === 'en' ? 'members' : 'አባላት'}
+                          </p>
+                        </div>
+                        <span className="px-3 py-1 bg-green-100 text-green-800 font-bold text-xs rounded-full">
+                          ✅ {lang === 'en' ? 'Active' : 'ንቅናቄ'}
                         </span>
-                      </td>
-                    </tr>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <p className="text-xs text-gray-600 font-semibold">
+                            {lang === 'en' ? 'Your Position' : 'አባላት ቁጥር'}
+                          </p>
+                          <p className="text-xl font-bold text-gray-900">{equb.position}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-600 font-semibold">
+                            {lang === 'en' ? 'Contribution' : 'አስተዋጽዖ'}
+                          </p>
+                          <p className="text-xl font-bold text-gray-900">ETB {equb.contribution}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-600 font-semibold">
+                            {lang === 'en' ? 'Your Payout' : 'ክፍሌ'}
+                          </p>
+                          <p className="text-xl font-bold text-purple-600">{equb.nextPayout}</p>
+                        </div>
+                      </div>
+
+                      <button className="mt-4 w-full px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all text-sm">
+                        {lang === 'en' ? 'View Details' : 'ዝርዝር ይመልከቱ'}
+                      </button>
+                    </div>
                   ))}
-                </tbody>
-              </table>
+                </div>
+              )}
+            </div>
+
+            {/* Quick Actions - Question: What should I do next? */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                ⚡ {lang === 'en' ? 'Quick Actions' : 'ፈጣን ድርጊቶች'}
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 rounded-lg font-bold hover:shadow-lg transition-all text-center">
+                  ➕ {lang === 'en' ? 'Join an Equb' : 'Equb ተጠምዱ'}
+                </button>
+                <button className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-4 rounded-lg font-bold hover:shadow-lg transition-all text-center">
+                  🆕 {lang === 'en' ? 'Create an Equb' : 'Equb ፍጠር'}
+                </button>
+                <button className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-4 rounded-lg font-bold hover:shadow-lg transition-all text-center">
+                  💳 {lang === 'en' ? 'Make Payment' : 'ክፍያ ክፍል'}
+                </button>
+                <button className="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-4 rounded-lg font-bold hover:shadow-lg transition-all text-center">
+                  👥 {lang === 'en' ? 'Invite Friends' : 'ጓደኞቹን ጋብዝ'}
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Support & Settings */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Support */}
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-2xl font-black text-gray-900 mb-6">
-                {lang === 'en' ? '💬 Support' : '💬 ተገባኝ'}
+          {/* Section 3: Notifications & Activity - Question: What has happened recently? */}
+          <div>
+            {/* Notifications */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                🔔 {lang === 'en' ? 'Notifications' : 'ማስታወቂያዎች'}
               </h2>
+
               <div className="space-y-3">
-                <button className="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-all font-semibold">
-                  {lang === 'en' ? '📚 Help Center' : '📚 ረዳት ማዕከል'}
-                </button>
-                <button className="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-all font-semibold">
-                  {lang === 'en' ? '💬 Live Chat' : '💬 ብቁ ውይይት'}
-                </button>
-                <button className="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-all font-semibold">
-                  {lang === 'en' ? '⚠️ Report Issue' : '⚠️ ችግር ሪፖርት'}
-                </button>
+                {notifications.map((notif, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg p-3 hover:shadow-md transition-all"
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl">{notif.icon}</span>
+                      <div className="flex-1">
+                        <p className="font-bold text-gray-900 text-sm">{notif.title}</p>
+                        <p className="text-xs text-gray-600">{notif.time}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Settings */}
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-2xl font-black text-gray-900 mb-6">
-                {lang === 'en' ? '⚙️ Account' : '⚙️ መስተዋወቅ'}
+            {/* Recent Activity */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                📊 {lang === 'en' ? 'Recent Activity' : 'ቅርብ ጊዜ ሕይወት'}
               </h2>
+
               <div className="space-y-3">
-                <button className="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-all font-semibold">
-                  {lang === 'en' ? 'Profile Settings' : 'መገለጫ ቅንብር'}
-                </button>
-                <button className="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-all font-semibold">
-                  {lang === 'en' ? 'Security' : 'ደህንነት'}
-                </button>
-                <button
-                  onClick={() => signout()}
-                  className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-all font-semibold"
-                >
-                  {lang === 'en' ? '🚪 Logout' : '🚪 ወጣ'}
-                </button>
+                {recentActivity.map((activity, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg p-3 hover:shadow-md transition-all"
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl">{activity.icon}</span>
+                      <div className="flex-1">
+                        <p className="font-bold text-gray-900 text-sm">{activity.action}</p>
+                        <p className="text-xs text-gray-600">{activity.time}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Bottom Support Section */}
+        <div className="mt-12 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-8 text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            {lang === 'en' ? 'Need Help?' : 'እርዳታ ያስፈልገ?'}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all">
+              📚 {lang === 'en' ? 'Help Center' : 'ረዳት ማእከል'}
+            </button>
+            <button className="px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-all">
+              💬 {lang === 'en' ? 'Live Chat' : 'ቀጥታ ውይይት'}
+            </button>
+            <button className="px-6 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-all">
+              ⚠️ {lang === 'en' ? 'Report Issue' : 'ችግር ሪፖርት'}
+            </button>
           </div>
         </div>
       </div>

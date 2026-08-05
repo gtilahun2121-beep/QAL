@@ -65,7 +65,12 @@ export const PaymentFlow: React.FC<PaymentFlowProps> = ({
     setError(null);
 
     try {
-      const result = await paymentService.initiatePayment(equbId, roundNumber);
+      const result = await paymentService.initiate({
+        equbId,
+        roundNumber,
+        amount,
+        method: selectedMethod,
+      });
       setTransactionRef(result.paymentId);
 
       if (selectedMethod === 'wallet') {
@@ -86,7 +91,7 @@ export const PaymentFlow: React.FC<PaymentFlowProps> = ({
 
   const processWalletPayment = async (paymentId: string) => {
     try {
-      const payment = await paymentService.confirmPayment(paymentId, 'WALLET_DEBIT');
+      const payment = await paymentService.verify(paymentId);
       setStep('confirmation');
       setTimeout(() => onSuccess(payment), 1500);
     } catch (err) {

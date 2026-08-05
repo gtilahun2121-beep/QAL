@@ -17,13 +17,24 @@ interface SignInTabProps {
 
 export default function SignInTab({ lang = defaultLanguage, onSuccess, onError }: SignInTabProps) {
   const { signin, isLoading } = useAuth();
-  const [formData, setFormData] = useState({ phoneNumber: '', pin: '' });
+  const [formData, setFormData] = useState({ phoneNumber: '+2519', pin: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [successMessage, setSuccessMessage] = useState('');
 
   const handleFieldChange = (field: string, value: string) => {
     let finalValue = value;
-    if (field === 'pin') {
+    if (field === 'phoneNumber') {
+      // Keep +2519 prefix
+      if (!value.startsWith('+2519')) {
+        value = '+2519';
+      }
+      // Allow only digits after +2519
+      const digitsOnly = value.replace(/\D/g, '');
+      if (digitsOnly.length > 10) {
+        value = '+' + digitsOnly.substring(0, 10);
+      }
+      finalValue = value;
+    } else if (field === 'pin') {
       finalValue = value.replace(/\D/g, '').slice(0, 4);
     }
     setFormData((prev) => ({ ...prev, [field]: finalValue }));
@@ -83,7 +94,7 @@ export default function SignInTab({ lang = defaultLanguage, onSuccess, onError }
         type="tel"
         value={formData.phoneNumber}
         onChange={(value) => handleFieldChange('phoneNumber', value)}
-        placeholder="+251 9XX XXX XXXX"
+        placeholder="+2519 xxxxxxxx"
         error={errors.phoneNumber}
       />
 

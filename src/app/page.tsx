@@ -7,20 +7,29 @@ import { translations } from '@/i18n/translations';
 import { useAuth } from './context/AuthContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import RegistrationForm from './components/RegistrationForm';
+import AuthModal from './components/modals/AuthModal';
 
 export default function Home() {
   const router = useRouter();
   const [lang, setLang] = useState<Language>(defaultLanguage);
-  const [showSignUpModal, setShowSignUpModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleLanguageChange = (newLang: Language) => {
     setLang(newLang);
   };
 
-  const handleRegistrationSuccess = () => {
-    setShowSignUpModal(false);
-    router.push('/dashboard');
+  const handleAuthSuccess = (title: string, message: string, duration?: number) => {
+    console.log('✅ handleAuthSuccess called - closing modal and redirecting to /dashboard');
+    setShowAuthModal(false);
+    // Add a small delay to ensure modal closes before redirect
+    setTimeout(() => {
+      console.log('🚀 Redirecting to /dashboard...');
+      router.push('/dashboard');
+    }, 500);
+  };
+
+  const handleAuthError = (title: string, message: string, duration?: number) => {
+    // Error is already shown to user via toast, just keep modal open
   };
 
   return (
@@ -28,29 +37,19 @@ export default function Home() {
       <Header
         lang={lang}
         onLanguageChange={handleLanguageChange}
-        onSignUpClick={() => setShowSignUpModal(true)}
+        onSignUpClick={() => setShowAuthModal(true)}
         isAuthenticated={false}
       />
 
-      {/* Sign Up Modal */}
-      {showSignUpModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center p-6 border-b border-gray-200 sticky top-0 bg-white">
-              <h2 className="text-2xl font-bold">Create Account</h2>
-              <button
-                onClick={() => setShowSignUpModal(false)}
-                className="text-2xl text-gray-600 hover:text-gray-900"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="p-8">
-              <RegistrationForm onSuccess={handleRegistrationSuccess} />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Auth Modal - New Choice Flow */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        mode="choice"
+        lang={lang}
+        onSuccess={handleAuthSuccess}
+        onError={handleAuthError}
+      />
 
       {/* Homepage Content */}
       <div className="flex-grow">
@@ -68,7 +67,7 @@ export default function Home() {
                 : 'Tuulee digaalaa Equb biiroo Itoophiyaatiin.'}
             </p>
             <button
-              onClick={() => setShowSignUpModal(true)}
+              onClick={() => setShowAuthModal(true)}
               className="bg-white text-[#0d7e4d] px-8 py-4 font-bold text-lg rounded-full hover:shadow-2xl transition-all"
             >
               🚀 Get Started
@@ -101,7 +100,7 @@ export default function Home() {
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-4xl font-black mb-6">Ready to Join?</h2>
             <button
-              onClick={() => setShowSignUpModal(true)}
+              onClick={() => setShowAuthModal(true)}
               className="bg-white text-[#0d7e4d] px-8 py-4 font-bold text-lg rounded-full"
             >
               ✍️ Sign Up

@@ -7,13 +7,16 @@ import { translations } from '@/i18n/translations';
 import SignUpTab from './AuthModalTabs/SignUpTab';
 import SignInTab from './AuthModalTabs/SignInTab';
 import ForgotPinTab from './AuthModalTabs/ForgotPinTab';
+import ChoiceFlow from './ChoiceFlow';
 
 export type AuthTab = 'signup' | 'signin' | 'forgot';
+export type AuthMode = 'tabs' | 'choice';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialTab?: AuthTab;
+  mode?: AuthMode;
   lang?: Language;
   onSuccess?: (title: string, message: string, duration?: number) => void;
   onError?: (title: string, message: string, duration?: number) => void;
@@ -21,12 +24,15 @@ interface AuthModalProps {
 
 /**
  * Unified Auth Modal Component
- * Combines Sign Up, Sign In, and Forgot PIN into a single modal with tabs
+ * Two modes:
+ * 1. 'tabs' (default) - Traditional tab-based interface for back-compat
+ * 2. 'choice' - New flow with Sign Up/Sign In decision screen
  */
 export default function AuthModal({
   isOpen,
   onClose,
   initialTab = 'signin',
+  mode = 'tabs',
   lang = defaultLanguage,
   onSuccess,
   onError,
@@ -47,6 +53,20 @@ export default function AuthModal({
     { id: 'forgot', label: lang === 'en' ? 'Forgot PIN' : lang === 'am' ? 'PIN ርሳኸወ' : lang === 'om' ? 'PIN Irraanfate' : 'PIN ርሳኸወ', icon: '🆘' },
   ];
 
+  // If mode is 'choice', use the new ChoiceFlow component
+  if (mode === 'choice') {
+    return (
+      <ChoiceFlow
+        isOpen={isOpen}
+        onClose={onClose}
+        lang={lang}
+        onSuccess={onSuccess}
+        onError={onError}
+      />
+    );
+  }
+
+  // Otherwise use traditional tab-based interface
   return (
     <AnimatePresence>
       {isOpen && (
