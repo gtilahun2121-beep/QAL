@@ -12,29 +12,29 @@
 
 ### 1. What is my current Equb status? 👥
 **My Equbs Section** displays:
-- ✅ All active equbs you're part of
-- 👥 Members in each group
-- 📍 Your position in the queue
-- 💰 Your contribution amount
-- 🏆 When you'll receive your payout
+-  All active equbs you're part of
+-  Members in each group
+-  Your position in the queue
+-  Your contribution amount
+-  When you'll receive your payout
 - [View Details] buttons
 
 ### 2. What should I do next? ⚡
 **Quick Actions Section** shows 4 main actions:
-- ➕ Join an Equb
-- 🆕 Create an Equb
-- 💳 Make Payment
-- 👥 Invite Friends
+-  Join an Equb
+-  Create an Equb
+-  Make Payment
+-  Invite Friends
 
 ### 3. What has happened recently? 📊
 **Notifications & Activity Section** displays:
-- 🔔 Latest alerts (due dates, new members, payouts)
-- 📊 Recent activity timeline
-- ⏰ Timestamps for context
+-  Latest alerts (due dates, new members, payouts)
+-  Recent activity timeline
+-  Timestamps for context
 
 ---
 
-## 🎨 Dashboard Components
+##  Dashboard Components
 
 ### Top Section
 ```
@@ -43,14 +43,14 @@ Welcome, [User Name] 👋                    [Sign Out Button]
 
 ### Getting Started (New Users Only)
 ```
-🚀 Getting Started
-✅ Fayda Verified | 📱 Phone Verified | ➕ Join Equb | 💳 Add Payment | 📖 Learn
+ Getting Started
+ Fayda Verified | Phone Verified |  Join Equb |  Add Payment | Learn
 ```
 
 ### Summary Cards (4 Cards in a Row)
 ```
 ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐
-│ 💰 Wallet   │  │ 👥 Active   │  │ 📅 Next     │  │ 🏆 Next     │
+│  Wallet   │  │  Active   │  │  Next     │  │  Next     │
 │ Balance     │  │ Equbs       │  │ Payment     │  │ Payout      │
 │ ETB 12,500  │  │ 3           │  │ 5 days      │  │ 3m away     │
 └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘
@@ -59,36 +59,36 @@ Welcome, [User Name] 👋                    [Sign Out Button]
 ### Main Content (3-Column Layout)
 
 **LEFT & CENTER (2/3 width):**
-- 👥 My Equbs - Full equb cards
-- ⚡ Quick Actions - 4 action buttons
+-  My Equbs - Full equb cards
+-  Quick Actions - 4 action buttons
 
 **RIGHT (1/3 width):**
-- 🔔 Notifications - Latest updates
-- 📊 Recent Activity - Recent actions
+-  Notifications - Latest updates
+-  Recent Activity - Recent actions
 
 ### Bottom Section
 ```
 Help & Support
-[📚 Help Center] [💬 Live Chat] [⚠️ Report Issue]
+[ Help Center] [ Live Chat] [ Report Issue]
 ```
 
 ---
 
-## 🎯 User Experience
+##  User Experience
 
 ### First-Time User (New Login)
-1. ✅ Sees welcome message
-2. ✅ Sees "Getting Started" section (5 onboarding steps)
-3. ✅ Sees 4 summary cards (key metrics)
-4. ✅ Sees quick action buttons
-5. ✅ Knows exactly what to do next
+1. Sees welcome message
+2.  Sees "Getting Started" section (5 onboarding steps)
+3.  Sees 4 summary cards (key metrics)
+4.  Sees quick action buttons
+5.  Knows exactly what to do next
 
 ### Returning User
-1. ✅ Sees welcome message
-2. ✅ Immediately sees summary cards (balance, equbs, payment, payout)
-3. ✅ Can see all their equbs
-4. ✅ Can take quick actions
-5. ✅ Can see latest notifications
+1.  Sees welcome message
+2.  Immediately sees summary cards (balance, equbs, payment, payout)
+3. Can see all their equbs
+4. Can take quick actions
+5. Can see latest notifications
 
 ---
 
