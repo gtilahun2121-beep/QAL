@@ -134,9 +134,7 @@ export default function AdminDashboard() {
           >
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-3xl font-black mb-2">
-                  {roleDisplay[admin.role].icon} Admin Dashboard
-                </h1>
+                <h1 className="text-3xl font-black mb-2">Admin Dashboard</h1>
                 <p className="text-sm">
                   Role: <span className="font-black">{roleDisplay[admin.role].name}</span> | Email: {admin.email}
                 </p>
@@ -151,7 +149,7 @@ export default function AdminDashboard() {
                 whileTap={{ scale: 0.95 }}
                 className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full font-bold transition-all"
               >
-                🚪 Logout
+                 Logout
               </motion.button>
             </div>
           </motion.div>
@@ -164,12 +162,12 @@ export default function AdminDashboard() {
             className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-8"
           >
             {[
-              { id: 'overview', label: '📊 Overview', permission: null },
-              { id: 'members', label: '👥 Members', permission: 'view_members' },
-              { id: 'kyc', label: '✅ KYC', permission: 'approve_kyc' },
-              { id: 'disputes', label: '⚖️ Disputes', permission: 'manage_disputes' },
-              { id: 'finance', label: '💰 Finance', permission: 'view_financial_records' },
-              { id: 'admin', label: '⚙️ Admin', permission: 'manage_admin_users' },
+              { id: 'overview', label: 'Overview', permission: null },
+              { id: 'members', label: 'Members', permission: 'view_members' },
+              { id: 'kyc', label: 'KYC', permission: 'approve_kyc' },
+              { id: 'disputes', label: 'Disputes', permission: 'manage_disputes' },
+              { id: 'finance', label: 'Finance', permission: 'view_financial_records' },
+              { id: 'admin', label: 'Admin', permission: 'manage_admin_users' },
             ].map(
               (tab) =>
                 (tab.permission === null || hasPermission(tab.permission)) && (
@@ -221,21 +219,20 @@ export default function AdminDashboard() {
 function OverviewTab({ members, kycDocs, disputes, records }: any) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-      <StatCard icon="👥" label="Total Members" value={members.length.toString()} />
-      <StatCard icon="⏳" label="Pending KYC" value={kycDocs.filter((d: any) => d.status === 'pending').length.toString()} />
-      <StatCard icon="🔴" label="Open Disputes" value={disputes.filter((d: any) => d.status === 'open').length.toString()} />
-      <StatCard icon="💵" label="Total Transactions" value={records.length.toString()} />
+      <StatCard label="Total Members" value={members.length.toString()} />
+      <StatCard label="Pending KYC" value={kycDocs.filter((d: any) => d.status === 'pending').length.toString()} />
+      <StatCard label="Open Disputes" value={disputes.filter((d: any) => d.status === 'open').length.toString()} />
+      <StatCard label="Total Transactions" value={records.length.toString()} />
     </div>
   );
 }
 
-function StatCard({ icon, label, value }: any) {
+function StatCard({ label, value }: any) {
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
       className="bg-white rounded-lg p-4 border-2 border-[#d4af37] shadow-md hover:shadow-lg transition-all"
     >
-      <div className="text-3xl mb-2">{icon}</div>
       <p className="text-sm text-gray-600">{label}</p>
       <p className="text-2xl font-black text-[#0d7e4d]">{value}</p>
     </motion.div>
@@ -335,14 +332,14 @@ function KYCTab({ documents }: any) {
               whileTap={{ scale: 0.95 }}
               className="flex-1 px-4 py-2 bg-green-500 text-white font-bold rounded-lg hover:shadow-md transition-all"
             >
-              ✅ Approve
+               Approve
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="flex-1 px-4 py-2 bg-red-500 text-white font-bold rounded-lg hover:shadow-md transition-all"
             >
-              ❌ Reject
+               Reject
             </motion.button>
           </div>
         </motion.div>
@@ -386,7 +383,7 @@ function DisputesTab({ disputes }: any) {
               whileTap={{ scale: 0.95 }}
               className="flex-1 px-4 py-2 bg-blue-500 text-white font-bold rounded-lg hover:shadow-md transition-all"
             >
-              🔍 Investigate
+               Investigate
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -472,12 +469,11 @@ function AdminUsersTab({ admin }: any) {
         whileTap={{ scale: 0.95 }}
         className="px-6 py-3 bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all mb-6"
       >
-        ➕ Add New Admin
+        Add New Admin
       </motion.button>
 
       <div className="bg-[#f5f3f0] border-2 border-[#d4af37] rounded-lg p-4">
         <div className="flex items-center gap-4">
-          <div className="text-3xl">👤</div>
           <div>
             <p className="font-black text-[#0d7e4d]">{admin.fullName}</p>
             <p className="text-sm text-gray-600">{admin.email}</p>

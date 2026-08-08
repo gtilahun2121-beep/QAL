@@ -226,7 +226,7 @@ export default function SimpleRegistrationForm({
               fayda.verified ? 'bg-green-100 text-green-800 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'
             }`}
           >
-            {fayda.verifying ? '⏳ Verifying...' : fayda.verified ? '✓ Verified' : 'Verify with Fayda'}
+            {fayda.verifying ? ' Verifying...' : fayda.verified ? '✓ Verified' : 'Verify with Fayda'}
           </button>
 
           <div className="flex gap-3">
@@ -268,12 +268,12 @@ export default function SimpleRegistrationForm({
           {errors.submit && <p className="text-red-500 text-sm text-center">{errors.submit}</p>}
 
           <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
-            <h4 className="font-bold text-green-900 text-sm mb-3">🔒 Security</h4>
+            <h4 className="font-bold text-green-900 text-sm mb-3">Security</h4>
             <div className="space-y-2 text-sm text-green-700">
-              <div className="flex items-center gap-2"><span>🔒</span><span>End-to-end encryption</span></div>
-              <div className="flex items-center gap-2"><span>✅</span><span>Fayda verified</span></div>
-              <div className="flex items-center gap-2"><span>📱</span><span>OTP verified</span></div>
-              <div className="flex items-center gap-2"><span>🛡️</span><span>Data protected</span></div>
+              <div className="flex items-center gap-2"><span className="font-black">✓</span><span>End-to-end encryption</span></div>
+              <div className="flex items-center gap-2"><span className="font-black">✓</span><span>Fayda verified</span></div>
+              <div className="flex items-center gap-2"><span className="font-black">✓</span><span>OTP verified</span></div>
+              <div className="flex items-center gap-2"><span className="font-black">✓</span><span>Data protected</span></div>
             </div>
           </div>
 
@@ -289,7 +289,7 @@ export default function SimpleRegistrationForm({
               disabled={submitting}
               className="flex-1 bg-[#0d7e4d] text-white font-bold py-3 rounded-lg hover:bg-[#0a5c38] disabled:opacity-50"
             >
-              {submitting ? '⏳ Creating...' : '🎉 Create Account'}
+              {submitting ? ' Creating...' : ' Create Account'}
             </button>
           </div>
         </div>

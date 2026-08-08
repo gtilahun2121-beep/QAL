@@ -66,7 +66,7 @@ export default function GuestOverviewRefactored({ lang = 'en', onJoinClick, onSi
         variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
         className="bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] rounded-2xl p-6 text-white"
       >
-        <h2 className="text-2xl font-black mb-3">👋 Welcome to QalNet!</h2>
+        <h2 className="text-2xl font-black mb-3"> Welcome to QalNet!</h2>
         <p className="text-sm leading-relaxed">
           Discover profession-based Equb groups designed for your income level. Save together, grow together.
         </p>
@@ -87,7 +87,7 @@ export default function GuestOverviewRefactored({ lang = 'en', onJoinClick, onSi
         className="space-y-3"
       >
         <h3 className="font-black text-[#0d7e4d] text-lg">
-          🏢 Available Equb Groups ({displayedEqubs.length})
+           Available Equb Groups ({displayedEqubs.length})
         </h3>
         <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto">
           {displayedEqubs.map((equb) => (
@@ -114,7 +114,7 @@ export default function GuestOverviewRefactored({ lang = 'en', onJoinClick, onSi
           onClick={onJoinClick}
           className="w-full py-3 bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300"
         >
-          🚀 Start Your Equb Journey
+           Start Your Equb Journey
         </motion.button>
       </motion.div>
 

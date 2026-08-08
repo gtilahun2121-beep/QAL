@@ -7,7 +7,6 @@ interface Step {
   number: number;
   title: string;
   description: string;
-  icon: string;
 }
 
 interface HowItWorksProps {
@@ -71,7 +70,7 @@ export default function HowItWorks({ title, steps }: HowItWorksProps) {
           viewport={{ once: true }}
         >
           <h2 className="text-4xl md:text-5xl font-black text-[#ce1126] mb-4">
-            🔄 {title}
+            {title}
           </h2>
           <p className="text-xl text-[#5a5a5a]">
             Simple steps to start saving together
@@ -103,13 +102,8 @@ export default function HowItWorks({ title, steps }: HowItWorksProps) {
                     initial="hidden"
                     animate={isInView ? 'visible' : 'hidden'}
                   >
-                    <div className="text-4xl">{step.icon}</div>
+                    <div className="text-2xl font-black text-white">{step.number}</div>
                   </motion.div>
-
-                  {/* Number Badge */}
-                  <div className="absolute -top-4 -right-4 w-10 h-10 bg-[#d4af37] rounded-full flex items-center justify-center font-black text-[#0d7e4d] shadow-lg">
-                    {step.number}
-                  </div>
 
                   {/* Content */}
                   <h3 className="text-xl font-black text-[#0d7e4d] mb-2">
@@ -158,15 +152,12 @@ export default function HowItWorks({ title, steps }: HowItWorksProps) {
                       initial="hidden"
                       animate={isInView ? 'visible' : 'hidden'}
                     >
-                      <div className="text-3xl">{step.icon}</div>
+                      <div className="text-2xl font-black text-white">{step.number}</div>
                     </motion.div>
 
                     {/* Content */}
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="inline-block w-8 h-8 bg-[#d4af37] rounded-full text-center leading-8 font-black text-[#0d7e4d]">
-                          {step.number}
-                        </span>
                         <h3 className="text-lg font-black text-[#0d7e4d]">
                           {step.title}
                         </h3>

@@ -29,7 +29,7 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 bg-gradient-to-br from-[#d4af37] to-[#ce1126] rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-              <span className="text-[#0d7e4d] font-black text-lg">🇪🇹</span>
+              <span className="text-[#0d7e4d] font-black text-lg">Q</span>
             </div>
             <div>
               <span className="font-black text-2xl text-white drop-shadow-lg">QalNet</span>
@@ -71,7 +71,7 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
                 onClick={onSignUpClick}
                 className="hidden sm:inline-block px-6 py-2 bg-white text-[#0d7e4d] font-bold rounded-full hover:shadow-lg transition-all text-sm"
               >
-                ✍️ Sign Up
+                 Sign Up
               </button>
             )}
 
@@ -108,7 +108,7 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
                 }}
                 className="w-full px-4 py-3 bg-white text-[#0d7e4d] font-bold rounded-lg"
               >
-                ✍️ Sign Up
+                 Sign Up
               </button>
             )}
           </div>

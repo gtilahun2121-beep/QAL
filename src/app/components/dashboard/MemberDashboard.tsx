@@ -24,7 +24,6 @@ export default function MemberDashboard({
       nextPayoutDate: '2026-08-15',
       position: 7,
       status: 'active',
-      icon: '👨‍🏫',
     },
     {
       id: 'equb_2',
@@ -34,7 +33,6 @@ export default function MemberDashboard({
       nextPayoutDate: '2026-09-10',
       position: 3,
       status: 'active',
-      icon: '💻',
     },
     {
       id: 'equb_3',
@@ -44,7 +42,6 @@ export default function MemberDashboard({
       nextPayoutDate: '2026-10-20',
       position: 5,
       status: 'pending_contribution',
-      icon: '🛍️',
     },
   ]);
 
@@ -54,14 +51,12 @@ export default function MemberDashboard({
       equbName: 'Tech Freelancers Collective',
       amount: 16000,
       date: '2026-06-10',
-      icon: '✓',
     },
     {
       id: 'payout_2',
       equbName: 'Teachers Savings Group',
       amount: 6000,
       date: '2026-05-15',
-      icon: '✓',
     },
   ]);
 
@@ -89,7 +84,7 @@ export default function MemberDashboard({
       <motion.div variants={itemVariants} className="bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] rounded-2xl p-6 text-white">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h2 className="text-2xl font-black mb-2">💼 Welcome Back!</h2>
+            <h2 className="text-2xl font-black mb-2">Welcome Back!</h2>
             <p className="text-sm opacity-90">Phone: {phoneNumber}</p>
           </div>
           <motion.button
@@ -98,7 +93,7 @@ export default function MemberDashboard({
             onClick={onSignOut}
             className="px-4 py-2 bg-white/20 backdrop-blur text-white font-bold rounded-full hover:bg-white/30 transition-all text-sm"
           >
-            🚪 Sign Out
+            Sign Out
           </motion.button>
         </div>
       </motion.div>
@@ -121,14 +116,14 @@ export default function MemberDashboard({
             onClick={onPaymentClick}
             className="flex-1 px-4 py-3 bg-[#d4af37] text-[#0d7e4d] font-black rounded-full hover:shadow-lg transition-all"
           >
-            💳 Make Payment
+            Make Payment
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="flex-1 px-4 py-3 bg-white/20 backdrop-blur text-white font-bold rounded-full hover:bg-white/30 transition-all"
           >
-            📊 Withdraw
+            Withdraw
           </motion.button>
         </div>
       </motion.div>
@@ -136,7 +131,7 @@ export default function MemberDashboard({
       {/* Active Equbs Section */}
       <motion.div variants={itemVariants}>
         <h3 className="font-black text-[#0d7e4d] text-lg mb-4 flex items-center gap-2">
-          👥 Active Equbs ({activeEqubs.length})
+          Active Equbs ({activeEqubs.length})
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {activeEqubs.map((equb, idx) => (
@@ -148,7 +143,6 @@ export default function MemberDashboard({
               className="bg-white border-2 border-[#d4af37] rounded-2xl p-4 hover:shadow-lg transition-all"
             >
               <div className="flex items-start justify-between mb-3">
-                <div className="text-3xl">{equb.icon}</div>
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-bold ${
                     equb.status === 'active'
@@ -156,7 +150,7 @@ export default function MemberDashboard({
                       : 'bg-yellow-100 text-yellow-700'
                   }`}
                 >
-                  {equb.status === 'active' ? '✓ Active' : '⏳ Pending'}
+                  {equb.status === 'active' ? 'Active' : 'Pending'}
                 </span>
               </div>
 
@@ -194,7 +188,7 @@ export default function MemberDashboard({
                 whileTap={{ scale: 0.98 }}
                 className="w-full py-2 bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white font-bold rounded-lg text-sm hover:shadow-md transition-all"
               >
-                📋 View Details
+                View Details
               </motion.button>
             </motion.div>
           ))}
@@ -203,7 +197,7 @@ export default function MemberDashboard({
 
       {/* Quick Stats */}
       <motion.div variants={itemVariants}>
-        <h3 className="font-black text-[#0d7e4d] text-lg mb-4">📊 Quick Stats</h3>
+        <h3 className="font-black text-[#0d7e4d] text-lg mb-4">Quick Stats</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-4 border-2 border-blue-200">
             <p className="text-xs text-blue-600 font-bold mb-2">Total Active</p>
@@ -228,7 +222,7 @@ export default function MemberDashboard({
       {/* Past Payouts */}
       {pastPayouts.length > 0 && (
         <motion.div variants={itemVariants}>
-          <h3 className="font-black text-[#0d7e4d] text-lg mb-4">✓ Past Payouts</h3>
+          <h3 className="font-black text-[#0d7e4d] text-lg mb-4">Past Payouts</h3>
           <div className="space-y-2">
             {pastPayouts.map((payout) => (
               <motion.div
@@ -263,8 +257,7 @@ export default function MemberDashboard({
           variants={itemVariants}
           className="text-center py-12 bg-gray-50 rounded-2xl"
         >
-          <p className="text-4xl mb-3">🌟</p>
-          <h3 className="font-black text-[#0d7e4d] mb-2">No Active Equbs Yet</h3>
+          <p className="font-black text-[#0d7e4d] mb-2">No Active Equbs Yet</p>
           <p className="text-sm text-gray-600 mb-4">
             Join your first Equb group to start saving with your community
           </p>

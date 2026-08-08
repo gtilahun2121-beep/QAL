@@ -23,7 +23,7 @@ export default function EqubSelectionStep({ onSelect, selected }: EqubSelectionS
       <div className="space-y-4">
         <div>
           <h3 className="text-2xl font-black text-[#0d7e4d] mb-2 text-center">
-            🏢 Choose Your Equb Group
+             Choose Your Equb Group
           </h3>
           <p className="text-center text-sm text-gray-600 mb-4">
             Select the profession-based Equb that matches your income level
@@ -55,7 +55,6 @@ export default function EqubSelectionStep({ onSelect, selected }: EqubSelectionS
               }`}
             >
               <div className="flex items-start gap-3">
-                <span className="text-3xl">{equb.icon}</span>
                 <div className="flex-1">
                   <h4 className="font-black text-[#0d7e4d] text-sm">{equb.name}</h4>
                   <p className="text-xs text-gray-600 mb-2">{equb.description}</p>

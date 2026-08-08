@@ -90,7 +90,7 @@ export default function EqubRotation({
           viewport={{ once: true }}
         >
           <h2 className="text-4xl md:text-5xl font-black text-white mb-4 drop-shadow-lg">
-            💰 {title}
+             {title}
           </h2>
           <p className="text-xl text-white/90 drop-shadow-md">{description}</p>
         </motion.div>
@@ -206,7 +206,7 @@ export default function EqubRotation({
                     animate={isInView ? 'visible' : 'hidden'}
                     whileHover={{ scale: 1.1 }}
                   >
-                    👤
+                    
                   </motion.div>
 
                   {/* Member index badge */}
@@ -228,12 +228,12 @@ export default function EqubRotation({
                 ease: 'linear',
               }}
             >
-              <div className="text-5xl drop-shadow-lg">💰</div>
+              <div className="text-5xl drop-shadow-lg">Q</div>
             </motion.div>
 
             {/* Center circle */}
             <div className="absolute w-20 h-20 rounded-full bg-gradient-to-br from-[#d4af37] to-[#0d7e4d] flex items-center justify-center shadow-2xl border-4 border-white">
-              <div className="text-3xl">🏦</div>
+              <div className="text-3xl font-black text-white">Q</div>
             </div>
           </motion.div>
         </motion.div>
@@ -247,16 +247,15 @@ export default function EqubRotation({
           viewport={{ once: true }}
         >
           {[
-            { icon: '✅', title: 'Fair & Transparent', desc: 'Everyone gets their turn' },
-            { icon: '🤝', title: 'Community Trust', desc: 'Rotating savings together' },
-            { icon: '⚡', title: 'Quick Payout', desc: 'Instant when your turn comes' },
+            { title: 'Fair & Transparent', desc: 'Everyone gets their turn' },
+            { title: 'Community Trust', desc: 'Rotating savings together' },
+            { title: 'Quick Payout', desc: 'Instant when your turn comes' },
           ].map((benefit, idx) => (
             <motion.div
               key={idx}
               className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center text-white"
               whileHover={{ scale: 1.05, y: -4 }}
             >
-              <div className="text-4xl mb-3">{benefit.icon}</div>
               <h4 className="font-black text-lg mb-2">{benefit.title}</h4>
               <p className="text-white/80">{benefit.desc}</p>
             </motion.div>

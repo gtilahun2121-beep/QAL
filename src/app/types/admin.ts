@@ -77,26 +77,22 @@ export const rolePermissions: Record<AdminRole, Permission[]> = {
 };
 
 // Role Display Names and Colors
-export const roleDisplay: Record<AdminRole, { name: string; color: string; icon: string }> = {
+export const roleDisplay: Record<AdminRole, { name: string; color: string }> = {
   super_admin: {
     name: 'Super Admin',
     color: 'from-[#ce1126] to-[#0d7e4d]',
-    icon: '👑',
   },
   kyc_approver: {
     name: 'KYC Approver',
     color: 'from-[#0d7e4d] to-[#d4af37]',
-    icon: '✅',
   },
   dispute_manager: {
     name: 'Dispute Manager',
     color: 'from-yellow-500 to-orange-500',
-    icon: '⚖️',
   },
   finance_auditor: {
     name: 'Finance Auditor',
     color: 'from-blue-500 to-blue-600',
-    icon: '💰',
   },
 };
 

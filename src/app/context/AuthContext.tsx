@@ -121,15 +121,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       // Extract user data from response
-      const userData: User = response.user || {
+      const userData: User = {
+        ...(response.user as Partial<User>),
         id: response.user?.id || `user_${Date.now()}`,
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
         phoneNumber: data.phoneNumber,
         profession: data.profession || 'Not specified',
-        role: response.user?.role || 'member',
-        createdAt: new Date().toISOString(),
+        role: (response.user?.role as UserRole) || 'member',
+        createdAt: response.user?.createdAt || new Date().toISOString(),
       };
 
       setUser(userData);

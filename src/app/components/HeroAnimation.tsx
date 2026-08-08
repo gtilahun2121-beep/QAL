@@ -111,7 +111,7 @@ export default function HeroAnimation({
             animate={{ rotate: [0, 10, -10, 0] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
-            <div className="text-7xl drop-shadow-lg">🇪🇹</div>
+            <div className="text-7xl drop-shadow-lg">Q</div>
           </motion.div>
 
           {/* Main Headline */}
@@ -167,7 +167,7 @@ export default function HeroAnimation({
                 href="/architecture"
                 className="inline-block px-8 py-4 bg-[#d4af37] text-[#0d7e4d] font-bold rounded-full border-2 border-white hover:shadow-2xl transition-all duration-300 text-lg"
               >
-                {ctaSecondary} 🏗️
+                {ctaSecondary} 
               </Link>
             </motion.div>
           </motion.div>

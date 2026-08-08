@@ -4,7 +4,6 @@ export type EqubCategory = {
   name: string;
   profession: string;
   description: string;
-  icon: string;
   incomeLevel: 'low' | 'medium' | 'high';
   monthlyPayment: number; // ETB
   expectedReturn: number; // ETB
@@ -16,7 +15,6 @@ export type EqubCategory = {
   };
   paymentMethods: {
     name: string;
-    icon: string;
     description: string;
   }[];
 };
@@ -27,7 +25,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Diaspora & Overseas Community Equb',
     profession: 'Diaspora Workers',
     description: 'For Ethiopians living and working abroad',
-    icon: '✈️',
     incomeLevel: 'high',
     monthlyPayment: 5000,
     expectedReturn: 60000,
@@ -35,10 +32,10 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 12, description: 'Annual cycle (12 months)' },
     paymentMethods: [
-      { name: 'CBE Bank Transfer', icon: '🏦', description: 'Direct bank transfer via CBE' },
-      { name: 'International Wire', icon: '🌐', description: 'Wire transfer from abroad' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
-      { name: 'Cash Payment', icon: '💵', description: 'Direct cash payment' },
+      { name: 'CBE Bank Transfer', description: 'Direct bank transfer via CBE' },
+      { name: 'International Wire', description: 'Wire transfer from abroad' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
+      { name: 'Cash Payment', description: 'Direct cash payment' },
     ],
   },
   {
@@ -46,7 +43,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Teachers & Academic Staff Equb',
     profession: 'Education Sector',
     description: 'For teachers, professors, and academic staff',
-    icon: '📚',
     incomeLevel: 'medium',
     monthlyPayment: 1500,
     expectedReturn: 18000,
@@ -54,9 +50,9 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 12, description: 'Annual cycle (12 months)' },
     paymentMethods: [
-      { name: 'CBE Bank Transfer', icon: '🏦', description: 'Direct bank transfer via CBE' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
-      { name: 'Cash Payment', icon: '💵', description: 'Direct cash payment' },
+      { name: 'CBE Bank Transfer', description: 'Direct bank transfer via CBE' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
+      { name: 'Cash Payment', description: 'Direct cash payment' },
     ],
   },
   {
@@ -64,7 +60,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Taxi & Minibus Drivers Equb',
     profession: 'Transportation',
     description: 'For taxi and minibus drivers',
-    icon: '🚕',
     incomeLevel: 'medium',
     monthlyPayment: 1200,
     expectedReturn: 14400,
@@ -72,9 +67,9 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 12, description: 'Annual cycle (12 months)' },
     paymentMethods: [
-      { name: 'CBE Bank Transfer', icon: '🏦', description: 'Bank transfer via CBE' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
-      { name: 'Cash Payment', icon: '💵', description: 'Direct cash payment' },
+      { name: 'CBE Bank Transfer', description: 'Bank transfer via CBE' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
+      { name: 'Cash Payment', description: 'Direct cash payment' },
     ],
   },
   {
@@ -82,7 +77,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Civil Servants & Government Workers Equb',
     profession: 'Government',
     description: 'For government employees and civil servants',
-    icon: '🏛️',
     incomeLevel: 'medium',
     monthlyPayment: 2000,
     expectedReturn: 24000,
@@ -90,9 +84,9 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 12, description: 'Annual cycle (12 months)' },
     paymentMethods: [
-      { name: 'CBE Bank Transfer', icon: '🏦', description: 'Direct bank transfer via CBE' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
-      { name: 'Cash Payment', icon: '💵', description: 'Direct cash payment' },
+      { name: 'CBE Bank Transfer', description: 'Direct bank transfer via CBE' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
+      { name: 'Cash Payment', description: 'Direct cash payment' },
     ],
   },
   {
@@ -100,7 +94,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Bajaj & Motorcycle Riders Equb',
     profession: 'Transportation',
     description: 'For bajaj and motorcycle taxi riders',
-    icon: '🏍️',
     incomeLevel: 'low',
     monthlyPayment: 800,
     expectedReturn: 9600,
@@ -108,9 +101,9 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 10, description: 'Extended cycle (10 months)' },
     paymentMethods: [
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
-      { name: 'Cash Payment', icon: '💵', description: 'Direct cash payment' },
-      { name: 'CBE Bank Transfer', icon: '🏦', description: 'Bank transfer if available' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
+      { name: 'Cash Payment', description: 'Direct cash payment' },
+      { name: 'CBE Bank Transfer', description: 'Bank transfer if available' },
     ],
   },
   {
@@ -118,7 +111,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Market Vendors & Retailers Equb',
     profession: 'Retail & Commerce',
     description: 'For market vendors and small retailers',
-    icon: '🛒',
     incomeLevel: 'low',
     monthlyPayment: 1000,
     expectedReturn: 12000,
@@ -126,9 +118,9 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 12, description: 'Annual cycle (12 months)' },
     paymentMethods: [
-      { name: 'Cash Payment', icon: '💵', description: 'Direct cash payment' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
-      { name: 'CBE Bank Transfer', icon: '🏦', description: 'Bank transfer if available' },
+      { name: 'Cash Payment', description: 'Direct cash payment' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
+      { name: 'CBE Bank Transfer', description: 'Bank transfer if available' },
     ],
   },
   {
@@ -136,7 +128,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Healthcare Professionals Equb',
     profession: 'Healthcare',
     description: 'For doctors, nurses, and healthcare workers',
-    icon: '⚕️',
     incomeLevel: 'high',
     monthlyPayment: 3000,
     expectedReturn: 36000,
@@ -144,9 +135,9 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 12, description: 'Annual cycle (12 months)' },
     paymentMethods: [
-      { name: 'CBE Bank Transfer', icon: '🏦', description: 'Direct bank transfer via CBE' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
-      { name: 'Cash Payment', icon: '💵', description: 'Direct cash payment' },
+      { name: 'CBE Bank Transfer', description: 'Direct bank transfer via CBE' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
+      { name: 'Cash Payment', description: 'Direct cash payment' },
     ],
   },
   {
@@ -154,7 +145,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Bankers & Financial Sector Staff Equb',
     profession: 'Finance',
     description: 'For bank employees and financial professionals',
-    icon: '🏦',
     incomeLevel: 'high',
     monthlyPayment: 3500,
     expectedReturn: 42000,
@@ -162,9 +152,9 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 12, description: 'Annual cycle (12 months)' },
     paymentMethods: [
-      { name: 'CBE Bank Transfer', icon: '🏦', description: 'Direct bank transfer via CBE' },
-      { name: 'Internal Bank Transfer', icon: '💳', description: 'Internal bank transfers' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
+      { name: 'CBE Bank Transfer', description: 'Direct bank transfer via CBE' },
+      { name: 'Internal Bank Transfer', description: 'Internal bank transfers' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
     ],
   },
   {
@@ -172,7 +162,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Wholesale Merchants & Importers Equb',
     profession: 'Business & Trade',
     description: 'For wholesale traders and importers',
-    icon: '📦',
     incomeLevel: 'high',
     monthlyPayment: 4000,
     expectedReturn: 48000,
@@ -180,9 +169,9 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 12, description: 'Annual cycle (12 months)' },
     paymentMethods: [
-      { name: 'CBE Bank Transfer', icon: '🏦', description: 'Direct bank transfer via CBE' },
-      { name: 'Other Banks', icon: '🏦', description: 'Transfer via other Ethiopian banks' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
+      { name: 'CBE Bank Transfer', description: 'Direct bank transfer via CBE' },
+      { name: 'Other Banks', description: 'Transfer via other Ethiopian banks' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
     ],
   },
   {
@@ -190,7 +179,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Tailors & Garment Creators Equb',
     profession: 'Fashion & Textiles',
     description: 'For tailors and garment producers',
-    icon: '👗',
     incomeLevel: 'low',
     monthlyPayment: 900,
     expectedReturn: 10800,
@@ -198,9 +186,9 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 12, description: 'Annual cycle (12 months)' },
     paymentMethods: [
-      { name: 'Cash Payment', icon: '💵', description: 'Direct cash payment' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
-      { name: 'CBE Bank Transfer', icon: '🏦', description: 'Bank transfer if available' },
+      { name: 'Cash Payment', description: 'Direct cash payment' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
+      { name: 'CBE Bank Transfer', description: 'Bank transfer if available' },
     ],
   },
   {
@@ -208,7 +196,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Mechanics & Garage Owners Equb',
     profession: 'Automotive',
     description: 'For mechanics and garage owners',
-    icon: '🔧',
     incomeLevel: 'medium',
     monthlyPayment: 1800,
     expectedReturn: 21600,
@@ -216,9 +203,9 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 12, description: 'Annual cycle (12 months)' },
     paymentMethods: [
-      { name: 'CBE Bank Transfer', icon: '🏦', description: 'Bank transfer via CBE' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
-      { name: 'Cash Payment', icon: '💵', description: 'Direct cash payment' },
+      { name: 'CBE Bank Transfer', description: 'Bank transfer via CBE' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
+      { name: 'Cash Payment', description: 'Direct cash payment' },
     ],
   },
   {
@@ -226,7 +213,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Barbers & Beauty Salon Operators Equb',
     profession: 'Beauty & Personal Care',
     description: 'For barbers and beauty salon owners',
-    icon: '💇',
     incomeLevel: 'low',
     monthlyPayment: 850,
     expectedReturn: 10200,
@@ -234,8 +220,8 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 10, description: 'Extended cycle (10 months)' },
     paymentMethods: [
-      { name: 'Cash Payment', icon: '💵', description: 'Direct cash payment' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
+      { name: 'Cash Payment', description: 'Direct cash payment' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
     ],
   },
   {
@@ -243,7 +229,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Construction Workers & Carpenters Equb',
     profession: 'Construction',
     description: 'For construction workers and carpenters',
-    icon: '🏗️',
     incomeLevel: 'medium',
     monthlyPayment: 1400,
     expectedReturn: 16800,
@@ -251,9 +236,9 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 12, description: 'Annual cycle (12 months)' },
     paymentMethods: [
-      { name: 'Cash Payment', icon: '💵', description: 'Direct cash payment' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
-      { name: 'CBE Bank Transfer', icon: '🏦', description: 'Bank transfer if available' },
+      { name: 'Cash Payment', description: 'Direct cash payment' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
+      { name: 'CBE Bank Transfer', description: 'Bank transfer if available' },
     ],
   },
   {
@@ -261,7 +246,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Freight & Truck Drivers Equb',
     profession: 'Transportation & Logistics',
     description: 'For truck and freight drivers',
-    icon: '🚚',
     incomeLevel: 'medium',
     monthlyPayment: 1600,
     expectedReturn: 19200,
@@ -269,9 +253,9 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 12, description: 'Annual cycle (12 months)' },
     paymentMethods: [
-      { name: 'CBE Bank Transfer', icon: '🏦', description: 'Bank transfer via CBE' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
-      { name: 'Cash Payment', icon: '💵', description: 'Direct cash payment' },
+      { name: 'CBE Bank Transfer', description: 'Bank transfer via CBE' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
+      { name: 'Cash Payment', description: 'Direct cash payment' },
     ],
   },
   {
@@ -279,7 +263,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'NGO & Corporate Employees Equb',
     profession: 'Corporate & Non-Profit',
     description: 'For NGO and corporate sector employees',
-    icon: '💼',
     incomeLevel: 'high',
     monthlyPayment: 2500,
     expectedReturn: 30000,
@@ -287,9 +270,9 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 12, description: 'Annual cycle (12 months)' },
     paymentMethods: [
-      { name: 'CBE Bank Transfer', icon: '🏦', description: 'Direct bank transfer via CBE' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
-      { name: 'Cash Payment', icon: '💵', description: 'Direct cash payment' },
+      { name: 'CBE Bank Transfer', description: 'Direct bank transfer via CBE' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
+      { name: 'Cash Payment', description: 'Direct cash payment' },
     ],
   },
   {
@@ -297,7 +280,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Farmers & Agricultural Suppliers Equb',
     profession: 'Agriculture',
     description: 'For farmers and agricultural suppliers',
-    icon: '🌾',
     incomeLevel: 'low',
     monthlyPayment: 700,
     expectedReturn: 8400,
@@ -305,8 +287,8 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Seasonal',
     paymentCycle: { duration: 8, description: 'Seasonal cycle (8 months)' },
     paymentMethods: [
-      { name: 'Cash Payment', icon: '💵', description: 'Direct cash payment' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
+      { name: 'Cash Payment', description: 'Direct cash payment' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
     ],
   },
   {
@@ -314,7 +296,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Real Estate & Contractors Equb',
     profession: 'Real Estate & Development',
     description: 'For real estate agents and construction contractors',
-    icon: '🏢',
     incomeLevel: 'high',
     monthlyPayment: 4500,
     expectedReturn: 54000,
@@ -322,9 +303,9 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 12, description: 'Annual cycle (12 months)' },
     paymentMethods: [
-      { name: 'CBE Bank Transfer', icon: '🏦', description: 'Direct bank transfer via CBE' },
-      { name: 'Other Banks', icon: '🏦', description: 'Transfer via other Ethiopian banks' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
+      { name: 'CBE Bank Transfer', description: 'Direct bank transfer via CBE' },
+      { name: 'Other Banks', description: 'Transfer via other Ethiopian banks' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
     ],
   },
   {
@@ -332,7 +313,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Tech & Digital Freelancers Equb',
     profession: 'Technology & Digital',
     description: 'For tech professionals and digital freelancers',
-    icon: '💻',
     incomeLevel: 'high',
     monthlyPayment: 3200,
     expectedReturn: 38400,
@@ -340,9 +320,9 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 12, description: 'Annual cycle (12 months)' },
     paymentMethods: [
-      { name: 'CBE Bank Transfer', icon: '🏦', description: 'Direct bank transfer via CBE' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
-      { name: 'International Wire', icon: '🌐', description: 'Wire transfer capability' },
+      { name: 'CBE Bank Transfer', description: 'Direct bank transfer via CBE' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
+      { name: 'International Wire', description: 'Wire transfer capability' },
     ],
   },
   {
@@ -350,7 +330,6 @@ export const equbCategories: EqubCategory[] = [
     name: 'Cafe, Bar & Restaurant Staff Equb',
     profession: 'Hospitality & Food Service',
     description: 'For cafe, bar, and restaurant workers and owners',
-    icon: '☕',
     incomeLevel: 'low',
     monthlyPayment: 1100,
     expectedReturn: 13200,
@@ -358,9 +337,9 @@ export const equbCategories: EqubCategory[] = [
     payoutFrequency: 'Monthly',
     paymentCycle: { duration: 12, description: 'Annual cycle (12 months)' },
     paymentMethods: [
-      { name: 'Cash Payment', icon: '💵', description: 'Direct cash payment' },
-      { name: 'Mobile Money', icon: '📱', description: 'Telebirr or Zagel payment' },
-      { name: 'CBE Bank Transfer', icon: '🏦', description: 'Bank transfer if available' },
+      { name: 'Cash Payment', description: 'Direct cash payment' },
+      { name: 'Mobile Money', description: 'Telebirr or Zagel payment' },
+      { name: 'CBE Bank Transfer', description: 'Bank transfer if available' },
     ],
   },
 ];

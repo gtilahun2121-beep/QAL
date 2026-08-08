@@ -113,7 +113,7 @@ export default function ForgotPinFormRefactored({
       setUserData(user);
 
       onSuccess?.(
-        '✅ PIN Reset',
+        ' PIN Reset',
         'Your access code has been reset successfully',
         4000
       );
@@ -163,7 +163,7 @@ export default function ForgotPinFormRefactored({
       {step === 'otp' && (
         <>
           <div className="mb-4 bg-blue-50 border-2 border-blue-200 rounded-lg p-3">
-            <p className="text-xs text-blue-700 font-bold">📱 Phone: {phoneNumber}</p>
+            <p className="text-xs text-blue-700 font-bold"> Phone: {phoneNumber}</p>
           </div>
           <OtpResetStep
             otp={otp}
@@ -181,7 +181,7 @@ export default function ForgotPinFormRefactored({
       {step === 'newpin' && (
         <>
           <div className="mb-4 bg-blue-50 border-2 border-blue-200 rounded-lg p-3 space-y-1">
-            <p className="text-xs text-blue-700 font-bold">📱 Phone: {phoneNumber}</p>
+            <p className="text-xs text-blue-700 font-bold"> Phone: {phoneNumber}</p>
             <p className="text-xs text-blue-700 font-bold">✓ OTP Verified</p>
           </div>
           <NewPinStep
@@ -202,9 +202,8 @@ export default function ForgotPinFormRefactored({
       {step === 'success' && userData && (
         <>
           <FormSuccess
-            title="✅ PIN Reset Successful!"
+            title=" PIN Reset Successful!"
             message="Your access code has been reset. You can now sign in with your new PIN."
-            icon="🔐"
           />
           <div className="mt-6 bg-green-50 border-2 border-green-200 rounded-lg p-4">
             <p className="text-sm font-bold text-green-900 mb-3">✓ What's Next:</p>
@@ -220,7 +219,7 @@ export default function ForgotPinFormRefactored({
             whileTap={{ scale: 0.95 }}
             className="w-full py-3 mt-6 bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300"
           >
-            🔐 Go to Sign In
+             Go to Sign In
           </motion.button>
         </>
       )}

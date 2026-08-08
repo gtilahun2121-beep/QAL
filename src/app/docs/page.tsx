@@ -20,10 +20,10 @@ function DocsContent() {
   };
 
   const docSections = [
-    { title: t.architecture, href: '/architecture', icon: '🏗️' },
-    { title: t.security, href: '/security', icon: '🔒' },
-    { title: t.accessibility, href: '/accessibility', icon: '♿' },
-    { title: t.roadmap, href: '/roadmap', icon: '🗺️' },
+    { title: t.architecture, href: '/architecture', },
+    { title: t.security, href: '/security', },
+    { title: t.accessibility, href: '/accessibility', },
+    { title: t.roadmap, href: '/roadmap', },
   ];
 
   return (
@@ -46,7 +46,6 @@ function DocsContent() {
                 href={`${section.href}?lang=${lang}`}
                 className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-8 border border-gray-200 hover:border-emerald-400 hover:shadow-lg transition-all"
               >
-                <div className="text-4xl mb-4">{section.icon}</div>
                 <h3 className="font-bold text-lg text-gray-900 hover:text-emerald-600 transition-colors">
                   {section.title}
                 </h3>

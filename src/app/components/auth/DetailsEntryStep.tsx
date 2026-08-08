@@ -52,7 +52,7 @@ export default function DetailsEntryStep({
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
       <div>
         <h3 className="text-2xl font-black text-[#0d7e4d] mb-2 text-center">
-          ✍️ Your Details
+           Your Details
         </h3>
         <p className="text-center text-sm text-gray-600 mb-4">
           Complete your account information
@@ -65,7 +65,6 @@ export default function DetailsEntryStep({
         placeholder="Aisha Mohammed"
         value={fullName}
         onChange={onFullNameChange}
-        icon="👤"
         hint="Your legal name"
         error={!nameValidation.valid && fullName ? nameValidation.error : undefined}
       />
@@ -77,7 +76,6 @@ export default function DetailsEntryStep({
         value={pin}
         onChange={(val) => onPinChange(val.replace(/\D/g, ''))}
         maxLength={4}
-        icon="🔐"
         hint="You'll use this to log in"
         error={!pinValidation.valid && pin ? pinValidation.error : undefined}
       />
@@ -89,7 +87,6 @@ export default function DetailsEntryStep({
         value={confirmPin}
         onChange={(val) => onConfirmPinChange(val.replace(/\D/g, ''))}
         maxLength={4}
-        icon="🔑"
         hint="Must match your PIN above"
         error={!confirmValidation.valid && confirmPin ? confirmValidation.error : undefined}
       />
@@ -100,7 +97,6 @@ export default function DetailsEntryStep({
         placeholder="123456789"
         value={faydaNumber}
         onChange={onFaydaChange}
-        icon="🎫"
         hint="Your unique member ID (6-12 digits)"
         error={!faydaValidation.valid && faydaNumber ? faydaValidation.error : undefined}
       />

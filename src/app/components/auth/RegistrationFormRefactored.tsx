@@ -140,7 +140,7 @@ export default function RegistrationFormRefactored({
       const user = await AuthService.registerUser(registrationData);
       setCompletedUser(user);
       onSuccess?.(
-        '✅ Account Created',
+        ' Account Created',
         `Welcome to QalNet, ${fullName}! Your account is ready.`,
         5000
       );
@@ -221,7 +221,7 @@ export default function RegistrationFormRefactored({
       {step === 'otp' && (
         <>
           <div className="mb-4 bg-[#d4af37]/20 border-2 border-[#d4af37] rounded-lg p-3">
-            <p className="text-xs text-[#0d7e4d] font-bold">📱 Phone: {phoneNumber}</p>
+            <p className="text-xs text-[#0d7e4d] font-bold"> Phone: {phoneNumber}</p>
           </div>
           <OtpVerificationStep
             otp={otp}
@@ -239,8 +239,8 @@ export default function RegistrationFormRefactored({
       {step === 'details' && (
         <>
           <div className="mb-4 bg-[#d4af37]/20 border-2 border-[#d4af37] rounded-lg p-3 space-y-1">
-            <p className="text-xs text-[#0d7e4d] font-bold">📱 Phone: {phoneNumber}</p>
-            <p className="text-xs text-[#0d7e4d] font-bold">🏢 Equb: {selectedEqub?.name}</p>
+            <p className="text-xs text-[#0d7e4d] font-bold"> Phone: {phoneNumber}</p>
+            <p className="text-xs text-[#0d7e4d] font-bold"> Equb: {selectedEqub?.name}</p>
           </div>
           <DetailsEntryStep
             fullName={fullName}
@@ -264,26 +264,25 @@ export default function RegistrationFormRefactored({
       {step === 'success' && completedUser && (
         <>
           <FormSuccess
-            title="✅ Registration Complete!"
+            title=" Registration Complete!"
             message="Your account has been created successfully"
-            icon="🎉"
           />
           <div className="mt-6 bg-[#d4af37]/20 border-2 border-[#d4af37] rounded-lg p-4 space-y-2 text-sm">
             <p className="font-bold text-[#0d7e4d] mb-3">Account Summary:</p>
             <p className="text-gray-700">
-              <span className="font-bold">👤 Name:</span> {completedUser.fullName}
+              <span className="font-bold"> Name:</span> {completedUser.fullName}
             </p>
             <p className="text-gray-700">
-              <span className="font-bold">📱 Phone:</span> {completedUser.phoneNumber}
+              <span className="font-bold"> Phone:</span> {completedUser.phoneNumber}
             </p>
             <p className="text-gray-700">
-              <span className="font-bold">🏢 Equb:</span> {selectedEqub?.name}
+              <span className="font-bold"> Equb:</span> {selectedEqub?.name}
             </p>
             <p className="text-gray-700">
-              <span className="font-bold">💵 Monthly:</span> ETB {selectedEqub?.monthlyPayment}
+              <span className="font-bold"> Monthly:</span> ETB {selectedEqub?.monthlyPayment}
             </p>
             <p className="text-gray-700">
-              <span className="font-bold">🎫 Fayda:</span> {completedUser.faydaNumber}
+              <span className="font-bold"> Fayda:</span> {completedUser.faydaNumber}
             </p>
           </div>
           <motion.button
@@ -292,7 +291,7 @@ export default function RegistrationFormRefactored({
             whileTap={{ scale: 0.95 }}
             className="w-full py-3 mt-6 bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all"
           >
-            🔐 Go to Sign In
+             Go to Sign In
           </motion.button>
         </>
       )}

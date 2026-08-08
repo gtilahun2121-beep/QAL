@@ -117,7 +117,6 @@ export default function RegisterChoiceModal({
               onClick={onSignUp}
               className="w-full bg-white text-[#0d7e4d] px-6 py-3 rounded-full font-bold text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-300"
             >
-              <span>✍️</span>
               <span>{lang === 'en' ? 'Create New Account' : lang === 'am' ? 'አዲስ መስተዋወቅ ፍጠር' : 'Akkaunt Haaraa Uumuu'}</span>
             </motion.button>
 
@@ -128,7 +127,6 @@ export default function RegisterChoiceModal({
               onClick={onSignIn}
               className="w-full bg-white text-blue-600 px-6 py-3 rounded-full font-bold text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-300"
             >
-              <span>🔐</span>
               <span>{lang === 'en' ? 'I Already Have an Account' : lang === 'am' ? 'ቀድሞ መስተዋወቅ አለብኝ' : 'Akkaunt Jira'}</span>
             </motion.button>
           </div>
@@ -144,19 +142,16 @@ export default function RegisterChoiceModal({
             </p>
             <div className="flex justify-center items-center gap-4 text-gray-600">
               <div className="text-center">
-                <div className="text-lg mb-1">🔒</div>
                 <p className="text-xs font-semibold">
                   {lang === 'en' ? 'Secure' : lang === 'am' ? 'ደህንነት' : 'Nageenya'}
                 </p>
               </div>
               <div className="text-center">
-                <div className="text-lg mb-1">✅</div>
                 <p className="text-xs font-semibold">
                   {lang === 'en' ? 'Verified' : lang === 'am' ? 'ታገዙ' : 'Himitamte'}
                 </p>
               </div>
               <div className="text-center">
-                <div className="text-lg mb-1">⚡</div>
                 <p className="text-xs font-semibold">
                   {lang === 'en' ? 'Instant' : lang === 'am' ? 'ወዲያውኑ' : 'Yeroo'}
                 </p>

@@ -43,7 +43,7 @@ export default function PricingComparison({
           viewport={{ once: true }}
         >
           <h2 className="text-4xl md:text-5xl font-black text-[#0d7e4d] mb-4">
-            ⚖️ {title}
+             {title}
           </h2>
           <p className="text-xl text-[#5a5a5a]">{subtitle}</p>
         </motion.div>
@@ -64,10 +64,10 @@ export default function PricingComparison({
                 Feature
               </div>
               <div className="bg-gray-100 p-6 font-black text-center text-[#5a5a5a] border-r-2 border-[#d4af37]">
-                Traditional Equb 📋
+                Traditional Equb 
               </div>
               <div className="bg-gradient-to-r from-[#d4af37] to-[#c99d2e] p-6 font-black text-center text-[#0d7e4d]">
-                QalNet ⭐
+                QalNet 
               </div>
 
               {/* Rows */}
@@ -116,11 +116,11 @@ export default function PricingComparison({
                 <h4 className="font-black text-lg text-[#0d7e4d] mb-4">{item.feature}</h4>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-xs font-bold text-[#5a5a5a] mb-1">Traditional Equb 📋</p>
+                    <p className="text-xs font-bold text-[#5a5a5a] mb-1">Traditional Equb </p>
                     <p className="text-gray-700">{item.traditional}</p>
                   </div>
                   <div className="pt-3 border-t border-[#d4af37]">
-                    <p className="text-xs font-bold text-[#d4af37] mb-1">QalNet ⭐</p>
+                    <p className="text-xs font-bold text-[#d4af37] mb-1">QalNet </p>
                     <p className="font-bold text-[#0d7e4d]">{item.qalnet}</p>
                   </div>
                 </div>
@@ -145,7 +145,7 @@ export default function PricingComparison({
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.95 }}
           >
-            Get Started Free 🚀
+            Get Started Free 
           </motion.button>
         </motion.div>
       </div>

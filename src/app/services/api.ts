@@ -95,7 +95,7 @@ export const authAPI = {
   /**
    * Sign up - Create new account
    */
-  signup: async (data: {
+  signup: (data: {
     firstName: string;
     lastName: string;
     email: string;
@@ -104,31 +104,15 @@ export const authAPI = {
     fayda?: string;
     profession?: string;
     guarantor?: string;
-  }) => {
-    console.log('📤 [Signup] Calling with:', data);
-    
-    // MOCK RESPONSE - Real backend endpoint will replace this
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    const mockResponse = {
-      accessToken: `mock_access_token_${Date.now()}`,
-      refreshToken: `mock_refresh_token_${Date.now()}`,
-      user: {
-        id: `user_${Date.now()}`,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phoneNumber: data.phoneNumber,
-        profession: data.profession || '',
-        role: 'member',
-        createdAt: new Date().toISOString(),
-      },
-    };
-    
-    console.log('✅ [Signup] Mock response:', mockResponse);
-    return mockResponse;
-  },
+  }) =>
+    request<{
+      accessToken: string;
+      refreshToken: string;
+      user: any;
+    }>('/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
 
   /**
    * Sign in - Login with phone and PIN

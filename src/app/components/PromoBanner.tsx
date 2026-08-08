@@ -49,7 +49,7 @@ export default function PromoBanner({
         animate={{ y: [0, 20, 0] }}
         transition={{ duration: 4, repeat: Infinity }}
       >
-        🇪🇹
+        
       </motion.div>
 
       <motion.div
@@ -57,7 +57,7 @@ export default function PromoBanner({
         animate={{ y: [0, -20, 0] }}
         transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
       >
-        💰
+        
       </motion.div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -129,7 +129,7 @@ export default function PromoBanner({
               transition={{ duration: 3, repeat: Infinity }}
             >
               <div className="text-center h-full flex flex-col items-center justify-center">
-                <div className="text-7xl mb-4">💳</div>
+                <div className="text-7xl mb-4 text-[#d4af37]">✓</div>
                 <p className="text-white font-black text-xl mb-2">100% Secure</p>
                 <p className="text-white/80 font-semibold">Bank-Level Encryption</p>
               </div>
@@ -137,9 +137,9 @@ export default function PromoBanner({
 
             {/* Floating badges */}
             {[
-              { emoji: '🏦', text: 'Verified', top: '5%', left: '10%' },
-              { emoji: '✅', text: '99% Uptime', top: '60%', right: '10%' },
-              { emoji: '🔒', text: 'Secure', bottom: '10%', left: '5%' },
+              { emoji: '', text: 'Verified', top: '5%', left: '10%' },
+              { emoji: '', text: '99% Uptime', top: '60%', right: '10%' },
+              { emoji: '', text: 'Secure', bottom: '10%', left: '5%' },
             ].map((badge, idx) => (
               <motion.div
                 key={idx}

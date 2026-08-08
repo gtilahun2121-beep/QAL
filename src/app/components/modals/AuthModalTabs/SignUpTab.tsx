@@ -29,6 +29,8 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
   const [fayda, setFayda] = useState({
     verified: false,
     loading: false,
+    showOtpVerification: false,
+    faydaOtp: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [successMessage, setSuccessMessage] = useState('');
@@ -247,7 +249,7 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
     setFayda({ ...fayda, loading: true });
     try {
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      setFayda({ verified: true, loading: false });
+      setFayda({ verified: true, loading: false, showOtpVerification: false, faydaOtp: '' });
       setErrors({});
     } catch (error) {
       setErrors({ ...errors, otp: 'OTP verification failed' });
@@ -274,19 +276,19 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
   };
 
   const handleSubmit = async () => {
-    console.log('📢 handleSubmit called');
+    console.log(' handleSubmit called');
     console.log('formData.pin:', formData.pin);
     
     if (!validateStep5()) {
-      console.log('❌ PIN validation failed');
+      console.log(' PIN validation failed');
       onError?.('Validation Error', 'Please enter a valid PIN');
       return;
     }
 
-    console.log('✅ PIN validation passed');
+    console.log(' PIN validation passed');
 
     try {
-      console.log('📤 Calling signup() with data:', {
+      console.log(' Calling signup() with data:', {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
@@ -305,13 +307,13 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
         guarantor: '',
       });
 
-      console.log('✅ Signup successful!');
+      console.log(' Signup successful!');
       setSuccessMessage('✓ Registration complete!');
-      console.log('📢 Calling onSuccess callback...');
-      onSuccess?.('🎉 Welcome to QalNet!', 'Your secure account is ready.', 3000);
+      console.log(' Calling onSuccess callback...');
+      onSuccess?.(' Welcome to QalNet!', 'Your secure account is ready.', 3000);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Registration failed';
-      console.error('❌ Signup error:', message);
+      console.error(' Signup error:', message);
       onError?.('Error', message);
     }
   };
@@ -387,7 +389,7 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
           className="space-y-5"
         >
           <FormInput
-            label={lang === 'en' ? '👤 First Name' : '👤 መጀመሪያ ስም'}
+            label={lang === 'en' ? ' First Name' : ' መጀመሪያ ስም'}
             type="text"
             value={formData.firstName}
             onChange={(value) => handleFieldChange('firstName', value)}
@@ -396,7 +398,7 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
           />
 
           <FormInput
-            label={lang === 'en' ? '👤 Last Name' : '👤 ስም'}
+            label={lang === 'en' ? ' Last Name' : ' ስም'}
             type="text"
             value={formData.lastName}
             onChange={(value) => handleFieldChange('lastName', value)}
@@ -422,7 +424,7 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
           className="space-y-5"
         >
           <FormInput
-            label={lang === 'en' ? '📱 Phone Number' : '📱 ስልክ ቁጥር'}
+            label={lang === 'en' ? ' Phone Number' : ' ስልክ ቁጥር'}
             type="text"
             value={formData.phoneNumber}
             onChange={(value) => handleFieldChange('phoneNumber', value)}
@@ -432,7 +434,7 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
           />
 
           <FormInput
-            label={lang === 'en' ? '📧 Email Address' : '📧 ኢሜል'}
+            label={lang === 'en' ? ' Email Address' : ' ኢሜል'}
             type="email"
             value={formData.email}
             onChange={(value) => handleFieldChange('email', value)}
@@ -467,7 +469,7 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
           className="space-y-5"
         >
           <FormInput
-            label={lang === 'en' ? '🆔 Fayda Number' : '🆔 Fayda ቁጥር'}
+            label={lang === 'en' ? ' Fayda Number' : ' Fayda ቁጥር'}
             type="text"
             value={formData.fayda}
             onChange={(value) => handleFieldChange('fayda', value)}
@@ -510,7 +512,7 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
           </div>
 
           <FormInput
-            label={lang === 'en' ? '🔐 Enter OTP' : '🔐 OTP ገብአ'}
+            label={lang === 'en' ? ' Enter OTP' : ' OTP ገብአ'}
             type="text"
             value={formData.otp}
             onChange={(value) => handleFieldChange('otp', value)}
@@ -559,7 +561,7 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
           </div>
 
           <FormInput
-            label={lang === 'en' ? '🔐 Your PIN' : '🔐 PIN'}
+            label={lang === 'en' ? ' Your PIN' : ' PIN'}
             type="password"
             value={formData.pin}
             onChange={(value) => handleFieldChange('pin', value)}
@@ -578,7 +580,7 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
             </button>
             <button
               onClick={() => {
-                console.log('🔵 Create Account button clicked');
+                console.log(' Create Account button clicked');
                 console.log('PIN value:', formData.pin);
                 console.log('PIN length:', formData.pin.length);
                 handleSubmit();
@@ -587,10 +589,10 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
               className="flex-1 py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all disabled:opacity-50"
             >
               {isLoading
-                ? '⏳ Creating...'
+                ? ' Creating...'
                 : lang === 'en'
-                ? '🎉 Create Account'
-                : '🎉 ሂሳብ ይሰሩ'}
+                ? ' Create Account'
+                : ' ሂሳብ ይሰሩ'}
             </button>
           </div>
         </motion.div>

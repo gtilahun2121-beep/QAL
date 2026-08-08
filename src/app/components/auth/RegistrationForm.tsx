@@ -101,7 +101,7 @@ export default function RegistrationForm({ lang, onSuccess, onError }: Registrat
     
     setTimeout(() => {
       setLoading(false);
-      onSuccess?.('✅ Account Created!', `Welcome to QalNet, ${fullName}! Your account is ready.`, 5000);
+      onSuccess?.(' Account Created!', `Welcome to QalNet, ${fullName}! Your account is ready.`, 5000);
       setStep('success');
     }, 1500);
   };
@@ -126,7 +126,7 @@ export default function RegistrationForm({ lang, onSuccess, onError }: Registrat
       {step === 'equb' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <h3 className="text-2xl font-black text-[#0d7e4d] mb-6 text-center">
-            🏢 Choose Your Equb Group
+             Choose Your Equb Group
           </h3>
           <p className="text-center text-sm text-gray-600 mb-4">
             Select the profession-based Equb that matches your income level
@@ -157,7 +157,6 @@ export default function RegistrationForm({ lang, onSuccess, onError }: Registrat
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  <span className="text-3xl">{equb.icon}</span>
                   <div className="flex-1">
                     <h4 className="font-black text-[#0d7e4d] text-sm">{equb.name}</h4>
                     <p className="text-xs text-gray-600 mb-2">{equb.description}</p>
@@ -214,7 +213,7 @@ export default function RegistrationForm({ lang, onSuccess, onError }: Registrat
       {step === 'phone' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <h3 className="text-2xl font-black text-[#0d7e4d] mb-6 text-center">
-            ✍️ Sign Up
+             Sign Up
           </h3>
 
           <div className="space-y-4">
@@ -247,7 +246,7 @@ export default function RegistrationForm({ lang, onSuccess, onError }: Registrat
               whileTap={{ scale: 0.95 }}
               className="w-full py-3 bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
             >
-              {loading ? '⏳ Sending OTP...' : '✓ Send OTP Code'}
+              {loading ? ' Sending OTP...' : '✓ Send OTP Code'}
             </motion.button>
 
             <button
@@ -267,7 +266,7 @@ export default function RegistrationForm({ lang, onSuccess, onError }: Registrat
       {step === 'otp' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <h3 className="text-2xl font-black text-[#0d7e4d] mb-6 text-center">
-            🔐 Enter OTP Code
+             Enter OTP Code
           </h3>
 
           <div className="space-y-4">
@@ -301,7 +300,7 @@ export default function RegistrationForm({ lang, onSuccess, onError }: Registrat
               whileTap={{ scale: 0.95 }}
               className="w-full py-3 bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
             >
-              {loading ? '⏳ Verifying...' : '✓ Verify OTP'}
+              {loading ? ' Verifying...' : '✓ Verify OTP'}
             </motion.button>
 
             <button
@@ -321,7 +320,7 @@ export default function RegistrationForm({ lang, onSuccess, onError }: Registrat
       {step === 'details' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <h3 className="text-2xl font-black text-[#0d7e4d] mb-6 text-center">
-            ✍️ Complete Your Profile
+             Complete Your Profile
           </h3>
 
           <div className="space-y-4">
@@ -351,7 +350,7 @@ export default function RegistrationForm({ lang, onSuccess, onError }: Registrat
                 className="w-full px-4 py-3 border-2 border-[#d4af37] rounded-lg focus:outline-none focus:border-[#0d7e4d] font-bold text-2xl text-center tracking-widest"
               />
               <p className="text-xs text-[#5a5a5a] mt-1">
-                Remember this PIN - you'll use it to login
+                Remember this PIN - you&apos;ll use it to login
               </p>
             </div>
 
@@ -384,7 +383,7 @@ export default function RegistrationForm({ lang, onSuccess, onError }: Registrat
               whileTap={{ scale: 0.95 }}
               className="w-full py-3 bg-gradient-to-r from-[#ce1126] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
             >
-              {loading ? '⏳ Creating Account...' : '🎉 Complete Registration'}
+              {loading ? ' Creating Account...' : ' Complete Registration'}
             </motion.button>
 
             <button
@@ -407,7 +406,6 @@ export default function RegistrationForm({ lang, onSuccess, onError }: Registrat
           animate={{ opacity: 1, scale: 1 }}
           className="text-center"
         >
-          <div className="text-6xl mb-6 animate-bounce">🎉</div>
           <h3 className="text-2xl font-black text-[#0d7e4d] mb-4">
             Registration Successful!
           </h3>
@@ -418,21 +416,21 @@ export default function RegistrationForm({ lang, onSuccess, onError }: Registrat
           <div className="bg-[#d4af37]/20 border-2 border-[#d4af37] rounded-lg p-4 mb-6 text-left">
             <p className="text-sm font-bold text-[#0d7e4d] mb-2">✓ Account Details:</p>
             <p className="text-xs text-gray-600">
-              📱 Phone: {phoneNumber}
+               Phone: {phoneNumber}
             </p>
             <p className="text-xs text-gray-600">
-              👤 Name: {fullName}
+               Name: {fullName}
             </p>
             <p className="text-xs text-gray-600">
-              🎫 Fayda: {faydaNumber}
+               Fayda: {faydaNumber}
             </p>
             {selectedEqub && (
               <>
                 <p className="text-xs text-gray-600 mt-2 pt-2 border-t border-[#d4af37]">
-                  🏢 Equb: {selectedEqub.name}
+                   Equb: {selectedEqub.name}
                 </p>
                 <p className="text-xs text-gray-600">
-                  💵 Monthly: ETB {selectedEqub.monthlyPayment}
+                   Monthly: ETB {selectedEqub.monthlyPayment}
                 </p>
               </>
             )}
@@ -444,7 +442,7 @@ export default function RegistrationForm({ lang, onSuccess, onError }: Registrat
             whileTap={{ scale: 0.95 }}
             className="w-full py-3 bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300"
           >
-            🏠 Go to Home
+             Go to Home
           </motion.button>
         </motion.div>
       )}

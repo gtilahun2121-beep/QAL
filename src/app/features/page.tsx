@@ -22,7 +22,6 @@ function FeaturesContent() {
   const navTabs = [
     {
       id: 'my-equbs',
-      icon: '👥',
       title: t.myEqubs,
       features: [
         'Active pool dashboard',
@@ -35,7 +34,6 @@ function FeaturesContent() {
     },
     {
       id: 'discover',
-      icon: '🔍',
       title: t.discover,
       features: [
         'Browse open groups',
@@ -48,7 +46,6 @@ function FeaturesContent() {
     },
     {
       id: 'calendar',
-      icon: '📅',
       title: t.calendar,
       features: [
         'Payment deadlines',
@@ -61,7 +58,6 @@ function FeaturesContent() {
     },
     {
       id: 'wallet',
-      icon: '💳',
       title: t.wallet,
       features: [
         'Local digital wallet',
@@ -74,7 +70,6 @@ function FeaturesContent() {
     },
     {
       id: 'more',
-      icon: '⋯',
       title: t.more,
       features: [
         'Support ticketing',
@@ -90,17 +85,14 @@ function FeaturesContent() {
   const uxPrinciples = [
     {
       title: t.cognitiveDescent,
-      icon: '🧠',
       desc: 'Three-pillar navigation with emerald action indicators'
     },
     {
       title: t.visualHierarchy,
-      icon: '📐',
       desc: 'Active rounds pinned to top, progressive disclosure'
     },
     {
       title: t.inAppLearning,
-      icon: '📚',
       desc: 'Video tutorials, interactive docs, contextual tooltips'
     }
   ];
@@ -139,7 +131,6 @@ function FeaturesContent() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {navTabs.map((tab) => (
               <div key={tab.id} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-8 border border-gray-200 hover:border-emerald-400 transition-colors">
-                <div className="text-4xl mb-4">{tab.icon}</div>
                 <h3 className="font-bold text-lg mb-4 text-gray-900">{tab.title}</h3>
                 <ul className="space-y-2">
                   {tab.features.map((feature, idx) => (
@@ -164,7 +155,6 @@ function FeaturesContent() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {uxPrinciples.map((principle, idx) => (
               <div key={idx} className="bg-white rounded-lg p-8 shadow-sm hover:shadow-lg transition-shadow">
-                <div className="text-4xl mb-4">{principle.icon}</div>
                 <h3 className="font-bold text-xl mb-2 text-gray-900">{principle.title}</h3>
                 <p className="text-gray-600">{principle.desc}</p>
               </div>
@@ -195,7 +185,6 @@ function FeaturesContent() {
             </div>
             <div className="bg-gradient-to-br from-emerald-100 to-teal-100 rounded-lg h-96 flex items-center justify-center">
               <div className="text-center">
-                <div className="text-6xl mb-4">📱</div>
                 <p className="text-gray-700 font-semibold">Offline-First Architecture</p>
               </div>
             </div>

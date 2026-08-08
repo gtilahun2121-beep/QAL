@@ -36,13 +36,13 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
 
   const getTrustBadge = (tier: string) => {
     const badges: Record<string, string> = {
-      standard: '⭐',
-      bronze: '🥉',
-      silver: '🥈',
-      gold: '🥇',
-      verified_trust: '✅',
+      standard: '',
+      bronze: '',
+      silver: '',
+      gold: '',
+      verified_trust: '',
     };
-    return badges[tier] || '⭐';
+    return badges[tier] || '';
   };
 
   if (!isOpen) return null;
@@ -71,7 +71,7 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-2xl">
-                👤
+                
               </div>
               <div>
                 <p className="font-semibold text-gray-900">{user.phone}</p>
@@ -168,7 +168,7 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                   ✓ Successful Payments: <span className="font-semibold">{creditScore.successfulPaymentsCount}</span>
                 </p>
                 <p className="text-gray-600">
-                  ⚠ Delayed Payments: <span className="font-semibold">{creditScore.delayedPaymentsCount}</span>
+                   Delayed Payments: <span className="font-semibold">{creditScore.delayedPaymentsCount}</span>
                 </p>
               </div>
             </div>
@@ -179,16 +179,16 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
               <h3 className="font-semibold text-gray-900 mb-3">Support & Help</h3>
               <div className="space-y-2">
                 <button className="w-full text-left p-3 rounded-lg bg-gray-50 hover:bg-gray-100 text-sm">
-                  📖 {translations.faq_title[language]}
+                   {translations.faq_title[language]}
                 </button>
                 <button
                   onClick={onRequestSupport}
                   className="w-full text-left p-3 rounded-lg bg-gray-50 hover:bg-gray-100 text-sm"
                 >
-                  🎫 Submit Ticket
+                   Submit Ticket
                 </button>
                 <button className="w-full text-left p-3 rounded-lg bg-gray-50 hover:bg-gray-100 text-sm">
-                  📋 Terms & Privacy
+                   Terms & Privacy
                 </button>
               </div>
             </div>

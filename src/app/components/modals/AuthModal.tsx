@@ -47,10 +47,10 @@ export default function AuthModal({
     }
   }, [isOpen, initialTab]);
 
-  const tabs: { id: AuthTab; label: string; icon: string }[] = [
-    { id: 'signup', label: lang === 'en' ? 'Sign Up' : lang === 'am' ? 'ምዝገባ' : lang === 'om' ? 'Galmaa' : 'ምዝገባ', icon: '✍️' },
-    { id: 'signin', label: lang === 'en' ? 'Sign In' : lang === 'am' ? 'ወደ ውስጥ ግባ' : lang === 'om' ? 'Seensa' : 'ሰነብ', icon: '🔐' },
-    { id: 'forgot', label: lang === 'en' ? 'Forgot PIN' : lang === 'am' ? 'PIN ርሳኸወ' : lang === 'om' ? 'PIN Irraanfate' : 'PIN ርሳኸወ', icon: '🆘' },
+  const tabs: { id: AuthTab; label: string }[] = [
+    { id: 'signup', label: lang === 'en' ? 'Sign Up' : lang === 'am' ? 'ምዝገባ' : lang === 'om' ? 'Galmaa' : 'ምዝገባ' },
+    { id: 'signin', label: lang === 'en' ? 'Sign In' : lang === 'am' ? 'ወደ ውስጥ ግባ' : lang === 'om' ? 'Seensa' : 'ሰነብ' },
+    { id: 'forgot', label: lang === 'en' ? 'Forgot PIN' : lang === 'am' ? 'PIN ርሳኸወ' : lang === 'om' ? 'PIN Irraanfate' : 'PIN ርሳኸወ' },
   ];
 
   // If mode is 'choice', use the new ChoiceFlow component
@@ -115,7 +115,6 @@ export default function AuthModal({
                       : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
                   }`}
                 >
-                  <span className="text-lg">{tab.icon}</span>
                   <span className="hidden sm:inline">{tab.label}</span>
                 </button>
               ))}

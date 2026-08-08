@@ -39,21 +39,18 @@ export const PaymentFlow: React.FC<PaymentFlowProps> = ({
       id: 'wallet',
       name: 'In-App Wallet',
       description: 'Use your QalNet wallet balance',
-      icon: '💰',
       available: true,
     },
     {
       id: 'telebirr',
       name: 'Telebirr',
       description: 'Pay via Telebirr mobile money',
-      icon: '📱',
       available: true,
     },
     {
       id: 'cbe',
       name: 'CBE Bank',
       description: 'Direct CBE bank transfer',
-      icon: '🏦',
       available: true,
     },
   ];
@@ -143,7 +140,6 @@ export const PaymentFlow: React.FC<PaymentFlowProps> = ({
                     } ${!method.available ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     <div className="flex items-start gap-3">
-                      <span className="text-2xl">{method.icon}</span>
                       <div>
                         <p className="font-semibold text-gray-900">{method.name}</p>
                         <p className="text-sm text-gray-600">{method.description}</p>
@@ -201,7 +197,7 @@ export const PaymentFlow: React.FC<PaymentFlowProps> = ({
 
           {step === 'confirmation' && (
             <div className="text-center py-8">
-              <div className="text-6xl mb-4">✅</div>
+              <div className="text-6xl mb-4 text-emerald-600">✓</div>
               <p className="text-lg font-semibold text-gray-900 mb-2">Payment Successful!</p>
               <p className="text-sm text-gray-600 mb-4">
                 Your payment has been processed. Your membership is now active.
@@ -220,7 +216,7 @@ export const PaymentFlow: React.FC<PaymentFlowProps> = ({
 
           {step === 'error' && (
             <div className="text-center py-8">
-              <div className="text-6xl mb-4">❌</div>
+              <div className="text-6xl mb-4 text-red-600">✕</div>
               <p className="text-lg font-semibold text-red-600 mb-2">Payment Failed</p>
               <p className="text-sm text-gray-600 mb-4">{error}</p>
               <div className="flex gap-3">

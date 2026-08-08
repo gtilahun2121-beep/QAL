@@ -154,7 +154,7 @@ export default function DiagramRegistrationForm({
       {step === 1 && (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold mb-2">👤 First Name</label>
+            <label className="block text-sm font-semibold mb-2"> First Name</label>
             <input
               type="text"
               placeholder="John"
@@ -166,7 +166,7 @@ export default function DiagramRegistrationForm({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold mb-2">👤 Last Name</label>
+            <label className="block text-sm font-semibold mb-2"> Last Name</label>
             <input
               type="text"
               placeholder="Doe"
@@ -190,7 +190,7 @@ export default function DiagramRegistrationForm({
       {step === 2 && (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold mb-2">📱 Phone Number</label>
+            <label className="block text-sm font-semibold mb-2"> Phone Number</label>
             <input
               type="tel"
               placeholder="+2519 + 8 digits"
@@ -202,7 +202,7 @@ export default function DiagramRegistrationForm({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold mb-2">📧 Email Address</label>
+            <label className="block text-sm font-semibold mb-2"> Email Address</label>
             <input
               type="email"
               placeholder="user@gmail.com"
@@ -234,7 +234,7 @@ export default function DiagramRegistrationForm({
       {step === 3 && (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold mb-2">🆔 Fayda Number</label>
+            <label className="block text-sm font-semibold mb-2"> Fayda Number</label>
             <input
               type="text"
               placeholder="1234567890123456"
@@ -272,7 +272,7 @@ export default function DiagramRegistrationForm({
               fayda.verified ? 'bg-green-100 text-green-800 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'
             }`}
           >
-            {fayda.verifying ? '⏳ Verifying...' : fayda.verified ? '✓ Verified' : 'Verify with Fayda'}
+            {fayda.verifying ? ' Verifying...' : fayda.verified ? '✓ Verified' : 'Verify with Fayda'}
           </button>
 
           <div className="flex gap-3">
@@ -305,7 +305,7 @@ export default function DiagramRegistrationForm({
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-semibold mb-2">🔒 Create Password</label>
+            <label className="block text-sm font-semibold mb-2"> Create Password</label>
             <input
               type="password"
               placeholder="Min 8 characters"
@@ -318,7 +318,7 @@ export default function DiagramRegistrationForm({
 
           {/* Confirm Password */}
           <div>
-            <label className="block text-sm font-semibold mb-2">🔒 Confirm Password</label>
+            <label className="block text-sm font-semibold mb-2"> Confirm Password</label>
             <input
               type="password"
               placeholder="Re-enter password"
@@ -331,7 +331,7 @@ export default function DiagramRegistrationForm({
 
           {/* PIN */}
           <div>
-            <label className="block text-sm font-semibold mb-2">🔐 Create PIN</label>
+            <label className="block text-sm font-semibold mb-2"> Create PIN</label>
             <input
               type="password"
               placeholder="4-6 digits"
@@ -347,7 +347,7 @@ export default function DiagramRegistrationForm({
 
           {/* OTP Verification */}
           <div className="bg-orange-50 border-2 border-orange-300 rounded-lg p-4">
-            <p className="text-sm text-orange-900 font-semibold">📱 OTP Verification</p>
+            <p className="text-sm text-orange-900 font-semibold"> OTP Verification</p>
             <p className="text-xs text-orange-800 mt-2">Enter SMS or Email OTP</p>
           </div>
 
@@ -378,7 +378,7 @@ export default function DiagramRegistrationForm({
               disabled={submitting}
               className="flex-1 bg-[#0d7e4d] text-white font-bold py-3 rounded-lg hover:bg-[#0a5c38] disabled:opacity-50"
             >
-              {submitting ? '⏳ Creating...' : '🎉 Create Account'}
+              {submitting ? ' Creating...' : ' Create Account'}
             </button>
           </div>
         </div>

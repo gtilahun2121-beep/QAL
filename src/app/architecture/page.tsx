@@ -67,11 +67,11 @@ function ArchitectureContent() {
 
             <h2 className="text-2xl font-bold mt-8 mb-4">{t.security}</h2>
             <ul className="space-y-2 mb-8">
-              <li className="flex items-start"><span className="text-emerald-600 mr-2">🔒</span> AES-256 PII Encryption</li>
-              <li className="flex items-start"><span className="text-emerald-600 mr-2">🔒</span> Row-Level Security (RLS)</li>
-              <li className="flex items-start"><span className="text-emerald-600 mr-2">🔒</span> 5 failed attempt lockout</li>
-              <li className="flex items-start"><span className="text-emerald-600 mr-2">🔒</span> 100 req/min rate limiting</li>
-              <li className="flex items-start"><span className="text-emerald-600 mr-2">🔒</span> 90-day key rotation</li>
+              <li className="flex items-start"><span className="text-emerald-600 mr-2">✓</span> AES-256 PII Encryption</li>
+              <li className="flex items-start"><span className="text-emerald-600 mr-2">✓</span> Row-Level Security (RLS)</li>
+              <li className="flex items-start"><span className="text-emerald-600 mr-2">✓</span> 5 failed attempt lockout</li>
+              <li className="flex items-start"><span className="text-emerald-600 mr-2">✓</span> 100 req/min rate limiting</li>
+              <li className="flex items-start"><span className="text-emerald-600 mr-2">✓</span> 90-day key rotation</li>
             </ul>
 
             <h2 className="text-2xl font-bold mt-8 mb-4">{t.localizationTitle}</h2>

@@ -22,11 +22,11 @@ export const BottomNavigation: React.FC<BottomNavProps> = ({
   notificationCount = 0,
 }) => {
   const navItems = [
-    { id: 'my_equbs', icon: '📊', label: translations.my_equbs[language] },
-    { id: 'discover', icon: '🔍', label: translations.discover[language] },
-    { id: 'calendar', icon: '📅', label: translations.calendar[language] },
-    { id: 'wallet', icon: '💰', label: translations.wallet[language] },
-    { id: 'more', icon: '⋯', label: translations.more[language] },
+    { id: 'my_equbs', label: translations.my_equbs[language] },
+    { id: 'discover', label: translations.discover[language] },
+    { id: 'calendar', label: translations.calendar[language] },
+    { id: 'wallet', label: translations.wallet[language] },
+    { id: 'more', label: translations.more[language] },
   ];
 
   return (
@@ -43,7 +43,6 @@ export const BottomNavigation: React.FC<BottomNavProps> = ({
           aria-label={item.label}
           aria-current={activeTab === item.id ? 'page' : undefined}
         >
-          <span className="text-2xl">{item.icon}</span>
           <span className="text-xs mt-1 line-clamp-1">{item.label}</span>
           {item.id === 'more' && notificationCount > 0 && (
             <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">

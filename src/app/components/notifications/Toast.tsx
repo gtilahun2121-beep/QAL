@@ -35,10 +35,10 @@ export function Toast({ toast, onClose }: ToastProps) {
   }, [toast, onClose]);
 
   const iconMap = {
-    success: '✅',
-    error: '❌',
-    info: 'ℹ️',
-    warning: '⚠️',
+    success: '',
+    error: '',
+    info: 'ℹ',
+    warning: '',
   };
 
   const colorMap = {

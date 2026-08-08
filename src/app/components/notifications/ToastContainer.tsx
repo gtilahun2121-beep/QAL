@@ -24,15 +24,15 @@ const ToastNotification: React.FC<{ toast: Toast; onDismiss: () => void }> = ({ 
   const getIcon = (type: string) => {
     switch (type) {
       case 'success':
-        return '✅';
+        return '';
       case 'error':
-        return '❌';
+        return '';
       case 'warning':
-        return '⚠️';
+        return '';
       case 'info':
-        return 'ℹ️';
+        return 'ℹ';
       default:
-        return '💬';
+        return '';
     }
   };
 

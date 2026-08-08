@@ -42,7 +42,7 @@ function SecurityContent() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
             {securityMeasures.map((measure, idx) => (
               <div key={idx} className="bg-gradient-to-br from-red-50 to-pink-50 rounded-lg p-8 border border-red-200">
-                <h3 className="font-bold text-lg mb-2 text-gray-900">🔒 {measure.title}</h3>
+                <h3 className="font-bold text-lg mb-2 text-gray-900"> {measure.title}</h3>
                 <p className="text-gray-600">{measure.desc}</p>
               </div>
             ))}

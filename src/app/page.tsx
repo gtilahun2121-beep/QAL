@@ -19,11 +19,11 @@ export default function Home() {
   };
 
   const handleAuthSuccess = (title: string, message: string, duration?: number) => {
-    console.log('✅ handleAuthSuccess called - closing modal and redirecting to /dashboard');
+    console.log(' handleAuthSuccess called - closing modal and redirecting to /dashboard');
     setShowAuthModal(false);
     // Add a small delay to ensure modal closes before redirect
     setTimeout(() => {
-      console.log('🚀 Redirecting to /dashboard...');
+      console.log(' Redirecting to /dashboard...');
       router.push('/dashboard');
     }, 500);
   };
@@ -70,7 +70,7 @@ export default function Home() {
               onClick={() => setShowAuthModal(true)}
               className="bg-white text-[#0d7e4d] px-8 py-4 font-bold text-lg rounded-full hover:shadow-2xl transition-all"
             >
-              🚀 Get Started
+               Get Started
             </button>
           </div>
         </section>
@@ -81,12 +81,11 @@ export default function Home() {
             <h2 className="text-4xl font-black text-gray-800 mb-12 text-center">Features</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
-                { icon: '🔒', title: 'Secure', desc: 'Bank-level encryption' },
-                { icon: '👥', title: 'Community', desc: 'Connect with members' },
-                { icon: '💰', title: 'Transparent', desc: 'Track payments' },
+                { title: 'Secure', desc: 'Bank-level encryption' },
+                { title: 'Community', desc: 'Connect with members' },
+                { title: 'Transparent', desc: 'Track payments' },
               ].map((feature, idx) => (
                 <div key={idx} className="bg-gray-50 p-8 rounded-xl border-l-4 border-[#0d7e4d]">
-                  <p className="text-4xl mb-4">{feature.icon}</p>
                   <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
                   <p className="text-gray-600">{feature.desc}</p>
                 </div>
@@ -103,7 +102,7 @@ export default function Home() {
               onClick={() => setShowAuthModal(true)}
               className="bg-white text-[#0d7e4d] px-8 py-4 font-bold text-lg rounded-full"
             >
-              ✍️ Sign Up
+               Sign Up
             </button>
           </div>
         </section>

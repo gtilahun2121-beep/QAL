@@ -5,9 +5,9 @@ import { equbCategories, getTotalMembers } from '@/app/data/equbCategories';
 
 export default function GuestStatsSection() {
   const stats = [
-    { label: 'Categories', value: equbCategories.length, icon: '📦', color: 'bg-[#0d7e4d]' },
-    { label: 'Total Members', value: `${getTotalMembers().toLocaleString()}+`, icon: '👥', color: 'bg-[#d4af37]' },
-    { label: 'On-Time Payouts', value: '99%', icon: '✅', color: 'bg-[#ce1126]' },
+    { label: 'Categories', value: equbCategories.length, color: 'bg-[#0d7e4d]' },
+    { label: 'Total Members', value: `${getTotalMembers().toLocaleString()}+`, color: 'bg-[#d4af37]' },
+    { label: 'On-Time Payouts', value: '99%', color: 'bg-[#ce1126]' },
   ];
 
   return (
@@ -22,7 +22,6 @@ export default function GuestStatsSection() {
           whileHover={{ scale: 1.05 }}
           className={`${stat.color} text-white rounded-lg p-4 text-center`}
         >
-          <div className="text-2xl mb-2">{stat.icon}</div>
           <div className="text-2xl font-black">{stat.value}</div>
           <div className="text-xs font-bold mt-1">{stat.label}</div>
         </motion.div>

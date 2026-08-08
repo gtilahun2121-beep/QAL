@@ -532,12 +532,12 @@ export const initialActiveEqubs: EqubPool[] = [
     totalRounds: 12,
     payoutAmount: 60000,
     members: [
-      { id: "m-1", name: "Mamo (Host)", avatar: "👨‍💼", paidThisRound: true, trustScore: 920 },
-      { id: "m-2", name: "Aster K.", avatar: "👩‍🍳", paidThisRound: true, trustScore: 890 },
-      { id: "m-3", name: "Kebede A.", avatar: "👨‍🌾", paidThisRound: false, trustScore: 780 }, // unpaid
-      { id: "m-4", name: "Tsehay M.", avatar: "👩‍⚕️", paidThisRound: true, trustScore: 940 },
-      { id: "m-5", name: "Selam G.", avatar: "👩‍💼", paidThisRound: true, trustScore: 850 },
-      { id: "m-6", name: "Yonas B.", avatar: "👨‍💻", paidThisRound: true, trustScore: 880 },
+      { id: "m-1", name: "Mamo (Host)", avatar: "‍", paidThisRound: true, trustScore: 920 },
+      { id: "m-2", name: "Aster K.", avatar: "‍", paidThisRound: true, trustScore: 890 },
+      { id: "m-3", name: "Kebede A.", avatar: "‍", paidThisRound: false, trustScore: 780 }, // unpaid
+      { id: "m-4", name: "Tsehay M.", avatar: "‍", paidThisRound: true, trustScore: 940 },
+      { id: "m-5", name: "Selam G.", avatar: "‍", paidThisRound: true, trustScore: 850 },
+      { id: "m-6", name: "Yonas B.", avatar: "‍", paidThisRound: true, trustScore: 880 },
     ],
     socialProposals: [
       {
@@ -587,10 +587,10 @@ export const initialActiveEqubs: EqubPool[] = [
     totalRounds: 10,
     payoutAmount: 100000,
     members: [
-      { id: "t-1", name: "Host (Sheger)", avatar: "🏢", paidThisRound: true, trustScore: 950 },
-      { id: "t-2", name: "Elias T.", avatar: "👨‍💻", paidThisRound: true, trustScore: 910 },
-      { id: "t-3", name: "Meron H.", avatar: "👩‍💻", paidThisRound: true, trustScore: 890 },
-      { id: "t-4", name: "Dawit S.", avatar: "👨‍🎨", paidThisRound: true, trustScore: 840 },
+      { id: "t-1", name: "Host (Sheger)", avatar: "", paidThisRound: true, trustScore: 950 },
+      { id: "t-2", name: "Elias T.", avatar: "‍", paidThisRound: true, trustScore: 910 },
+      { id: "t-3", name: "Meron H.", avatar: "‍", paidThisRound: true, trustScore: 890 },
+      { id: "t-4", name: "Dawit S.", avatar: "‍", paidThisRound: true, trustScore: 840 },
     ]
   }
 ];

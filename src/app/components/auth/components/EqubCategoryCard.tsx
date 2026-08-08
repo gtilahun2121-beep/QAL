@@ -29,7 +29,6 @@ export default function EqubCategoryCard({ equb, onView }: EqubCategoryCardProps
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 flex-1">
-          <span className="text-3xl">{equb.icon}</span>
           <div className="flex-1">
             <h4 className="font-black text-[#0d7e4d] text-sm">{equb.name}</h4>
             <p className="text-xs text-gray-600 mb-2">{equb.description}</p>

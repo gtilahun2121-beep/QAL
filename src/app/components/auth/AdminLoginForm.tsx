@@ -81,7 +81,7 @@ export default function AdminLoginForm({ onSuccess, onError }: AdminLoginFormPro
       } else {
         setAdminData(admin);
         setLoading(false);
-        onSuccess?.('✅ Login Successful', `Welcome ${admin.fullName}!`);
+        onSuccess?.('Login Successful', `Welcome ${admin.fullName}!`);
         setStep('success');
       }
     }, 1000);
@@ -117,7 +117,7 @@ export default function AdminLoginForm({ onSuccess, onError }: AdminLoginFormPro
 
       setAdminData(admin);
       setLoading(false);
-      onSuccess?.('🔓 Login Successful', `Welcome ${admin.fullName}!`);
+      onSuccess?.('Login Successful', `Welcome ${admin.fullName}!`);
       setStep('success');
 
       // Store auth token
@@ -142,7 +142,7 @@ export default function AdminLoginForm({ onSuccess, onError }: AdminLoginFormPro
       {step === 'email' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <h3 className="text-2xl font-black text-[#ce1126] mb-2 text-center">
-            🔐 Admin Portal
+             Admin Portal
           </h3>
           <p className="text-center text-sm text-gray-600 mb-6">
             Sign in with your admin email
@@ -179,7 +179,7 @@ export default function AdminLoginForm({ onSuccess, onError }: AdminLoginFormPro
               whileTap={{ scale: 0.95 }}
               className="w-full py-3 bg-gradient-to-r from-[#ce1126] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
             >
-              {loading ? '⏳ Verifying...' : '✓ Continue'}
+              {loading ? 'Verifying...' : '✓ Continue'}
             </motion.button>
           </div>
         </motion.div>
@@ -189,7 +189,7 @@ export default function AdminLoginForm({ onSuccess, onError }: AdminLoginFormPro
       {step === 'password' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <h3 className="text-2xl font-black text-[#ce1126] mb-2 text-center">
-            🔑 Enter Master Password
+             Enter Master Password
           </h3>
           <p className="text-center text-sm text-gray-600 mb-6">
             Email: {email}
@@ -229,7 +229,7 @@ export default function AdminLoginForm({ onSuccess, onError }: AdminLoginFormPro
               whileTap={{ scale: 0.95 }}
               className="w-full py-3 bg-gradient-to-r from-[#ce1126] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
             >
-              {loading ? '⏳ Verifying...' : '✓ Verify Password'}
+              {loading ? 'Verifying...' : '✓ Verify Password'}
             </motion.button>
 
             <button
@@ -250,7 +250,7 @@ export default function AdminLoginForm({ onSuccess, onError }: AdminLoginFormPro
       {step === 'mfa' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <h3 className="text-2xl font-black text-[#ce1126] mb-2 text-center">
-            🔐 Two-Factor Authentication
+             Two-Factor Authentication
           </h3>
           <p className="text-center text-sm text-gray-600 mb-6">
             Check your email or authenticator app
@@ -291,7 +291,7 @@ export default function AdminLoginForm({ onSuccess, onError }: AdminLoginFormPro
               whileTap={{ scale: 0.95 }}
               className="w-full py-3 bg-gradient-to-r from-[#ce1126] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
             >
-              {loading ? '⏳ Verifying...' : '✓ Verify MFA'}
+              {loading ? 'Verifying...' : '✓ Verify MFA'}
             </motion.button>
 
             <button
@@ -315,7 +315,6 @@ export default function AdminLoginForm({ onSuccess, onError }: AdminLoginFormPro
           animate={{ opacity: 1, scale: 1 }}
           className="text-center"
         >
-          <div className="text-5xl mb-4">👑</div>
           <h3 className="text-2xl font-black text-[#0d7e4d] mb-2">
             Welcome Back!
           </h3>
@@ -325,7 +324,7 @@ export default function AdminLoginForm({ onSuccess, onError }: AdminLoginFormPro
 
           <div className={`bg-gradient-to-r ${roleDisplay[adminData.role].color} rounded-lg p-4 mb-6 text-white`}>
             <p className="text-sm font-bold mb-2">
-              {roleDisplay[adminData.role].icon} {roleDisplay[adminData.role].name}
+              {roleDisplay[adminData.role].name}
             </p>
             <p className="text-xs">
               {adminData.email}
@@ -338,7 +337,7 @@ export default function AdminLoginForm({ onSuccess, onError }: AdminLoginFormPro
             whileTap={{ scale: 0.95 }}
             className="w-full py-3 bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 mb-3"
           >
-            📊 Go to Admin Dashboard
+             Go to Admin Dashboard
           </motion.button>
 
           <motion.button
@@ -347,7 +346,7 @@ export default function AdminLoginForm({ onSuccess, onError }: AdminLoginFormPro
             whileTap={{ scale: 0.95 }}
             className="w-full py-2 border-2 border-[#0d7e4d] text-[#0d7e4d] font-bold rounded-full hover:bg-[#0d7e4d]/10 transition-all"
           >
-            🏠 Go to Home
+             Go to Home
           </motion.button>
         </motion.div>
       )}

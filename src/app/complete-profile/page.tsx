@@ -179,7 +179,7 @@ export default function CompleteProfilePage() {
               variant="primary"
             >
               {isLoading
-                ? '⏳ Saving...'
+                ? 'Saving...'
                 : lang === 'en'
                 ? 'Complete Profile'
                 : lang === 'am'

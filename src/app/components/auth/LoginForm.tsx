@@ -80,7 +80,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
       console.log('Login successful for user:', user);
       setUserData(user);
       setLoading(false);
-      onSuccess?.('🎉 Welcome Back!', `Hello ${user.fullName}, you're now logged in!`, 5000);
+      onSuccess?.(' Welcome Back!', `Hello ${user.fullName}, you're now logged in!`, 5000);
       setStep('success');
       
       // Store login token in localStorage
@@ -108,7 +108,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
       {step === 'phone' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <h3 className="text-2xl font-black text-[#ce1126] mb-2 text-center">
-            🔐 Sign In
+             Sign In
           </h3>
           <p className="text-center text-sm text-gray-600 mb-6">
             Enter your phone and PIN
@@ -148,7 +148,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
               whileTap={{ scale: 0.95 }}
               className="w-full py-3 bg-gradient-to-r from-[#ce1126] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
             >
-              {loading ? '⏳ Verifying...' : '✓ Continue'}
+              {loading ? ' Verifying...' : '✓ Continue'}
             </motion.button>
 
             <p className="text-center text-sm text-[#5a5a5a] mb-6">
@@ -165,7 +165,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
       {step === 'pin' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <h3 className="text-2xl font-black text-[#ce1126] mb-2 text-center">
-            🔐 Enter Your PIN
+             Enter Your PIN
           </h3>
           <p className="text-sm text-center text-[#5a5a5a] mb-6">
             Phone: {phoneNumber}
@@ -206,7 +206,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
               whileTap={{ scale: 0.95 }}
               className="w-full py-3 bg-gradient-to-r from-[#ce1126] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
             >
-              {loading ? '⏳ Verifying...' : '🔓 Login'}
+              {loading ? ' Verifying...' : ' Login'}
             </motion.button>
 
             <button
@@ -235,7 +235,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
               whileTap={{ scale: 0.95 }}
               className="w-full py-2 border-2 border-[#d4af37] text-[#0d7e4d] font-bold rounded-lg hover:bg-[#d4af37]/10 transition-all"
             >
-              🆘 Reset PIN
+               Reset PIN
             </motion.button>
           </div>
         </motion.div>
@@ -253,23 +253,23 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
             animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
             transition={{ duration: 0.6 }}
           >
-            ✅
+            
           </motion.div>
 
           <h3 className="text-2xl font-black text-[#0d7e4d] mb-4">
             Welcome Back!
           </h3>
           <p className="text-gray-600 mb-6">
-            Hello, {userData.fullName}! 👋
+            Hello, {userData.fullName}! 
           </p>
 
           <div className="bg-[#0d7e4d]/10 border-2 border-[#0d7e4d] rounded-lg p-4 mb-6 text-left">
             <p className="text-sm font-bold text-[#0d7e4d] mb-3">✓ Account Details:</p>
             <div className="space-y-2 text-xs text-gray-600">
-              <p>📱 Phone: {userData.phoneNumber}</p>
-              <p>👤 Name: {userData.fullName}</p>
-              <p>🎫 Fayda: {userData.faydaNumber}</p>
-              <p>⏰ Member Since: {new Date(userData.registeredAt).toLocaleDateString()}</p>
+              <p> Phone: {userData.phoneNumber}</p>
+              <p> Name: {userData.fullName}</p>
+              <p> Fayda: {userData.faydaNumber}</p>
+              <p> Member Since: {new Date(userData.registeredAt).toLocaleDateString()}</p>
             </div>
           </div>
 
@@ -279,7 +279,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
             whileTap={{ scale: 0.95 }}
             className="w-full py-3 bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 mb-3"
           >
-            🎯 Go to Dashboard
+             Go to Dashboard
           </motion.button>
 
           <motion.button
@@ -288,7 +288,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
             whileTap={{ scale: 0.95 }}
             className="w-full py-2 border-2 border-[#0d7e4d] text-[#0d7e4d] font-bold rounded-full hover:bg-[#0d7e4d]/10 transition-all"
           >
-            🏠 Go to Home
+             Go to Home
           </motion.button>
         </motion.div>
       )}

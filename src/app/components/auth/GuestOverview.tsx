@@ -23,22 +23,18 @@ export default function GuestOverview({ lang }: GuestOverviewProps) {
 
   const features = [
     {
-      icon: '💰',
       title: 'Equb Savings',
       description: 'Join profession-based savings groups matched to your income level',
     },
     {
-      icon: '👥',
       title: 'Community',
       description: `Connect with ${getTotalMembers().toLocaleString()}+ members in your profession`,
     },
     {
-      icon: '🔒',
       title: 'Secure',
       description: 'Your money and data are protected with advanced encryption',
     },
     {
-      icon: '⚡',
       title: 'Fast Payouts',
       description: 'Quick and reliable payout processing when your turn comes',
     },
@@ -71,7 +67,7 @@ export default function GuestOverview({ lang }: GuestOverviewProps) {
           variants={itemVariants}
           className="bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] rounded-2xl p-6 text-white"
         >
-          <h2 className="text-2xl font-black mb-3">👋 Welcome to QalNet!</h2>
+          <h2 className="text-2xl font-black mb-3"> Welcome to QalNet!</h2>
           <p className="text-sm leading-relaxed">
             Discover profession-based Equb groups designed for your income level. Save together, grow together.
           </p>
@@ -86,7 +82,6 @@ export default function GuestOverview({ lang }: GuestOverviewProps) {
               className="bg-white border-2 border-[#d4af37] rounded-lg p-4 hover:shadow-lg transition-all duration-300"
             >
               <div className="flex items-start gap-4">
-                <span className="text-3xl">{feature.icon}</span>
                 <div>
                   <h3 className="font-black text-[#0d7e4d]">{feature.title}</h3>
                   <p className="text-sm text-gray-600">{feature.description}</p>
@@ -101,7 +96,7 @@ export default function GuestOverview({ lang }: GuestOverviewProps) {
           variants={itemVariants}
           className="bg-[#f5f3f0] border-2 border-[#d4af37] rounded-lg p-4"
         >
-          <p className="font-black text-[#0d7e4d] mb-3">💵 Filter by Income Level</p>
+          <p className="font-black text-[#0d7e4d] mb-3">Filter by Income Level</p>
           <div className="grid grid-cols-4 gap-2">
             <motion.button
               onClick={() => setSelectedIncome('all')}
@@ -159,7 +154,7 @@ export default function GuestOverview({ lang }: GuestOverviewProps) {
           variants={itemVariants}
           className="space-y-3"
         >
-          <h3 className="font-black text-[#0d7e4d] text-lg">🏢 Available Equb Groups ({displayedEqubs.length})</h3>
+          <h3 className="font-black text-[#0d7e4d] text-lg"> Available Equb Groups ({displayedEqubs.length})</h3>
           <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto">
             {displayedEqubs.map((equb) => (
               <motion.div
@@ -169,7 +164,6 @@ export default function GuestOverview({ lang }: GuestOverviewProps) {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3 flex-1">
-                    <span className="text-3xl">{equb.icon}</span>
                     <div className="flex-1">
                       <h4 className="font-black text-[#0d7e4d] text-sm">{equb.name}</h4>
                       <p className="text-xs text-gray-600 mb-2">{equb.description}</p>
@@ -243,7 +237,7 @@ export default function GuestOverview({ lang }: GuestOverviewProps) {
             }}
             className="w-full py-3 bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300"
           >
-            🚀 Start Your Equb Journey
+             Start Your Equb Journey
           </motion.button>
         </motion.div>
       </motion.div>
@@ -264,7 +258,6 @@ export default function GuestOverview({ lang }: GuestOverviewProps) {
           >
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-start gap-4">
-                <span className="text-5xl">{selectedEqub.icon}</span>
                 <div>
                   <h2 className="text-2xl font-black text-[#0d7e4d]">{selectedEqub.name}</h2>
                   <p className="text-sm text-gray-600">{selectedEqub.profession}</p>
@@ -303,27 +296,26 @@ export default function GuestOverview({ lang }: GuestOverviewProps) {
             </div>
 
             <div className="mb-6">
-              <h3 className="font-black text-[#0d7e4d] mb-2">📝 About This Group</h3>
+              <h3 className="font-black text-[#0d7e4d] mb-2"> About This Group</h3>
               <p className="text-sm text-gray-600">{selectedEqub.description}</p>
             </div>
 
             <div className="bg-[#f5f3f0] border-2 border-[#d4af37] rounded-lg p-4 mb-6">
-              <h3 className="font-black text-[#0d7e4d] mb-2">⏰ Payout Frequency</h3>
+              <h3 className="font-black text-[#0d7e4d] mb-2"> Payout Frequency</h3>
               <p className="text-sm font-bold text-[#d4af37]">{selectedEqub.payoutFrequency}</p>
             </div>
 
             <div className="bg-[#f5f3f0] border-2 border-[#d4af37] rounded-lg p-4 mb-6">
-              <h3 className="font-black text-[#0d7e4d] mb-2">📅 Payment Cycle</h3>
+              <h3 className="font-black text-[#0d7e4d] mb-2"> Payment Cycle</h3>
               <p className="text-lg font-black text-[#ce1126] mb-1">{selectedEqub.paymentCycle.duration} Months</p>
               <p className="text-sm text-gray-600">{selectedEqub.paymentCycle.description}</p>
             </div>
 
             <div className="mb-6">
-              <h3 className="font-black text-[#0d7e4d] mb-3">💳 Accepted Payment Methods</h3>
+              <h3 className="font-black text-[#0d7e4d] mb-3">Accepted Payment Methods</h3>
               <div className="space-y-2">
                 {selectedEqub.paymentMethods.map((method, idx) => (
                   <div key={idx} className="bg-white border-2 border-[#d4af37] rounded-lg p-3 flex items-start gap-3">
-                    <span className="text-2xl">{method.icon}</span>
                     <div>
                       <p className="font-black text-[#0d7e4d] text-sm">{method.name}</p>
                       <p className="text-xs text-gray-600">{method.description}</p>
@@ -334,7 +326,7 @@ export default function GuestOverview({ lang }: GuestOverviewProps) {
             </div>
 
             <div className="mb-6">
-              <h3 className="font-black text-[#0d7e4d] mb-3">✨ Benefits</h3>
+              <h3 className="font-black text-[#0d7e4d] mb-3"> Benefits</h3>
               <ul className="space-y-2 text-sm">
                 <li className="flex gap-2">
                   <span className="text-[#0d7e4d] font-black">✓</span>
@@ -366,7 +358,7 @@ export default function GuestOverview({ lang }: GuestOverviewProps) {
               whileTap={{ scale: 0.95 }}
               className="w-full py-3 bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all mb-3"
             >
-              ✍️ Join This Equb
+               Join This Equb
             </motion.button>
 
             <motion.button

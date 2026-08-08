@@ -28,10 +28,10 @@ export default function SignInTab({ lang = defaultLanguage, onSuccess, onError }
       if (!value.startsWith('+2519')) {
         value = '+2519';
       }
-      // Allow only digits after +2519
+      // Allow only digits after +2519: max 12 digits = 2519 + 8-digit number
       const digitsOnly = value.replace(/\D/g, '');
-      if (digitsOnly.length > 10) {
-        value = '+' + digitsOnly.substring(0, 10);
+      if (digitsOnly.length > 12) {
+        value = '+' + digitsOnly.substring(0, 12);
       }
       finalValue = value;
     } else if (field === 'pin') {
@@ -114,7 +114,7 @@ export default function SignInTab({ lang = defaultLanguage, onSuccess, onError }
         disabled={isLoading}
         variant="primary"
       >
-        {isLoading ? '⏳ Processing...' : lang === 'en' ? 'Sign In' : lang === 'am' ? 'ወደ ውስጥ ግባ' : 'Seensa'}
+        {isLoading ? ' Processing...' : lang === 'en' ? 'Sign In' : lang === 'am' ? 'ወደ ውስጥ ግባ' : 'Seensa'}
       </FormButton>
 
       <p className="text-xs text-gray-500 text-center">

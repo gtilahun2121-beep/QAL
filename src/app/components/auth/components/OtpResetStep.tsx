@@ -31,7 +31,7 @@ export default function OtpResetStep({
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
       <div>
         <h3 className="text-2xl font-black text-[#ce1126] mb-2 text-center">
-          ✉️ Verify Code
+           Verify Code
         </h3>
         <p className="text-center text-sm text-gray-600 mb-4">
           Enter the 6-digit code sent to your phone
@@ -45,7 +45,6 @@ export default function OtpResetStep({
         value={otp}
         onChange={(val) => onOtpChange(val.replace(/\D/g, ''))}
         maxLength={6}
-        icon="🔐"
         hint="Demo: Enter any 6-digit code"
       />
 

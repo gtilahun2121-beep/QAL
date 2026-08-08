@@ -38,7 +38,7 @@ export default function NewPinStep({
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
       <div>
         <h3 className="text-2xl font-black text-[#ce1126] mb-2 text-center">
-          🔑 Create New Access Code
+           Create New Access Code
         </h3>
         <p className="text-center text-sm text-gray-600 mb-4">
           Set a new 4-digit PIN to secure your account
@@ -52,7 +52,6 @@ export default function NewPinStep({
         value={newPin}
         onChange={(val) => onNewPinChange(val.replace(/\D/g, ''))}
         maxLength={4}
-        icon="🔐"
         hint="You'll use this to sign in"
         error={!pinValidation.valid && newPin ? pinValidation.error : undefined}
       />
@@ -64,7 +63,6 @@ export default function NewPinStep({
         value={confirmPin}
         onChange={(val) => onConfirmPinChange(val.replace(/\D/g, ''))}
         maxLength={4}
-        icon="🔑"
         hint="Must match the new PIN above"
         error={!confirmValidation.valid && confirmPin ? confirmValidation.error : undefined}
       />

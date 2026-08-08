@@ -320,23 +320,23 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
                   <p className="text-xs font-semibold text-gray-700 mb-3">Password Requirements:</p>
                   <div className="space-y-2">
                     <div className={`flex items-center gap-2 text-sm ${passwordValidation.minLength ? 'text-green-600' : 'text-gray-600'}`}>
-                      <span>{passwordValidation.minLength ? '✅' : '⭕'}</span>
+                      <span>{passwordValidation.minLength ? '' : ''}</span>
                       <span>At least 8 characters</span>
                     </div>
                     <div className={`flex items-center gap-2 text-sm ${passwordValidation.uppercase ? 'text-green-600' : 'text-gray-600'}`}>
-                      <span>{passwordValidation.uppercase ? '✅' : '⭕'}</span>
+                      <span>{passwordValidation.uppercase ? '' : ''}</span>
                       <span>At least 1 uppercase letter</span>
                     </div>
                     <div className={`flex items-center gap-2 text-sm ${passwordValidation.lowercase ? 'text-green-600' : 'text-gray-600'}`}>
-                      <span>{passwordValidation.lowercase ? '✅' : '⭕'}</span>
+                      <span>{passwordValidation.lowercase ? '' : ''}</span>
                       <span>At least 1 lowercase letter</span>
                     </div>
                     <div className={`flex items-center gap-2 text-sm ${passwordValidation.digit ? 'text-green-600' : 'text-gray-600'}`}>
-                      <span>{passwordValidation.digit ? '✅' : '⭕'}</span>
+                      <span>{passwordValidation.digit ? '' : ''}</span>
                       <span>At least 1 digit</span>
                     </div>
                     <div className={`flex items-center gap-2 text-sm ${passwordValidation.specialChar ? 'text-green-600' : 'text-gray-600'}`}>
-                      <span>{passwordValidation.specialChar ? '✅' : '⭕'}</span>
+                      <span>{passwordValidation.specialChar ? '' : ''}</span>
                       <span>At least 1 special character (!@#$%^&*...)</span>
                     </div>
                   </div>
@@ -422,7 +422,7 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
 
             {formData.faydaVerified && (
               <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4 text-center">
-                <p className="text-green-700 font-semibold">✅ Identity Confirmed</p>
+                <p className="text-green-700 font-semibold"> Identity Confirmed</p>
               </div>
             )}
           </div>
@@ -452,7 +452,7 @@ export default function RegistrationForm({ onSuccess, onError }: RegistrationFor
           disabled={submitting}
           className="flex-1 px-6 py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all disabled:opacity-50"
         >
-          {submitting ? '⏳ Processing...' : step === 5 ? '🎉 Create Account' : 'Next →'}
+          {submitting ? ' Processing...' : step === 5 ? ' Create Account' : 'Next →'}
         </button>
       </div>
     </div>

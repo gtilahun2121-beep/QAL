@@ -10,4 +10,4 @@ const nextConfig = {
   // Parallel builds
   compress: true,
 };
-module.exports = nextConfig;
+export default nextConfig;

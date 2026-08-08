@@ -107,7 +107,7 @@ export default function AdminLoginFormRefactored({
 
       setAdmin(cleanAdmin);
       onSuccess?.(
-        '🔐 Login Successful',
+        'Login Successful',
         `Welcome back, ${adminData.email}!`,
         4000
       );
@@ -139,7 +139,7 @@ export default function AdminLoginFormRefactored({
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
           <div>
             <h3 className="text-2xl font-black text-purple-600 mb-2 text-center">
-              👑 Admin Portal
+               Admin Portal
             </h3>
             <p className="text-center text-sm text-gray-600 mb-4">
               Enter your admin credentials to continue
@@ -152,7 +152,6 @@ export default function AdminLoginFormRefactored({
             placeholder="admin@qalnet.com"
             value={email}
             onChange={setEmail}
-            icon="📧"
             hint="Your admin email address"
             autoComplete="email"
           />
@@ -163,7 +162,6 @@ export default function AdminLoginFormRefactored({
             placeholder="••••••••"
             value={masterPassword}
             onChange={setMasterPassword}
-            icon="🔐"
             hint="Your secure master password"
             autoComplete="current-password"
           />
@@ -195,7 +193,7 @@ export default function AdminLoginFormRefactored({
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
           <div>
             <h3 className="text-2xl font-black text-purple-600 mb-2 text-center">
-              🔑 Multi-Factor Authentication
+               Multi-Factor Authentication
             </h3>
             <p className="text-center text-sm text-gray-600 mb-4">
               Enter the 6-digit MFA code from your authenticator
@@ -203,7 +201,7 @@ export default function AdminLoginFormRefactored({
           </div>
 
           <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-3">
-            <p className="text-xs text-purple-700 font-bold">📧 Email: {email}</p>
+            <p className="text-xs text-purple-700 font-bold"> Email: {email}</p>
           </div>
 
           <FormInput
@@ -213,7 +211,6 @@ export default function AdminLoginFormRefactored({
             value={mfaCode}
             onChange={(val) => setMfaCode(val.replace(/\D/g, ''))}
             maxLength={6}
-            icon="🔐"
             hint="Demo: Enter any 6-digit code"
           />
 
@@ -239,9 +236,8 @@ export default function AdminLoginFormRefactored({
       {step === 'success' && admin && (
         <>
           <FormSuccess
-            title="✅ Admin Login Successful!"
+            title="Admin Login Successful!"
             message="You have been authenticated with multi-factor security"
-            icon="🔐"
           />
 
           <div className="mt-6 bg-purple-50 border-2 border-purple-200 rounded-lg p-4 space-y-3">
@@ -249,17 +245,17 @@ export default function AdminLoginFormRefactored({
               <p className="text-xs font-bold text-purple-900 mb-3">Admin Details:</p>
               <div className="space-y-1 text-xs text-purple-800">
                 <p>
-                  <span className="font-bold">📧 Email:</span> {admin.email}
+                  <span className="font-bold"> Email:</span> {admin.email}
                 </p>
                 <p>
-                  <span className="font-bold">👑 Role:</span>{' '}
+                  <span className="font-bold"> Role:</span>{' '}
                   {admin.role.replace('_', ' ').toUpperCase()}
                 </p>
                 <p>
-                  <span className="font-bold">🔑 Permissions:</span> {admin.permissions.length}
+                  <span className="font-bold"> Permissions:</span> {admin.permissions.length}
                 </p>
                 <p>
-                  <span className="font-bold">📅 Created:</span>{' '}
+                  <span className="font-bold"> Created:</span>{' '}
                   {new Date(admin.createdAt).toLocaleDateString()}
                 </p>
               </div>
@@ -272,7 +268,7 @@ export default function AdminLoginFormRefactored({
             whileTap={{ scale: 0.95 }}
             className="w-full py-3 mt-6 bg-gradient-to-r from-purple-600 to-red-600 text-white font-black rounded-full hover:shadow-lg transition-all duration-300"
           >
-            📊 Go to Admin Dashboard
+             Go to Admin Dashboard
           </motion.button>
         </>
       )}

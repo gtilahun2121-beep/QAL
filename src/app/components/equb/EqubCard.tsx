@@ -27,10 +27,10 @@ export const EqubCard: React.FC<EqubCardProps> = ({
   variant = 'active',
 }) => {
   const getTierEmoji = (reputation: number) => {
-    if (reputation >= 4.8) return '⭐⭐⭐⭐⭐';
-    if (reputation >= 4.5) return '⭐⭐⭐⭐';
-    if (reputation >= 4.0) return '⭐⭐⭐';
-    return '⭐⭐';
+    if (reputation >= 4.8) return '';
+    if (reputation >= 4.5) return '';
+    if (reputation >= 4.0) return '';
+    return '';
   };
 
   const getStatusColor = (status: string) => {
@@ -149,7 +149,7 @@ export const EqubCard: React.FC<EqubCardProps> = ({
         {equb.unpaidRoundsCount > 0 && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
             <p className="text-sm text-red-700">
-              ⚠️ {equb.unpaidRoundsCount} {translations.unpaid_rounds[language]}
+               {equb.unpaidRoundsCount} {translations.unpaid_rounds[language]}
             </p>
             <p className="text-xs text-red-600 mt-1">
               Due: {equb.nextDeadline}
@@ -167,7 +167,7 @@ export const EqubCard: React.FC<EqubCardProps> = ({
         <div className="mb-4 pb-4 border-b border-gray-200">
           <p className="text-xs text-gray-600 mb-1">Payout Mechanism</p>
           <p className="font-semibold text-sm">
-            {equb.payoutMechanism === 'auction' ? '🏆 Auction/Bidding' : '🎲 Lottery Draw'}
+            {equb.payoutMechanism === 'auction' ? ' Auction/Bidding' : ' Lottery Draw'}
           </p>
           {equb.payoutMechanism === 'auction' && (
             <p className="text-xs text-gray-600 mt-1">Highest bidder wins, bid redistributed</p>
@@ -178,7 +178,7 @@ export const EqubCard: React.FC<EqubCardProps> = ({
         {equb.autoDebitEnabled && (
           <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 mb-4">
             <p className="text-sm text-emerald-700">
-              ✅ {translations.auto_debit[language]} Enabled
+               {translations.auto_debit[language]} Enabled
             </p>
           </div>
         )}
@@ -214,7 +214,7 @@ export const EqubCard: React.FC<EqubCardProps> = ({
       {equb.socialProposals && equb.socialProposals.length > 0 && (
         <div className="bg-gray-50 px-4 py-2 border-t border-gray-200">
           <p className="text-xs text-gray-600">
-            📋 {equb.socialProposals.length} Active Proposals
+             {equb.socialProposals.length} Active Proposals
           </p>
         </div>
       )}

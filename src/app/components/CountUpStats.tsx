@@ -4,7 +4,6 @@ import { motion, useInView } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 
 interface StatItem {
-  icon: string;
   label: string;
   value: number;
   suffix: string;
@@ -89,7 +88,7 @@ export default function CountUpStats({ stats, title, description }: CountUpStats
           viewport={{ once: true }}
         >
           <h2 className="text-4xl md:text-5xl font-black text-[#0d7e4d] mb-4">
-            📊 {title}
+            {title}
           </h2>
           <p className="text-xl text-[#5a5a5a]">{description}</p>
         </motion.div>
@@ -115,9 +114,6 @@ export default function CountUpStats({ stats, title, description }: CountUpStats
 
               {/* Content */}
               <div className="relative z-10">
-                <div className="text-6xl mb-4 group-hover:scale-125 transition-transform duration-300">
-                  {stat.icon}
-                </div>
                 <div className="mb-6">
                   <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                 </div>

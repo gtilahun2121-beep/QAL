@@ -47,7 +47,7 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
           viewport={{ once: true }}
         >
           <h2 className="text-4xl md:text-5xl font-black text-[#0d7e4d] mb-4">
-            💬 What Our Members Say
+             What Our Members Say
           </h2>
           <p className="text-xl text-[#5a5a5a]">
             Real stories from Ethiopian savers transforming their lives
@@ -72,7 +72,7 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
               {/* Rating */}
               <div className="flex gap-1 mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
-                  <span key={i} className="text-2xl">⭐</span>
+                  <span key={i} className="text-2xl text-[#d4af37]">★</span>
                 ))}
               </div>
 

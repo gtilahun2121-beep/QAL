@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion';
 
 interface PromoFeature {
-  icon: string;
   title: string;
   description: string;
   highlight: string;
@@ -52,7 +51,7 @@ export default function PromoFeatures({ features, title, subtitle }: PromoFeatur
           viewport={{ once: true }}
         >
           <h2 className="text-4xl md:text-5xl font-black text-[#ce1126] mb-4">
-            🎁 {title}
+            {title}
           </h2>
           <p className="text-xl text-[#5a5a5a]">{subtitle}</p>
         </motion.div>
@@ -76,9 +75,6 @@ export default function PromoFeatures({ features, title, subtitle }: PromoFeatur
               <div className="absolute inset-0 bg-gradient-to-br from-[#0d7e4d]/5 to-[#ce1126]/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
               <div className="relative z-10">
-                <div className="text-5xl mb-4 transform group-hover:scale-125 group-hover:-rotate-12 transition-transform duration-300">
-                  {feature.icon}
-                </div>
                 <h3 className="font-black text-lg text-[#0d7e4d] mb-3 group-hover:text-[#ce1126] transition-colors">
                   {feature.title}
                 </h3>

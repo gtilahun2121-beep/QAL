@@ -198,7 +198,7 @@ export default function CreateAccountModal({
             <div className="bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] px-8 py-6 flex justify-between items-center rounded-t-2xl">
               <div>
                 <h2 className="text-2xl font-black text-white">
-                  {step === 'account' ? '🏦 Create Account' : '✅ Verify OTP'}
+                  {step === 'account' ? ' Create Account' : ' Verify OTP'}
                 </h2>
                 <p className="text-sm text-white/80 font-semibold mt-1">
                   {lang === 'en' ? 'Complete your Equb profile' : 'በእርስዎ Equb ተጠናቀቁ'}
@@ -260,7 +260,7 @@ export default function CreateAccountModal({
                     variant="primary"
                   >
                     {isLoading
-                      ? '⏳ Sending OTP...'
+                      ? ' Sending OTP...'
                       : lang === 'en'
                       ? 'Send OTP'
                       : 'OTP Ergaa'}
@@ -293,7 +293,7 @@ export default function CreateAccountModal({
                     variant="primary"
                   >
                     {isLoading
-                      ? '⏳ Verifying...'
+                      ? ' Verifying...'
                       : lang === 'en'
                       ? 'Verify OTP'
                       : 'OTP ሂድ'}
