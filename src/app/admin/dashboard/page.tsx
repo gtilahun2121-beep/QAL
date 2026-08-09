@@ -132,10 +132,10 @@ export default function AdminDashboard() {
             animate="visible"
             className="bg-gradient-to-r from-purple-600 to-red-600 rounded-2xl p-6 text-white mb-8 shadow-xl"
           >
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-3xl font-black mb-2">Admin Dashboard</h1>
-                <p className="text-sm">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-black mb-1 break-words">Admin Dashboard</h1>
+                <p className="text-sm break-words">
                   Role: <span className="font-black">{roleDisplay[admin.role].name}</span> | Email: {admin.email}
                 </p>
               </div>
@@ -147,7 +147,7 @@ export default function AdminDashboard() {
                 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full font-bold transition-all"
+                className="w-full sm:w-auto px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full font-bold transition-all"
               >
                  Logout
               </motion.button>

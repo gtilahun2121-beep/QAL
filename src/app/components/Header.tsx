@@ -27,13 +27,13 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#d4af37] to-[#27487f] rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+          <Link href="/" className="flex items-center gap-3 group min-w-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-[#d4af37] to-[#27487f] rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
               <span className="text-[#0a1f3d] font-black text-lg">Q</span>
             </div>
             <div>
-              <span className="font-black text-2xl text-white drop-shadow-lg">QalNet</span>
-              <p className="text-xs text-white/80 font-semibold -mt-1">Ethiopia's Digital Equb</p>
+              <span className="font-black text-xl sm:text-2xl text-white drop-shadow-lg truncate">QalNet</span>
+              <p className="hidden sm:block text-xs text-white/80 font-semibold -mt-1">Ethiopia's Digital Equb</p>
             </div>
           </Link>
 
@@ -56,7 +56,7 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
             <select
               value={lang}
               onChange={(e) => onLanguageChange(e.target.value as Language)}
-              className="px-4 py-2 border-2 border-[#d4af37] rounded-full text-sm bg-white text-[#0a1f3d] font-bold cursor-pointer"
+              className="px-2 sm:px-4 py-2 border-2 border-[#d4af37] rounded-full text-xs sm:text-sm bg-white text-[#0a1f3d] font-bold cursor-pointer"
             >
               {(Object.keys(languages) as Language[]).map((l) => (
                 <option key={l} value={l}>

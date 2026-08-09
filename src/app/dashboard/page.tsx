@@ -391,14 +391,14 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
       <div className="flex-grow max-w-7xl mx-auto w-full px-4 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-4xl font-black text-gray-900">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
+            <h1 className="text-3xl sm:text-4xl font-black text-gray-900 break-words">
               {lang === 'en' ? 'Welcome, ' : 'ደህና መጡ, '}
               {displayName} 
             </h1>
             <button
               onClick={handleSignOut}
-              className="px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all"
+              className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all"
             >
               {lang === 'en' ? 'Sign Out' : 'ወጣ'}
             </button>
@@ -918,7 +918,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
               </div>
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">Payment Method</label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {PAYMENT_METHODS.slice(0, 6).map((m) => (
                     <button
                       key={m.id}

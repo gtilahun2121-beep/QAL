@@ -146,13 +146,13 @@ function JoinContent({ uid, lang, setLang }: JoinContentProps) {
 
       <div className="flex-grow py-8 px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-4xl font-black text-gray-900">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
+            <h1 className="text-3xl sm:text-4xl font-black text-gray-900 break-words">
               {lang === 'en' ? 'Join an Equb ' : 'Equb ይቀላቀሉ '}
             </h1>
             <button
               onClick={() => router.push('/dashboard')}
-              className="px-4 py-2 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
+              className="w-full sm:w-auto px-4 py-2 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
             >
               ← {lang === 'en' ? 'Back to Dashboard' : 'ወደ ዳሽቦርድ'}
             </button>
@@ -217,11 +217,11 @@ function JoinContent({ uid, lang, setLang }: JoinContentProps) {
                 ✕ {lang === 'en' ? 'Clear' : 'አጥፋ'}
               </button>
             </div>
-            <div className="flex items-center justify-between mt-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 mt-4">
               <p className="text-sm text-gray-500">
                 {filtered.length} {lang === 'en' ? 'Equbs found' : 'Equbs ተገኝተዋል'}
               </p>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-400 break-words">
                 {lang === 'en' ? 'Wallet balance' : 'ዋሊት'}: ETB {dashboard.walletBalance.toLocaleString()}
               </p>
             </div>

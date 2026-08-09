@@ -107,7 +107,7 @@ interface ToastContainerProps {
 
 export function ToastContainer({ toasts, onClose }: ToastContainerProps) {
   return (
-    <div className="fixed top-6 right-6 z-[9999] space-y-3 pointer-events-none">
+    <div className="fixed top-4 left-4 right-4 sm:left-auto sm:right-6 z-[9999] space-y-3 pointer-events-none">
       <AnimatePresence>
         {toasts.map((toast) => (
           <div key={toast.id} className="pointer-events-auto">

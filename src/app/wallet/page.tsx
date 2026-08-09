@@ -124,13 +124,13 @@ function WalletContent({ uid, lang, setLang }: WalletContentProps) {
 
       <div className="flex-grow py-8 px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="text-4xl font-black text-gray-900">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <h1 className="text-3xl sm:text-4xl font-black text-gray-900">
               {lang === 'en' ? 'Wallet ' : 'ዋሊት '}
             </h1>
             <button
               onClick={() => router.push('/dashboard')}
-              className="px-4 py-2 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
+              className="w-full sm:w-auto px-4 py-2 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
             >
               ← {lang === 'en' ? 'Back to Dashboard' : 'ወደ ዳሽቦርድ'}
             </button>
@@ -139,8 +139,10 @@ function WalletContent({ uid, lang, setLang }: WalletContentProps) {
           {/* Wallet Balance */}
           <div className="bg-gradient-to-r from-[#16357a] to-[#d4af37] text-white rounded-2xl shadow-lg p-8 mb-8">
             <p className="text-sm opacity-90">{lang === 'en' ? 'Current Balance' : 'አሁን ሚዛን'}</p>
-            <h2 className="text-5xl font-black mb-4">ETB {balance.toLocaleString()}</h2>
-            <div className="flex gap-4">
+            <h2 className="text-3xl sm:text-5xl font-black mb-4 break-words">
+              ETB {balance.toLocaleString()}
+            </h2>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <button
                 onClick={() => setShowDepositModal(true)}
                 className="bg-white text-[#16357a] font-bold px-6 py-2 rounded-lg hover:shadow-lg transition-all"

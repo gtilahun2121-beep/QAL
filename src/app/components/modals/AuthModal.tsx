@@ -85,7 +85,7 @@ export default function AuthModal({
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-[#16357a] to-[#d4af37] px-8 py-6 flex justify-between items-center">
+            <div className="bg-gradient-to-r from-[#16357a] to-[#d4af37] px-4 sm:px-8 py-6 flex justify-between items-center">
               <div>
                 <h2 className="text-2xl font-black text-white">QalNet</h2>
                 <p className="text-sm text-white/80 font-semibold mt-1">
@@ -121,7 +121,7 @@ export default function AuthModal({
             </div>
 
             {/* Content */}
-            <div className="overflow-y-auto max-h-[calc(90vh-180px)] p-8">
+            <div className="overflow-y-auto max-h-[calc(90vh-180px)] p-4 sm:p-8">
               <AnimatePresence mode="wait">
                 {activeTab === 'signup' && (
                   <motion.div

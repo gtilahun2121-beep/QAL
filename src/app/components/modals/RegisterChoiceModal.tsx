@@ -78,7 +78,7 @@ export default function RegisterChoiceModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-[#16357a] to-[#d4af37] px-8 py-4 text-center">
+        <div className="bg-gradient-to-r from-[#16357a] to-[#d4af37] px-4 sm:px-8 py-4 text-center">
           <h2 className="text-xl font-black text-white mb-1">QalNet</h2>
           <p className="text-white/90 font-semibold text-sm">
             {lang === 'en'
@@ -90,7 +90,7 @@ export default function RegisterChoiceModal({
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <div className="mb-6 text-center">
             <h3 className="text-xl font-bold text-gray-800 mb-1">
               {lang === 'en'
