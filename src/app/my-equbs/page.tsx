@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Language, defaultLanguage } from '@/i18n/config';
 import { useAuth } from '@/app/context/AuthContext';
@@ -37,8 +37,20 @@ export default function MyEqubsPage() {
 
 function MyEqubsContent({ uid, lang, setLang }: MyEqubsContentProps) {
   const router = useRouter();
-  const [state] = useState<DashboardState>(() => DashboardService.loadState(uid));
+  const [state, setState] = useState<DashboardState>(() => DashboardService.loadState(uid));
   const [now] = useState(() => Date.now());
+
+  useEffect(() => {
+    let active = true;
+    DashboardService.loadFromApi(uid)
+      .then((loaded) => {
+        if (active) setState(loaded);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [uid]);
 
   const dashboard = state;
 
@@ -54,7 +66,7 @@ function MyEqubsContent({ uid, lang, setLang }: MyEqubsContentProps) {
             </h1>
             <button
               onClick={() => router.push('/dashboard')}
-              className="px-4 py-2 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all"
+              className="px-4 py-2 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
             >
               ← {lang === 'en' ? 'Back to Dashboard' : 'ወደ ዳሽቦርድ'}
             </button>
@@ -70,7 +82,7 @@ function MyEqubsContent({ uid, lang, setLang }: MyEqubsContentProps) {
               </p>
               <button
                 onClick={() => router.push('/join-equb')}
-                className="px-6 py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all"
+                className="px-6 py-3 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
               >
                  {lang === 'en' ? 'Join an Equb' : 'Equb ተጠምዱ'}
               </button>
@@ -80,7 +92,7 @@ function MyEqubsContent({ uid, lang, setLang }: MyEqubsContentProps) {
               {dashboard.equbs.map((equb) => (
                 <div
                   key={equb.id}
-                  className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-l-4 border-[#0d7e4d]"
+                  className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-l-4 border-[#16357a]"
                   onClick={() => router.push(`/dashboard?equb=${equb.id}`)}
                 >
                   <div className="flex items-start justify-between mb-4">
@@ -98,7 +110,7 @@ function MyEqubsContent({ uid, lang, setLang }: MyEqubsContentProps) {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">{lang === 'en' ? 'Contribution' : 'መዋጮ'}</span>
-                      <span className="font-bold text-green-600">ETB {equb.contribution.toLocaleString()}</span>
+                      <span className="font-bold text-blue-700">ETB {equb.contribution.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">{lang === 'en' ? 'Your Position' : 'ቦታ'}</span>
@@ -120,7 +132,7 @@ function MyEqubsContent({ uid, lang, setLang }: MyEqubsContentProps) {
                       e.stopPropagation();
                       router.push(`/dashboard?equb=${equb.id}`);
                     }}
-                    className="w-full bg-[#0d7e4d] text-white font-bold py-2 rounded-lg hover:bg-[#0a5c38] transition-all"
+                    className="w-full bg-[#16357a] text-white font-bold py-2 rounded-lg hover:bg-[#27487f] transition-all"
                   >
                     {lang === 'en' ? 'View Details' : 'ዝርዝር ይመልከቱ'}
                   </button>

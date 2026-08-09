@@ -68,15 +68,20 @@ export const PaymentFlow: React.FC<PaymentFlowProps> = ({
         amount,
         method: selectedMethod,
       });
-      setTransactionRef(result.paymentId);
+      setTransactionRef(result.paymentId || result.payment_id || result.checkout_url || result.status || 'pending');
 
-      if (selectedMethod === 'wallet') {
-        // Local payment processing
-        await processWalletPayment(result.paymentId);
+      if (selectedMethod === 'wallet' && result.status === 'paid' || result.status === 'completed' || result.status === 'success') {
+        // Local wallet payment already completed
+        setStep('confirmation');
+        setTimeout(() => onSuccess({ id: '', userId: '', equbId, roundNumber, amount, feeDeducted: 0, hostCommissionDeducted: 0, paymentStatus: 'paid', transactionReference: String(result.payment_id || ''), paidAt: new Date().toISOString(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }), 1500);
+      } else if (selectedMethod === 'wallet') {
+        // Wallet payment accepted
+        setStep('confirmation');
+        setTimeout(() => onSuccess({ id: '', userId: '', equbId, roundNumber, amount, feeDeducted: 0, hostCommissionDeducted: 0, paymentStatus: 'paid', transactionReference: String(result.payment_id || ''), paidAt: new Date().toISOString(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }), 1500);
       } else {
         // Redirect to external gateway
         setStep('gateway-redirect');
-        window.location.href = result.gatewayUrl;
+        window.location.href = result.checkout_url;
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Payment initiation failed');
@@ -86,22 +91,11 @@ export const PaymentFlow: React.FC<PaymentFlowProps> = ({
     }
   };
 
-  const processWalletPayment = async (paymentId: string) => {
-    try {
-      const payment = await paymentService.verify(paymentId);
-      setStep('confirmation');
-      setTimeout(() => onSuccess(payment), 1500);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Payment processing failed');
-      setStep('error');
-    }
-  };
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-emerald-600 text-white p-4 flex justify-between items-center">
+        <div className="sticky top-0 bg-blue-700 text-white p-4 flex justify-between items-center">
           <h2 className="text-xl font-bold">Payment</h2>
           <button
             onClick={onCancel}
@@ -117,9 +111,9 @@ export const PaymentFlow: React.FC<PaymentFlowProps> = ({
           {step === 'method-selection' && (
             <>
               {/* Amount Display */}
-              <div className="bg-emerald-50 rounded-lg p-4 mb-6 text-center">
+              <div className="bg-blue-100 rounded-lg p-4 mb-6 text-center">
                 <p className="text-sm text-gray-600 mb-1">Amount to Pay</p>
-                <p className="text-4xl font-bold text-emerald-600">
+                <p className="text-4xl font-bold text-blue-700">
                   {amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </p>
                 <p className="text-sm text-gray-600 mt-1">ETB</p>
@@ -135,8 +129,8 @@ export const PaymentFlow: React.FC<PaymentFlowProps> = ({
                     disabled={!method.available}
                     className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
                       selectedMethod === method.id
-                        ? 'border-emerald-600 bg-emerald-50'
-                        : 'border-gray-200 hover:border-emerald-300'
+                        ? 'border-blue-700 bg-blue-100'
+                        : 'border-gray-200 hover:border-blue-300'
                     } ${!method.available ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     <div className="flex items-start gap-3">
@@ -179,7 +173,7 @@ export const PaymentFlow: React.FC<PaymentFlowProps> = ({
                 <button
                   onClick={handleInitiatePayment}
                   disabled={!selectedMethod || loading}
-                  className="flex-1 bg-emerald-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-blue-700 text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Processing...' : 'Proceed'}
                 </button>
@@ -197,7 +191,7 @@ export const PaymentFlow: React.FC<PaymentFlowProps> = ({
 
           {step === 'confirmation' && (
             <div className="text-center py-8">
-              <div className="text-6xl mb-4 text-emerald-600">✓</div>
+              <div className="text-6xl mb-4 text-blue-700">✓</div>
               <p className="text-lg font-semibold text-gray-900 mb-2">Payment Successful!</p>
               <p className="text-sm text-gray-600 mb-4">
                 Your payment has been processed. Your membership is now active.
@@ -207,7 +201,7 @@ export const PaymentFlow: React.FC<PaymentFlowProps> = ({
               )}
               <button
                 onClick={() => onSuccess({ id: transactionRef || '', userId: '', equbId, roundNumber, amount, feeDeducted: amount * 0.0008, hostCommissionDeducted: amount * 0.0002, paymentStatus: 'paid', transactionReference: transactionRef || '', paidAt: new Date().toISOString(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() })}
-                className="w-full bg-emerald-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-colors"
+                className="w-full bg-blue-700 text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-800 transition-colors"
               >
                 Continue
               </button>

@@ -332,7 +332,7 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
               <div
                 className={`flex items-center justify-center w-12 h-12 rounded-full font-bold text-sm transition-all mb-2 ${
                   s <= step
-                    ? 'bg-[#0d7e4d] text-white shadow-lg'
+                    ? 'bg-[#16357a] text-white shadow-lg'
                     : 'bg-gray-200 text-gray-500'
                 }`}
               >
@@ -346,7 +346,7 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
         </div>
         <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
           <div
-            className="bg-[#0d7e4d] h-full transition-all duration-300"
+            className="bg-[#16357a] h-full transition-all duration-300"
             style={{ width: `${(step / 5) * 100}%` }}
           />
         </div>
@@ -408,7 +408,7 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
 
           <button
             onClick={handleNext}
-            className="w-full py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all duration-200 mt-8"
+            className="w-full py-3 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all duration-200 mt-8"
           >
             {lang === 'en' ? 'Next →' : 'ቀጥል →'}
           </button>
@@ -446,13 +446,13 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
           <div className="flex gap-3 mt-8">
             <button
               onClick={handleBack}
-              className="flex-1 py-3 border-2 border-[#0d7e4d] text-[#0d7e4d] font-bold rounded-lg hover:bg-gray-50 transition-all"
+              className="flex-1 py-3 border-2 border-[#16357a] text-[#16357a] font-bold rounded-lg hover:bg-gray-50 transition-all"
             >
               {lang === 'en' ? '← Back' : '← ተመለስ'}
             </button>
             <button
               onClick={handleNext}
-              className="flex-1 py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all"
+              className="flex-1 py-3 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
             >
               {lang === 'en' ? 'Next →' : 'ቀጥል →'}
             </button>
@@ -481,13 +481,13 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
           <div className="flex gap-3 mt-8">
             <button
               onClick={handleBack}
-              className="flex-1 py-3 border-2 border-[#0d7e4d] text-[#0d7e4d] font-bold rounded-lg hover:bg-gray-50 transition-all"
+              className="flex-1 py-3 border-2 border-[#16357a] text-[#16357a] font-bold rounded-lg hover:bg-gray-50 transition-all"
             >
               {lang === 'en' ? '← Back' : '← ተመለስ'}
             </button>
             <button
               onClick={handleNext}
-              className="flex-1 py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all"
+              className="flex-1 py-3 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
             >
               {lang === 'en' ? 'Next →' : 'ቀጥል →'}
             </button>
@@ -525,7 +525,7 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
           <div className="flex gap-3 mt-8">
             <button
               onClick={handleBack}
-              className="flex-1 py-3 border-2 border-[#0d7e4d] text-[#0d7e4d] font-bold rounded-lg hover:bg-gray-50 transition-all"
+              className="flex-1 py-3 border-2 border-[#16357a] text-[#16357a] font-bold rounded-lg hover:bg-gray-50 transition-all"
             >
               {lang === 'en' ? '← Back' : '← ተመለስ'}
             </button>
@@ -536,7 +536,7 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
                   setStep(step + 1);
                 }
               }}
-              className="flex-1 py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all"
+              className="flex-1 py-3 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
             >
               {lang === 'en' ? 'Confirm →' : 'ያረጋግጡ →'}
             </button>
@@ -574,7 +574,7 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
           <div className="flex gap-3 mt-8">
             <button
               onClick={handleBack}
-              className="flex-1 py-3 border-2 border-[#0d7e4d] text-[#0d7e4d] font-bold rounded-lg hover:bg-gray-50 transition-all"
+              className="flex-1 py-3 border-2 border-[#16357a] text-[#16357a] font-bold rounded-lg hover:bg-gray-50 transition-all"
             >
               {lang === 'en' ? '← Back' : '← ተመለስ'}
             </button>
@@ -586,7 +586,7 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
                 handleSubmit();
               }}
               disabled={isLoading}
-              className="flex-1 py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all disabled:opacity-50"
+              className="flex-1 py-3 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all disabled:opacity-50"
             >
               {isLoading
                 ? ' Creating...'

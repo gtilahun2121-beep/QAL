@@ -59,7 +59,7 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
       {/* Drawer */}
       <div className="fixed left-0 top-0 bottom-0 w-full max-w-sm bg-white z-50 shadow-lg overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-emerald-600 text-white p-4 flex justify-between items-center">
+        <div className="sticky top-0 bg-blue-700 text-white p-4 flex justify-between items-center">
           <h2 className="text-xl font-bold">{translations.my_equbs[language]}</h2>
           <button onClick={onClose} className="text-2xl" aria-label="Close drawer">
             ✕
@@ -70,7 +70,7 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
         {user && (
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-2xl">
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-2xl">
                 
               </div>
               <div>
@@ -86,7 +86,7 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
           <button
             onClick={() => setActiveSection('account')}
             className={`w-full text-left px-4 py-3 ${
-              activeSection === 'account' ? 'bg-emerald-50 text-emerald-600' : 'text-gray-700'
+              activeSection === 'account' ? 'bg-blue-100 text-blue-700' : 'text-gray-700'
             }`}
           >
             {translations.current_balance[language]}
@@ -94,7 +94,7 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
           <button
             onClick={() => setActiveSection('wallet')}
             className={`w-full text-left px-4 py-3 ${
-              activeSection === 'wallet' ? 'bg-emerald-50 text-emerald-600' : 'text-gray-700'
+              activeSection === 'wallet' ? 'bg-blue-100 text-blue-700' : 'text-gray-700'
             }`}
           >
             {translations.linked_accounts[language]}
@@ -102,7 +102,7 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
           <button
             onClick={() => setActiveSection('trust')}
             className={`w-full text-left px-4 py-3 ${
-              activeSection === 'trust' ? 'bg-emerald-50 text-emerald-600' : 'text-gray-700'
+              activeSection === 'trust' ? 'bg-blue-100 text-blue-700' : 'text-gray-700'
             }`}
           >
             {translations.trust_score[language]}
@@ -110,7 +110,7 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
           <button
             onClick={() => setActiveSection('support')}
             className={`w-full text-left px-4 py-3 ${
-              activeSection === 'support' ? 'bg-emerald-50 text-emerald-600' : 'text-gray-700'
+              activeSection === 'support' ? 'bg-blue-100 text-blue-700' : 'text-gray-700'
             }`}
           >
             Support
@@ -122,15 +122,15 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
           {activeSection === 'account' && wallet && (
             <div>
               <h3 className="font-semibold text-gray-900 mb-3">{translations.current_balance[language]}</h3>
-              <div className="bg-emerald-50 rounded-lg p-4 mb-4">
+              <div className="bg-blue-100 rounded-lg p-4 mb-4">
                 <p className="text-sm text-gray-600 mb-1">Balance</p>
-                <p className="text-3xl font-bold text-emerald-600">
+                <p className="text-3xl font-bold text-blue-700">
                   {wallet.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} {wallet.currency}
                 </p>
               </div>
               <button
                 onClick={onViewHistory}
-                className="w-full bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
+                className="w-full bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800"
               >
                 {translations.transaction_history[language]}
               </button>
@@ -145,7 +145,7 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                 <p>• CBE Bank</p>
                 <p>• Dashen Bank</p>
               </div>
-              <button className="w-full mt-4 border border-emerald-600 text-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-50">
+              <button className="w-full mt-4 border border-blue-700 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-100">
                 Link New Account
               </button>
             </div>
@@ -156,9 +156,9 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
               <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                 {getTrustBadge(creditScore.tier)} {translations.trust_score[language]}
               </h3>
-              <div className="bg-emerald-50 rounded-lg p-4 mb-4">
+              <div className="bg-blue-100 rounded-lg p-4 mb-4">
                 <p className="text-sm text-gray-600 mb-2">Score</p>
-                <p className="text-2xl font-bold text-emerald-600">{creditScore.trustScore}</p>
+                <p className="text-2xl font-bold text-blue-700">{creditScore.trustScore}</p>
                 <p className="text-sm text-gray-600 mt-2">
                   Tier: {creditScore.tier.charAt(0).toUpperCase() + creditScore.tier.slice(1)}
                 </p>

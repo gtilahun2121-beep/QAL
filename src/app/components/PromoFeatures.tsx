@@ -39,7 +39,7 @@ export default function PromoFeatures({ features, title, subtitle }: PromoFeatur
     <section className="py-20 md:py-32 bg-white relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-0 right-0 w-72 h-72 bg-[#d4af37]/10 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#0d7e4d]/10 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#16357a]/10 rounded-full blur-3xl"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
@@ -50,7 +50,7 @@ export default function PromoFeatures({ features, title, subtitle }: PromoFeatur
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-4xl md:text-5xl font-black text-[#ce1126] mb-4">
+          <h2 className="text-4xl md:text-5xl font-black text-[#27487f] mb-4">
             {title}
           </h2>
           <p className="text-xl text-[#5a5a5a]">{subtitle}</p>
@@ -72,10 +72,10 @@ export default function PromoFeatures({ features, title, subtitle }: PromoFeatur
               whileHover={{ scale: 1.08, y: -12 }}
             >
               {/* Icon background glow */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#0d7e4d]/5 to-[#ce1126]/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-[#16357a]/5 to-[#27487f]/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
               <div className="relative z-10">
-                <h3 className="font-black text-lg text-[#0d7e4d] mb-3 group-hover:text-[#ce1126] transition-colors">
+                <h3 className="font-black text-lg text-[#16357a] mb-3 group-hover:text-[#27487f] transition-colors">
                   {feature.title}
                 </h3>
                 <p className="text-sm text-gray-600 mb-4 group-hover:text-gray-900 transition-colors">

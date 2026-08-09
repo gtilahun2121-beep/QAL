@@ -111,7 +111,7 @@ function FeaturesContent() {
       <Header lang={lang} onLanguageChange={handleLanguageChange} />
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-emerald-50 to-teal-50 py-16">
+      <section className="bg-gradient-to-br from-blue-100 to-blue-100 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             {t.features}
@@ -130,12 +130,12 @@ function FeaturesContent() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {navTabs.map((tab) => (
-              <div key={tab.id} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-8 border border-gray-200 hover:border-emerald-400 transition-colors">
+              <div key={tab.id} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-8 border border-gray-200 hover:border-blue-400 transition-colors">
                 <h3 className="font-bold text-lg mb-4 text-gray-900">{tab.title}</h3>
                 <ul className="space-y-2">
                   {tab.features.map((feature, idx) => (
                     <li key={idx} className="text-sm text-gray-600 flex items-start">
-                      <span className="text-emerald-500 mr-2">•</span>
+                      <span className="text-blue-1000 mr-2">•</span>
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -177,13 +177,13 @@ function FeaturesContent() {
               <ul className="space-y-4">
                 {offlineFeatures.map((feature, idx) => (
                   <li key={idx} className="flex items-start">
-                    <span className="text-emerald-600 font-bold mr-3">✓</span>
+                    <span className="text-blue-700 font-bold mr-3">✓</span>
                     <span className="text-gray-700">{feature}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="bg-gradient-to-br from-emerald-100 to-teal-100 rounded-lg h-96 flex items-center justify-center">
+            <div className="bg-gradient-to-br from-blue-100 to-blue-100 rounded-lg h-96 flex items-center justify-center">
               <div className="text-center">
                 <p className="text-gray-700 font-semibold">Offline-First Architecture</p>
               </div>

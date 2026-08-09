@@ -205,9 +205,9 @@ export default function ForgotPinFormRefactored({
             title=" PIN Reset Successful!"
             message="Your access code has been reset. You can now sign in with your new PIN."
           />
-          <div className="mt-6 bg-green-50 border-2 border-green-200 rounded-lg p-4">
-            <p className="text-sm font-bold text-green-900 mb-3">✓ What's Next:</p>
-            <ul className="space-y-1 text-xs text-green-800">
+          <div className="mt-6 bg-blue-100 border-2 border-blue-200 rounded-lg p-4">
+            <p className="text-sm font-bold text-blue-950 mb-3">✓ What's Next:</p>
+            <ul className="space-y-1 text-xs text-blue-900">
               <li>✓ Use your phone number to sign in</li>
               <li>✓ Enter your new 4-digit PIN</li>
               <li>✓ Access your Equb account</li>
@@ -217,7 +217,7 @@ export default function ForgotPinFormRefactored({
             onClick={() => (window.location.href = '/auth')}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="w-full py-3 mt-6 bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300"
+            className="w-full py-3 mt-6 bg-gradient-to-r from-[#16357a] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300"
           >
              Go to Sign In
           </motion.button>

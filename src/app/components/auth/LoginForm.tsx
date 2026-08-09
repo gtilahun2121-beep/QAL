@@ -107,7 +107,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
       {/* Step 1: Phone Number */}
       {step === 'phone' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <h3 className="text-2xl font-black text-[#ce1126] mb-2 text-center">
+          <h3 className="text-2xl font-black text-[#27487f] mb-2 text-center">
              Sign In
           </h3>
           <p className="text-center text-sm text-gray-600 mb-6">
@@ -116,7 +116,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-bold text-[#0d7e4d] mb-2">
+              <label className="block text-sm font-bold text-[#16357a] mb-2">
                 Phone Number
               </label>
               <input
@@ -124,7 +124,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
                 placeholder="+251911223344"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-[#d4af37] rounded-lg focus:outline-none focus:border-[#ce1126] font-bold text-lg"
+                className="w-full px-4 py-3 border-2 border-[#d4af37] rounded-lg focus:outline-none focus:border-[#27487f] font-bold text-lg"
               />
               <p className="text-xs text-[#5a5a5a] mt-1">
                 Same number you used to register
@@ -146,14 +146,14 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
               disabled={loading}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="w-full py-3 bg-gradient-to-r from-[#ce1126] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+              className="w-full py-3 bg-gradient-to-r from-[#27487f] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
             >
               {loading ? ' Verifying...' : '✓ Continue'}
             </motion.button>
 
             <p className="text-center text-sm text-[#5a5a5a] mb-6">
               Don't have an account?{' '}
-              <a href="/auth?mode=register" className="text-[#0d7e4d] font-black hover:underline">
+              <a href="/auth?mode=register" className="text-[#16357a] font-black hover:underline">
                 Sign up here
               </a>
             </p>
@@ -164,7 +164,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
       {/* Step 2: PIN Entry */}
       {step === 'pin' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <h3 className="text-2xl font-black text-[#ce1126] mb-2 text-center">
+          <h3 className="text-2xl font-black text-[#27487f] mb-2 text-center">
              Enter Your PIN
           </h3>
           <p className="text-sm text-center text-[#5a5a5a] mb-6">
@@ -173,7 +173,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-bold text-[#0d7e4d] mb-2">
+              <label className="block text-sm font-bold text-[#16357a] mb-2">
                 4-Digit Security PIN
               </label>
               <input
@@ -182,7 +182,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
                 maxLength={4}
                 value={pin}
                 onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
-                className="w-full px-4 py-3 border-2 border-[#d4af37] rounded-lg focus:outline-none focus:border-[#ce1126] font-bold text-3xl text-center tracking-widest"
+                className="w-full px-4 py-3 border-2 border-[#d4af37] rounded-lg focus:outline-none focus:border-[#27487f] font-bold text-3xl text-center tracking-widest"
               />
               <p className="text-xs text-[#5a5a5a] mt-1">
                 Enter the PIN you set during registration
@@ -204,7 +204,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
               disabled={loading}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="w-full py-3 bg-gradient-to-r from-[#ce1126] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+              className="w-full py-3 bg-gradient-to-r from-[#27487f] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
             >
               {loading ? ' Verifying...' : ' Login'}
             </motion.button>
@@ -215,7 +215,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
                 setError('');
                 setPin('');
               }}
-              className="w-full py-2 text-[#0d7e4d] font-bold hover:underline"
+              className="w-full py-2 text-[#16357a] font-bold hover:underline"
             >
               ← Use Different Phone
             </button>
@@ -233,7 +233,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
               }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="w-full py-2 border-2 border-[#d4af37] text-[#0d7e4d] font-bold rounded-lg hover:bg-[#d4af37]/10 transition-all"
+              className="w-full py-2 border-2 border-[#d4af37] text-[#16357a] font-bold rounded-lg hover:bg-[#d4af37]/10 transition-all"
             >
                Reset PIN
             </motion.button>
@@ -256,15 +256,15 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
             
           </motion.div>
 
-          <h3 className="text-2xl font-black text-[#0d7e4d] mb-4">
+          <h3 className="text-2xl font-black text-[#16357a] mb-4">
             Welcome Back!
           </h3>
           <p className="text-gray-600 mb-6">
             Hello, {userData.fullName}! 
           </p>
 
-          <div className="bg-[#0d7e4d]/10 border-2 border-[#0d7e4d] rounded-lg p-4 mb-6 text-left">
-            <p className="text-sm font-bold text-[#0d7e4d] mb-3">✓ Account Details:</p>
+          <div className="bg-[#16357a]/10 border-2 border-[#16357a] rounded-lg p-4 mb-6 text-left">
+            <p className="text-sm font-bold text-[#16357a] mb-3">✓ Account Details:</p>
             <div className="space-y-2 text-xs text-gray-600">
               <p> Phone: {userData.phoneNumber}</p>
               <p> Name: {userData.fullName}</p>
@@ -277,7 +277,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
             onClick={() => window.location.href = '/'}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="w-full py-3 bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 mb-3"
+            className="w-full py-3 bg-gradient-to-r from-[#16357a] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 mb-3"
           >
              Go to Dashboard
           </motion.button>
@@ -286,7 +286,7 @@ export default function LoginForm({ lang, onSuccess, onError }: LoginFormProps) 
             onClick={() => window.location.href = '/'}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="w-full py-2 border-2 border-[#0d7e4d] text-[#0d7e4d] font-bold rounded-full hover:bg-[#0d7e4d]/10 transition-all"
+            className="w-full py-2 border-2 border-[#16357a] text-[#16357a] font-bold rounded-full hover:bg-[#16357a]/10 transition-all"
           >
              Go to Home
           </motion.button>

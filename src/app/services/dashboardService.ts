@@ -1,8 +1,13 @@
 /**
  * Dashboard Service
- * Per-user dashboard state persisted in localStorage so the dashboard,
- * wallet, my-equbs and join-equb pages stay in sync.
+ * DB-backed per-user dashboard state.
+ *
+ * Reads the user's real Equbs, wallet balance and contribution/payout history
+ * from the backend API and caches a mirror in localStorage so the dashboard,
+ * wallet, my-equbs and join-equb pages stay in sync and work offline.
  */
+
+import { equbAPI, walletAPI } from '@/app/services/api';
 
 export interface DashboardEqub {
   id: string;
@@ -264,6 +269,102 @@ export const DashboardService = {
     } catch (error) {
       console.error('Failed to save dashboard state:', error);
     }
+  },
+
+  /**
+   * Load real DB-backed dashboard state from the backend API and merge it
+   * with any locally persisted preferences (notifications, activity, steps).
+   * Falls back to local state if the API is unreachable.
+   */
+  async loadFromApi(userId: string): Promise<DashboardState> {
+    const local = this.loadState(userId);
+
+    try {
+      const [equbs, wallet] = await Promise.all([
+        equbAPI.myEqubs(),
+        walletAPI.get(),
+      ]);
+
+      const dashboardState: DashboardState = {
+        ...local,
+        walletBalance: wallet ? Number(wallet.balance) : local.walletBalance,
+        equbs: equbs.map((e: any) => this.toDashboardEqub(e, userId)),
+      };
+
+      // Build transaction history from the user's real contributions + payouts.
+      const equbTxns = await this.fetchTransactionsEqubs(dashboardState.equbs);
+      if (equbTxns.length > 0) {
+        dashboardState.transactions = equbTxns;
+      }
+
+      // Keep a mirror so the UI is instant on next visit.
+      this.persist(userId, dashboardState);
+      return dashboardState;
+    } catch (error) {
+      console.warn('Dashboard API load failed, using local state:', error);
+      return local;
+    }
+  },
+
+  /**
+   * Maps a backend equb record (toEqubResponse shape) into the DashboardEqub UI model.
+   */
+  toDashboardEqub(e: any, userId: string): DashboardEqub {
+    const cycleDays = Number(e.frequency || 30) || 30;
+    const currentRound = Number(e.currentRound) || 1;
+    const base = e.startDate ? new Date(e.startDate).getTime() : Date.now();
+    const nextPaymentDate = new Date(
+      base + (currentRound - 1) * cycleDays * 86400000
+    ).toISOString().split('T')[0];
+
+    return {
+      id: e.id,
+      name: e.name,
+      members: Number(e.totalMembers) || 0,
+      position: currentRound,
+      contribution: Number(e.contributionAmount) || 0,
+      nextPaymentDate,
+      nextPayout:
+        e.status === 'active' && Number(e.totalMembers) > 1
+          ? `${Math.max(1, Math.ceil((Number(e.totalMembers) || currentRound) / 2))} months`
+          : '—',
+      status: e.status === 'active' ? 'active' : 'pending_contribution',
+      category: e.category,
+      description: e.description,
+      manager: Boolean(e.isManager),
+    };
+  },
+
+  /**
+   * Builds transaction rows from each equb's contribution/payout data in the DB.
+   */
+  async fetchTransactionsEqubs(equbs: DashboardEqub[]): Promise<DashboardTransaction[]> {
+    const txns: DashboardTransaction[] = [];
+
+    await Promise.all(
+      equbs.map(async (equb) => {
+        try {
+          const dashboard = await equbAPI.memberDashboard(equb.id);
+          const contributed = Number(dashboard?.totalPaid) || 0;
+          const count = Number(dashboard?.contributionsMade) || 0;
+
+          if (count > 0 && contributed > 0) {
+            txns.push({
+              id: `db_txn_pay_${equb.id}`,
+              type: 'Payment',
+              equb: equb.name,
+              amount: -contributed,
+              date: equb.nextPaymentDate,
+              status: 'Completed',
+            });
+          }
+        } catch {
+          // Skip equbs that fail to load their dashboard detail.
+        }
+      })
+    );
+
+    return txns.sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 20);
   },
 
   addNotification(

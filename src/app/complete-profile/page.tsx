@@ -137,7 +137,7 @@ export default function CompleteProfilePage() {
               <select
                 value={formData.profession}
                 onChange={(e) => handleFieldChange('profession', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0d7e4d]"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16357a]"
               >
                 <option value="">
                   {lang === 'en' ? '-- Choose a category --' : '-- Filadhu --'}

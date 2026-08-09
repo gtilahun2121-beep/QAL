@@ -85,7 +85,7 @@ export default function AuthModal({
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] px-8 py-6 flex justify-between items-center">
+            <div className="bg-gradient-to-r from-[#16357a] to-[#d4af37] px-8 py-6 flex justify-between items-center">
               <div>
                 <h2 className="text-2xl font-black text-white">QalNet</h2>
                 <p className="text-sm text-white/80 font-semibold mt-1">
@@ -111,7 +111,7 @@ export default function AuthModal({
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex-1 py-4 px-4 font-bold text-sm transition-all flex items-center justify-center gap-2 ${
                     activeTab === tab.id
-                      ? 'bg-[#0d7e4d] text-white border-b-4 border-[#d4af37]'
+                      ? 'bg-[#16357a] text-white border-b-4 border-[#d4af37]'
                       : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
                   }`}
                 >

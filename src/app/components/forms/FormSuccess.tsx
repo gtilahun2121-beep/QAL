@@ -12,10 +12,10 @@ export default function FormSuccess({ title, message }: FormSuccessProps) {
     <motion.div
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-green-50 border-2 border-green-200 rounded-lg p-6 text-center"
+      className="bg-blue-100 border-2 border-blue-200 rounded-lg p-6 text-center"
     >
-      <h3 className="text-2xl font-black text-green-900 mb-2">{title}</h3>
-      <p className="text-green-700 text-sm">{message}</p>
+      <h3 className="text-2xl font-black text-blue-950 mb-2">{title}</h3>
+      <p className="text-blue-800 text-sm">{message}</p>
     </motion.div>
   );
 }

@@ -115,7 +115,7 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
       {/* Step 1: Phone Verification */}
       {step === 'phone' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <h3 className="text-2xl font-black text-[#ce1126] mb-2 text-center">
+          <h3 className="text-2xl font-black text-[#27487f] mb-2 text-center">
              Reset Access Code
           </h3>
           <p className="text-center text-sm text-gray-600 mb-6">
@@ -124,7 +124,7 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-bold text-[#0d7e4d] mb-2">
+              <label className="block text-sm font-bold text-[#16357a] mb-2">
                 Phone Number
               </label>
               <input
@@ -132,7 +132,7 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
                 placeholder="+251911223344"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-[#d4af37] rounded-lg focus:outline-none focus:border-[#ce1126] font-bold"
+                className="w-full px-4 py-3 border-2 border-[#d4af37] rounded-lg focus:outline-none focus:border-[#27487f] font-bold"
               />
               <p className="text-xs text-[#5a5a5a] mt-1">
                 Same number you used to register
@@ -154,7 +154,7 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
               disabled={loading}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="w-full py-3 bg-gradient-to-r from-[#ce1126] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+              className="w-full py-3 bg-gradient-to-r from-[#27487f] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
             >
               {loading ? ' Sending Code...' : ' Send Verification Code'}
             </motion.button>
@@ -165,7 +165,7 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
       {/* Step 2: OTP Verification */}
       {step === 'otp' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <h3 className="text-2xl font-black text-[#ce1126] mb-2 text-center">
+          <h3 className="text-2xl font-black text-[#27487f] mb-2 text-center">
              Verify Code
           </h3>
           <p className="text-center text-sm text-gray-600 mb-6">
@@ -174,7 +174,7 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-bold text-[#0d7e4d] mb-2">
+              <label className="block text-sm font-bold text-[#16357a] mb-2">
                 Verification Code
               </label>
               <input
@@ -183,7 +183,7 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
                 maxLength={6}
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                className="w-full px-4 py-3 border-2 border-[#d4af37] rounded-lg focus:outline-none focus:border-[#ce1126] font-bold text-3xl text-center tracking-widest"
+                className="w-full px-4 py-3 border-2 border-[#d4af37] rounded-lg focus:outline-none focus:border-[#27487f] font-bold text-3xl text-center tracking-widest"
               />
               <p className="text-xs text-[#5a5a5a] mt-2 text-center">
                 Demo: Use any 6-digit code
@@ -205,7 +205,7 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
               disabled={loading}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="w-full py-3 bg-gradient-to-r from-[#ce1126] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+              className="w-full py-3 bg-gradient-to-r from-[#27487f] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
             >
               {loading ? ' Verifying...' : '✓ Verify Code'}
             </motion.button>
@@ -216,7 +216,7 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
                 setError('');
                 setOtp('');
               }}
-              className="w-full py-2 text-[#0d7e4d] font-bold hover:underline"
+              className="w-full py-2 text-[#16357a] font-bold hover:underline"
             >
               ← Back
             </button>
@@ -227,7 +227,7 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
       {/* Step 3: Set New PIN */}
       {step === 'newpin' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <h3 className="text-2xl font-black text-[#ce1126] mb-2 text-center">
+          <h3 className="text-2xl font-black text-[#27487f] mb-2 text-center">
              Create New Access Code
           </h3>
           <p className="text-center text-sm text-gray-600 mb-6">
@@ -236,7 +236,7 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-bold text-[#0d7e4d] mb-2">
+              <label className="block text-sm font-bold text-[#16357a] mb-2">
                 New 4-Digit PIN
               </label>
               <input
@@ -245,7 +245,7 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
                 maxLength={4}
                 value={newPin}
                 onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ''))}
-                className="w-full px-4 py-3 border-2 border-[#d4af37] rounded-lg focus:outline-none focus:border-[#ce1126] font-bold text-2xl text-center tracking-widest"
+                className="w-full px-4 py-3 border-2 border-[#d4af37] rounded-lg focus:outline-none focus:border-[#27487f] font-bold text-2xl text-center tracking-widest"
               />
               <p className="text-xs text-[#5a5a5a] mt-1">
                 You'll use this to sign in
@@ -253,7 +253,7 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-[#0d7e4d] mb-2">
+              <label className="block text-sm font-bold text-[#16357a] mb-2">
                 Confirm PIN
               </label>
               <input
@@ -262,7 +262,7 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
                 maxLength={4}
                 value={confirmPin}
                 onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, ''))}
-                className="w-full px-4 py-3 border-2 border-[#d4af37] rounded-lg focus:outline-none focus:border-[#ce1126] font-bold text-2xl text-center tracking-widest"
+                className="w-full px-4 py-3 border-2 border-[#d4af37] rounded-lg focus:outline-none focus:border-[#27487f] font-bold text-2xl text-center tracking-widest"
               />
               <p className="text-xs text-[#5a5a5a] mt-1">
                 Must match the new PIN above
@@ -284,7 +284,7 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
               disabled={loading}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="w-full py-3 bg-gradient-to-r from-[#ce1126] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+              className="w-full py-3 bg-gradient-to-r from-[#27487f] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300 disabled:opacity-50"
             >
               {loading ? ' Resetting...' : '✓ Reset PIN'}
             </motion.button>
@@ -296,7 +296,7 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
                 setNewPin('');
                 setConfirmPin('');
               }}
-              className="w-full py-2 text-[#0d7e4d] font-bold hover:underline"
+              className="w-full py-2 text-[#16357a] font-bold hover:underline"
             >
               ← Back
             </button>
@@ -311,16 +311,16 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
           animate={{ opacity: 1, scale: 1 }}
           className="text-center"
         >
-          <h3 className="text-2xl font-black text-[#0d7e4d] mb-4">
+          <h3 className="text-2xl font-black text-[#16357a] mb-4">
             PIN Reset Successful!
           </h3>
           <p className="text-gray-600 mb-6">
             Your access code has been successfully reset
           </p>
 
-          <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4 mb-6 text-left">
-            <p className="text-sm font-bold text-green-900 mb-2">✓ What's Next:</p>
-            <ul className="space-y-1 text-xs text-green-800">
+          <div className="bg-blue-100 border-2 border-blue-200 rounded-lg p-4 mb-6 text-left">
+            <p className="text-sm font-bold text-blue-950 mb-2">✓ What's Next:</p>
+            <ul className="space-y-1 text-xs text-blue-900">
               <li>✓ Use your phone number to sign in</li>
               <li>✓ Enter your new 4-digit PIN</li>
               <li>✓ Access your Equb account</li>
@@ -331,7 +331,7 @@ export default function ForgotPinForm({ onSuccess, onError }: ForgotPinFormProps
             onClick={() => window.location.href = '/auth'}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="w-full py-3 bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300"
+            className="w-full py-3 bg-gradient-to-r from-[#16357a] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all duration-300"
           >
              Go to Sign In
           </motion.button>

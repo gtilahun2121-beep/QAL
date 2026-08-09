@@ -37,7 +37,7 @@ export const BottomNavigation: React.FC<BottomNavProps> = ({
           onClick={() => onTabChange(item.id)}
           className={`flex flex-col items-center justify-center w-full h-full transition-colors ${
             activeTab === item.id
-              ? 'text-emerald-600 bg-emerald-50'
+              ? 'text-blue-700 bg-blue-100'
               : 'text-gray-600 hover:bg-gray-50'
           }`}
           aria-label={item.label}

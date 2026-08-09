@@ -35,7 +35,7 @@ export default function AdminSetupPage() {
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-2xl p-8 shadow-xl"
           >
-            <h1 className="text-3xl font-black text-[#0d7e4d] mb-2 text-center">
+            <h1 className="text-3xl font-black text-[#16357a] mb-2 text-center">
                Admin Portal Setup
             </h1>
             <p className="text-center text-gray-600 mb-8">
@@ -69,7 +69,7 @@ export default function AdminSetupPage() {
                   <div className="space-y-3">
                     {credentials.map((cred, idx) => (
                       <div key={idx} className="bg-white p-3 rounded border-l-4 border-blue-500 text-sm">
-                        <p className="font-bold text-[#0d7e4d]">{cred.role}</p>
+                        <p className="font-bold text-[#16357a]">{cred.role}</p>
                         <p className="text-xs text-gray-600">{cred.email}</p>
                         <p className="text-xs text-gray-600">{cred.password}</p>
                         <p className="text-xs text-gray-600">MFA: {cred.mfa}</p>
@@ -84,15 +84,15 @@ export default function AdminSetupPage() {
                 animate={{ opacity: 1 }}
                 className="text-center space-y-6"
               >
-                <h2 className="text-2xl font-black text-[#0d7e4d]">
+                <h2 className="text-2xl font-black text-[#16357a]">
                   Setup Complete!
                 </h2>
                 <p className="text-gray-600">
                   Demo admin accounts have been initialized. You can now log in with any of the credentials below.
                 </p>
 
-                <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4 text-left">
-                  <p className="font-black text-green-900 mb-3">✓ Available Admin Accounts:</p>
+                <div className="bg-blue-100 border-2 border-blue-200 rounded-lg p-4 text-left">
+                  <p className="font-black text-blue-950 mb-3">✓ Available Admin Accounts:</p>
                   <div className="space-y-2 text-sm">
                     {credentials.map((cred, idx) => (
                       <div key={idx} className="text-gray-700">
@@ -120,7 +120,7 @@ export default function AdminSetupPage() {
                     href="/"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="block py-3 border-2 border-[#0d7e4d] text-[#0d7e4d] font-black rounded-full hover:bg-[#0d7e4d]/10 transition-all text-center"
+                    className="block py-3 border-2 border-[#16357a] text-[#16357a] font-black rounded-full hover:bg-[#16357a]/10 transition-all text-center"
                   >
                      Go to Home
                   </motion.a>
@@ -136,20 +136,20 @@ export default function AdminSetupPage() {
             transition={{ delay: 0.3 }}
             className="mt-8 bg-white rounded-2xl p-6 shadow-lg"
           >
-            <h3 className="text-xl font-black text-[#0d7e4d] mb-4">
+            <h3 className="text-xl font-black text-[#16357a] mb-4">
               Admin Roles Explained
             </h3>
 
             <div className="space-y-4">
-              <div className="border-l-4 border-[#0d7e4d] pl-4">
-                <h4 className="font-black text-[#0d7e4d]">Super Admin</h4>
+              <div className="border-l-4 border-[#16357a] pl-4">
+                <h4 className="font-black text-[#16357a]">Super Admin</h4>
                 <p className="text-sm text-gray-600">
                   Full access. Can manage all users, approve KYC, handle disputes, view finances, and manage other admins.
                 </p>
               </div>
 
-              <div className="border-l-4 border-green-500 pl-4">
-                <h4 className="font-black text-green-700">KYC Approver</h4>
+              <div className="border-l-4 border-blue-1000 pl-4">
+                <h4 className="font-black text-blue-800">KYC Approver</h4>
                 <p className="text-sm text-gray-600">
                   Reviews member KYC documents. Can approve or reject documents with notes.
                 </p>

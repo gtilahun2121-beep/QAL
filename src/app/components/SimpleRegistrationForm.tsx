@@ -88,9 +88,9 @@ export default function SimpleRegistrationForm({
       <div className="mb-8">
         <div className="flex justify-between mb-4">
           {[1, 2, 3, 4].map(s => (
-            <div key={s} className={`flex-1 text-center ${s <= step ? 'text-[#0d7e4d]' : 'text-gray-400'}`}>
+            <div key={s} className={`flex-1 text-center ${s <= step ? 'text-[#16357a]' : 'text-gray-400'}`}>
               <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold mx-auto mb-2 ${
-                s < step ? 'bg-[#0d7e4d] text-white' : s === step ? 'bg-[#0d7e4d] text-white border-2 border-white' : 'bg-gray-200'
+                s < step ? 'bg-[#16357a] text-white' : s === step ? 'bg-[#16357a] text-white border-2 border-white' : 'bg-gray-200'
               }`}>
                 {s < step ? '✓' : s}
               </div>
@@ -99,7 +99,7 @@ export default function SimpleRegistrationForm({
           ))}
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
-          <div className="bg-[#0d7e4d] h-2 rounded-full transition-all" style={{ width: `${(step/4)*100}%` }} />
+          <div className="bg-[#16357a] h-2 rounded-full transition-all" style={{ width: `${(step/4)*100}%` }} />
         </div>
       </div>
 
@@ -113,7 +113,7 @@ export default function SimpleRegistrationForm({
             placeholder="First Name"
             value={formData.firstName}
             onChange={e => updateField('firstName', e.target.value)}
-            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#0d7e4d] focus:outline-none"
+            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#16357a] focus:outline-none"
           />
           {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName}</p>}
           
@@ -122,7 +122,7 @@ export default function SimpleRegistrationForm({
             placeholder="Last Name"
             value={formData.lastName}
             onChange={e => updateField('lastName', e.target.value)}
-            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#0d7e4d] focus:outline-none"
+            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#16357a] focus:outline-none"
           />
           {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName}</p>}
 
@@ -134,7 +134,7 @@ export default function SimpleRegistrationForm({
                 setErrors({ firstName: 'Min 2 chars', lastName: 'Min 2 chars' });
               }
             }}
-            className="w-full bg-[#0d7e4d] text-white font-bold py-3 rounded-lg hover:bg-[#0a5c38] mt-6"
+            className="w-full bg-[#16357a] text-white font-bold py-3 rounded-lg hover:bg-[#27487f] mt-6"
           >
             Next →
           </button>
@@ -149,7 +149,7 @@ export default function SimpleRegistrationForm({
             placeholder="+2519 + 8 digits"
             value={formData.phoneNumber}
             onChange={e => updateField('phoneNumber', e.target.value)}
-            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#0d7e4d] focus:outline-none"
+            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#16357a] focus:outline-none"
           />
           {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber}</p>}
 
@@ -158,14 +158,14 @@ export default function SimpleRegistrationForm({
             placeholder="user@gmail.com"
             value={formData.email}
             onChange={e => updateField('email', e.target.value)}
-            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#0d7e4d] focus:outline-none"
+            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#16357a] focus:outline-none"
           />
           {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
 
           <div className="flex gap-3">
             <button
               onClick={() => setStep(1)}
-              className="flex-1 border-2 border-[#0d7e4d] text-[#0d7e4d] font-bold py-3 rounded-lg hover:bg-gray-50"
+              className="flex-1 border-2 border-[#16357a] text-[#16357a] font-bold py-3 rounded-lg hover:bg-gray-50"
             >
               ← Back
             </button>
@@ -179,7 +179,7 @@ export default function SimpleRegistrationForm({
                   if (!formData.email.endsWith('@gmail.com')) setErrors({ email: '@gmail.com only' });
                 }
               }}
-              className="flex-1 bg-[#0d7e4d] text-white font-bold py-3 rounded-lg hover:bg-[#0a5c38]"
+              className="flex-1 bg-[#16357a] text-white font-bold py-3 rounded-lg hover:bg-[#27487f]"
             >
               Next →
             </button>
@@ -196,16 +196,16 @@ export default function SimpleRegistrationForm({
             value={formData.fayda}
             onChange={e => updateField('fayda', e.target.value)}
             disabled={fayda.verified}
-            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#0d7e4d] focus:outline-none disabled:bg-gray-100"
+            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#16357a] focus:outline-none disabled:bg-gray-100"
           />
           {errors.fayda && <p className="text-red-500 text-sm">{errors.fayda}</p>}
 
           {fayda.verified ? (
-            <div className="bg-green-50 border-2 border-green-300 rounded-lg p-4 flex items-center gap-3">
+            <div className="bg-blue-100 border-2 border-blue-300 rounded-lg p-4 flex items-center gap-3">
               <span className="text-2xl">✓</span>
               <div>
-                <p className="font-bold text-green-800">Identity Verified</p>
-                <p className="text-sm text-green-700">Fayda ID confirmed</p>
+                <p className="font-bold text-blue-900">Identity Verified</p>
+                <p className="text-sm text-blue-800">Fayda ID confirmed</p>
               </div>
             </div>
           ) : null}
@@ -223,7 +223,7 @@ export default function SimpleRegistrationForm({
             }}
             disabled={fayda.verified || fayda.verifying}
             className={`w-full font-bold py-3 rounded-lg ${
-              fayda.verified ? 'bg-green-100 text-green-800 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'
+              fayda.verified ? 'bg-blue-100 text-blue-900 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'
             }`}
           >
             {fayda.verifying ? ' Verifying...' : fayda.verified ? '✓ Verified' : 'Verify with Fayda'}
@@ -232,7 +232,7 @@ export default function SimpleRegistrationForm({
           <div className="flex gap-3">
             <button
               onClick={() => setStep(2)}
-              className="flex-1 border-2 border-[#0d7e4d] text-[#0d7e4d] font-bold py-3 rounded-lg hover:bg-gray-50"
+              className="flex-1 border-2 border-[#16357a] text-[#16357a] font-bold py-3 rounded-lg hover:bg-gray-50"
             >
               ← Back
             </button>
@@ -240,7 +240,7 @@ export default function SimpleRegistrationForm({
               onClick={() => fayda.verified && setStep(4)}
               disabled={!fayda.verified}
               className={`flex-1 font-bold py-3 rounded-lg ${
-                fayda.verified ? 'bg-[#0d7e4d] text-white hover:bg-[#0a5c38]' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                fayda.verified ? 'bg-[#16357a] text-white hover:bg-[#27487f]' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
               Next →
@@ -262,14 +262,14 @@ export default function SimpleRegistrationForm({
             value={formData.otp}
             onChange={e => updateField('otp', e.target.value)}
             maxLength={5}
-            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#0d7e4d] focus:outline-none text-center text-2xl tracking-widest"
+            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#16357a] focus:outline-none text-center text-2xl tracking-widest"
           />
           {errors.otp && <p className="text-red-500 text-sm text-center">{errors.otp}</p>}
           {errors.submit && <p className="text-red-500 text-sm text-center">{errors.submit}</p>}
 
-          <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
-            <h4 className="font-bold text-green-900 text-sm mb-3">Security</h4>
-            <div className="space-y-2 text-sm text-green-700">
+          <div className="bg-blue-100 border-2 border-blue-200 rounded-lg p-4">
+            <h4 className="font-bold text-blue-950 text-sm mb-3">Security</h4>
+            <div className="space-y-2 text-sm text-blue-800">
               <div className="flex items-center gap-2"><span className="font-black">✓</span><span>End-to-end encryption</span></div>
               <div className="flex items-center gap-2"><span className="font-black">✓</span><span>Fayda verified</span></div>
               <div className="flex items-center gap-2"><span className="font-black">✓</span><span>OTP verified</span></div>
@@ -280,14 +280,14 @@ export default function SimpleRegistrationForm({
           <div className="flex gap-3">
             <button
               onClick={() => setStep(3)}
-              className="flex-1 border-2 border-[#0d7e4d] text-[#0d7e4d] font-bold py-3 rounded-lg hover:bg-gray-50"
+              className="flex-1 border-2 border-[#16357a] text-[#16357a] font-bold py-3 rounded-lg hover:bg-gray-50"
             >
               ← Back
             </button>
             <button
               onClick={handleCreateAccount}
               disabled={submitting}
-              className="flex-1 bg-[#0d7e4d] text-white font-bold py-3 rounded-lg hover:bg-[#0a5c38] disabled:opacity-50"
+              className="flex-1 bg-[#16357a] text-white font-bold py-3 rounded-lg hover:bg-[#27487f] disabled:opacity-50"
             >
               {submitting ? ' Creating...' : ' Create Account'}
             </button>

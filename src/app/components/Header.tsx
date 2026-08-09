@@ -23,13 +23,13 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
   ];
 
   return (
-    <header className="bg-gradient-to-r from-[#0d7e4d] to-[#ce1126] shadow-2xl sticky top-0 z-50 border-b-4 border-[#d4af37]">
+    <header className="bg-gradient-to-r from-[#0a1f3d] to-[#16357a] shadow-2xl sticky top-0 z-50 border-b-4 border-[#d4af37]">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#d4af37] to-[#ce1126] rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-              <span className="text-[#0d7e4d] font-black text-lg">Q</span>
+            <div className="w-10 h-10 bg-gradient-to-br from-[#d4af37] to-[#27487f] rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <span className="text-[#0a1f3d] font-black text-lg">Q</span>
             </div>
             <div>
               <span className="font-black text-2xl text-white drop-shadow-lg">QalNet</span>
@@ -56,7 +56,7 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
             <select
               value={lang}
               onChange={(e) => onLanguageChange(e.target.value as Language)}
-              className="px-4 py-2 border-2 border-[#d4af37] rounded-full text-sm bg-white text-[#0d7e4d] font-bold cursor-pointer"
+              className="px-4 py-2 border-2 border-[#d4af37] rounded-full text-sm bg-white text-[#0a1f3d] font-bold cursor-pointer"
             >
               {(Object.keys(languages) as Language[]).map((l) => (
                 <option key={l} value={l}>
@@ -69,7 +69,7 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
             {!isAuthenticated && (
               <button
                 onClick={onSignUpClick}
-                className="hidden sm:inline-block px-6 py-2 bg-white text-[#0d7e4d] font-bold rounded-full hover:shadow-lg transition-all text-sm"
+                className="hidden sm:inline-block px-6 py-2 bg-white text-[#0a1f3d] font-bold rounded-full hover:shadow-lg transition-all text-sm"
               >
                  Sign Up
               </button>
@@ -106,7 +106,7 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
                   onSignUpClick?.();
                   setMobileMenuOpen(false);
                 }}
-                className="w-full px-4 py-3 bg-white text-[#0d7e4d] font-bold rounded-lg"
+                className="w-full px-4 py-3 bg-white text-[#0a1f3d] font-bold rounded-lg"
               >
                  Sign Up
               </button>

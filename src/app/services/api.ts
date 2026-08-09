@@ -194,34 +194,33 @@ export const authAPI = {
  */
 export const userAPI = {
   /**
-   * Get user profile
+   * Get current authenticated user profile
    */
-  getProfile: (userId: string) =>
-    request<any>(`/users/${userId}`, {
+  getProfile: () =>
+    request<any>('/auth/me', {
       method: 'GET',
     }),
 
   /**
-   * Update user profile
+   * Update user profile (extends /auth me)
    */
   updateProfile: (userId: string, data: any) =>
-    request<any>(`/users/${userId}`, {
+    request<any>(`/auth/users/${userId}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
     }),
 };
 
 /**
- * Equb API Endpoints
+ * Equb API Endpoints (matches backend /equbs routes)
  */
 export const equbAPI = {
   /**
-   * Get all equbs
+   * Get all equbs (requires auth)
    */
-  getAll: (params?: { page?: number; limit?: number }) =>
-    request<any>('/equbs', {
+  getAll: () =>
+    request<any[]>('/equbs', {
       method: 'GET',
-      params,
     }),
 
   /**
@@ -236,46 +235,151 @@ export const equbAPI = {
    * Create new equb
    */
   create: (data: any) =>
-    request<any>('/equbs', {
+    request<any>('/equbs/create', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
   /**
-   * Join equb
+   * List the equbs the current user is a member of
    */
-  join: (equbId: string) =>
-    request<any>(`/equbs/${equbId}/join`, {
+  myEqubs: () =>
+    request<any[]>('/equbs/member/my-equbs', {
+      method: 'GET',
+    }),
+
+  /**
+   * Accept an invitation to join an equb
+   */
+  acceptInvitation: (equbId: string) =>
+    request<any>(`/equbs/${equbId}/accept-invitation`, {
       method: 'POST',
+    }),
+
+  /**
+   * Invite members by phone number
+   */
+  inviteMembers: (equbId: string, memberPhones: string[]) =>
+    request<any>(`/equbs/${equbId}/invite-members`, {
+      method: 'POST',
+      body: JSON.stringify({ memberPhones }),
+    }),
+
+  /**
+   * Record a contribution for the current round
+   */
+  contribute: (equbId: string, dto: { amount: number; paymentMethod: string }) =>
+    request<any>(`/equbs/${equbId}/contribute`, {
+      method: 'POST',
+      body: JSON.stringify(dto),
+    }),
+
+  /**
+   * Member dashboard for a given equb
+   */
+  memberDashboard: (equbId: string) =>
+    request<any>(`/equbs/${equbId}/member-dashboard`, {
+      method: 'GET',
+    }),
+
+  /**
+   * Payout history for an equb
+   */
+  payoutHistory: (equbId: string) =>
+    request<any>(`/equbs/${equbId}/payout-history`, {
+      method: 'GET',
+    }),
+
+  /**
+   * Contribution status for a round
+   */
+  contributionStatus: (equbId: string) =>
+    request<any>(`/equbs/${equbId}/contributions/status`, {
+      method: 'GET',
     }),
 };
 
 /**
- * Payment API Endpoints
+ * Wallet API Endpoints (mirror backend /api/v1/wallet)
+ */
+export const walletAPI = {
+  /**
+   * Get current user wallet balance
+   */
+  get: () =>
+    request<{ walletId: string; balance: number; currency: string }>('/wallet', {
+      method: 'GET',
+    }),
+
+  /**
+   * Credit wallet
+   */
+  deposit: (amount: number) =>
+    request<{ success: boolean; message: string; balance: number; currency: string }>(
+      '/wallet/deposit',
+      {
+        method: 'POST',
+        body: JSON.stringify({ amount }),
+      }
+    ),
+
+  /**
+   * Debit wallet
+   */
+  withdraw: (amount: number) =>
+    request<{ success: boolean; message: string; balance: number; currency: string }>(
+      '/wallet/withdraw',
+      {
+        method: 'POST',
+        body: JSON.stringify({ amount }),
+      }
+    ),
+};
+
+/**
+ * Payment API Endpoints (mirror backend /api/v1/payments + bid)
  */
 export const paymentService = {
   /**
-   * Initiate payment
+   * Initiate wallet deduction or gateway checkout
    */
-  initiate: (data: any) =>
-    request<any>('/payments/initiate', {
+  initiate: (data: {
+    equbId: string;
+    roundNumber: number;
+    amount: number;
+    method: 'telebirr' | 'cbe' | 'wallet';
+  }) =>
+    request<any>('/payments/checkout', {
+      method: 'POST',
+      body: JSON.stringify({
+        equb_id: data.equbId,
+        round_number: data.roundNumber,
+        payment_method: data.method === 'wallet' ? 'wallet' : 'telebirr',
+      }),
+    }),
+
+  /**
+   * Get pending payments for a round
+   */
+  getPending: (equbId: string, round?: number) =>
+    request<any>(`/payments/pending?equb_id=${equbId}${round ? `&round=${round}` : ''}`, {
+      method: 'GET',
+    }),
+
+  /**
+   * Submit a discount bid (B_r)
+   */
+  bid: (equbId: string, data: any) =>
+    request<any>(`/equbs/${equbId}/bid`, {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
   /**
-   * Verify payment
+   * Verify payment status via payout history lookup
    */
-  verify: (paymentId: string) =>
-    request<any>(`/payments/${paymentId}/verify`, {
-      method: 'POST',
-    }),
-
-  /**
-   * Get payment status
-   */
-  getStatus: (paymentId: string) =>
-    request<any>(`/payments/${paymentId}/status`, {
+  verify: (equbId: string) =>
+    request<any>(`/equbs/${equbId}/payout-history`, {
       method: 'GET',
     }),
 };
@@ -297,6 +401,7 @@ export default {
   authAPI,
   userAPI,
   equbAPI,
+  walletAPI,
   paymentService,
   healthAPI,
   request,

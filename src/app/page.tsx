@@ -54,7 +54,7 @@ export default function Home() {
       {/* Homepage Content */}
       <div className="flex-grow">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-[#0d7e4d] via-[#0a5c38] to-[#ce1126] text-white py-20 px-4">
+        <section className="bg-gradient-to-br from-[#0a1f3d] via-[#16357a] to-[#27487f] text-white py-20 px-4">
           <div className="max-w-6xl mx-auto text-center">
             <h1 className="text-5xl md:text-6xl font-black mb-4 drop-shadow-lg">
               {lang === 'en' ? 'Welcome to QalNet' : lang === 'am' ? 'ወደ QalNet ደህና መጡ' : 'Gara QalNet'}
@@ -68,7 +68,7 @@ export default function Home() {
             </p>
             <button
               onClick={() => setShowAuthModal(true)}
-              className="bg-white text-[#0d7e4d] px-8 py-4 font-bold text-lg rounded-full hover:shadow-2xl transition-all"
+              className="bg-white text-[#0a1f3d] px-8 py-4 font-bold text-lg rounded-full hover:shadow-2xl transition-all"
             >
                Get Started
             </button>
@@ -76,18 +76,18 @@ export default function Home() {
         </section>
 
         {/* Features Section */}
-        <section className="py-16 px-4 bg-white">
+        <section className="py-16 px-4 bg-[#0a1f3d]">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-4xl font-black text-gray-800 mb-12 text-center">Features</h2>
+            <h2 className="text-4xl font-black text-white mb-12 text-center">Features</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
                 { title: 'Secure', desc: 'Bank-level encryption' },
                 { title: 'Community', desc: 'Connect with members' },
                 { title: 'Transparent', desc: 'Track payments' },
               ].map((feature, idx) => (
-                <div key={idx} className="bg-gray-50 p-8 rounded-xl border-l-4 border-[#0d7e4d]">
-                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                  <p className="text-gray-600">{feature.desc}</p>
+                <div key={idx} className="bg-[#16357a] p-8 rounded-xl border-l-4 border-[#d4af37]">
+                  <h3 className="text-xl font-bold mb-2 text-white">{feature.title}</h3>
+                  <p className="text-white/70">{feature.desc}</p>
                 </div>
               ))}
             </div>
@@ -95,12 +95,12 @@ export default function Home() {
         </section>
 
         {/* CTA Section */}
-        <section className="bg-gradient-to-r from-[#0d7e4d] to-[#ce1126] text-white py-16 px-4">
+        <section className="bg-gradient-to-r from-[#16357a] to-[#27487f] text-white py-16 px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-4xl font-black mb-6">Ready to Join?</h2>
             <button
               onClick={() => setShowAuthModal(true)}
-              className="bg-white text-[#0d7e4d] px-8 py-4 font-bold text-lg rounded-full"
+              className="bg-white text-[#0a1f3d] px-8 py-4 font-bold text-lg rounded-full"
             >
                Sign Up
             </button>

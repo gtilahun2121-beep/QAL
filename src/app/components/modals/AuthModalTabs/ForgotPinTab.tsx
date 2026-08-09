@@ -195,7 +195,7 @@ export default function ForgotPinTab({ lang = defaultLanguage, onSuccess, onErro
           <button
             type="button"
             onClick={() => setStep('phone')}
-            className="text-sm text-[#0d7e4d] hover:underline w-full text-center"
+            className="text-sm text-[#16357a] hover:underline w-full text-center"
           >
             ← Back to phone
           </button>
@@ -251,7 +251,7 @@ export default function ForgotPinTab({ lang = defaultLanguage, onSuccess, onErro
           <button
             type="button"
             onClick={() => setStep('otp')}
-            className="text-sm text-[#0d7e4d] hover:underline w-full text-center"
+            className="text-sm text-[#16357a] hover:underline w-full text-center"
           >
             ← Back to OTP
           </button>

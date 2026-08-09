@@ -107,7 +107,7 @@ export default function AdminDashboard() {
   if (loading || !admin) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-2xl font-black text-[#0d7e4d]">Loading...</div>
+        <div className="text-2xl font-black text-[#16357a]">Loading...</div>
       </div>
     );
   }
@@ -179,7 +179,7 @@ export default function AdminDashboard() {
                     className={`py-3 px-3 font-black rounded-lg transition-all text-sm sm:text-base ${
                       activeTab === tab.id
                         ? 'bg-gradient-to-r from-purple-600 to-red-600 text-white shadow-lg'
-                        : 'bg-white text-[#0d7e4d] border-2 border-[#d4af37] hover:shadow-md'
+                        : 'bg-white text-[#16357a] border-2 border-[#d4af37] hover:shadow-md'
                     }`}
                   >
                     {tab.label}
@@ -234,7 +234,7 @@ function StatCard({ label, value }: any) {
       className="bg-white rounded-lg p-4 border-2 border-[#d4af37] shadow-md hover:shadow-lg transition-all"
     >
       <p className="text-sm text-gray-600">{label}</p>
-      <p className="text-2xl font-black text-[#0d7e4d]">{value}</p>
+      <p className="text-2xl font-black text-[#16357a]">{value}</p>
     </motion.div>
   );
 }
@@ -247,27 +247,27 @@ function MembersTab({ members, admin }: any) {
       animate={{ opacity: 1 }}
       className="bg-white rounded-2xl p-6 shadow-lg"
     >
-      <h2 className="text-2xl font-black text-[#0d7e4d] mb-6">Members Management</h2>
+      <h2 className="text-2xl font-black text-[#16357a] mb-6">Members Management</h2>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b-2 border-[#d4af37]">
-              <th className="text-left py-3 font-black text-[#0d7e4d]">Name</th>
-              <th className="text-left py-3 font-black text-[#0d7e4d]">Phone</th>
-              <th className="text-left py-3 font-black text-[#0d7e4d]">Status</th>
-              <th className="text-left py-3 font-black text-[#0d7e4d]">KYC</th>
-              <th className="text-left py-3 font-black text-[#0d7e4d]">Actions</th>
+              <th className="text-left py-3 font-black text-[#16357a]">Name</th>
+              <th className="text-left py-3 font-black text-[#16357a]">Phone</th>
+              <th className="text-left py-3 font-black text-[#16357a]">Status</th>
+              <th className="text-left py-3 font-black text-[#16357a]">KYC</th>
+              <th className="text-left py-3 font-black text-[#16357a]">Actions</th>
             </tr>
           </thead>
           <tbody>
             {members.map((member: any) => (
               <tr key={member.id} className="border-b border-gray-200 hover:bg-[#f5f3f0] transition-all">
-                <td className="py-3 font-bold text-[#0d7e4d]">{member.fullName}</td>
+                <td className="py-3 font-bold text-[#16357a]">{member.fullName}</td>
                 <td className="py-3">{member.phoneNumber}</td>
                 <td className="py-3">
                   <span className={`px-3 py-1 rounded-full text-xs font-black ${
                     member.status === 'active'
-                      ? 'bg-green-100 text-green-700'
+                      ? 'bg-blue-100 text-blue-800'
                       : 'bg-red-100 text-red-700'
                   }`}>
                     {member.status.toUpperCase()}
@@ -276,7 +276,7 @@ function MembersTab({ members, admin }: any) {
                 <td className="py-3">
                   <span className={`px-3 py-1 rounded-full text-xs font-black ${
                     member.kycStatus === 'approved'
-                      ? 'bg-green-100 text-green-700'
+                      ? 'bg-blue-100 text-blue-800'
                       : member.kycStatus === 'pending'
                       ? 'bg-yellow-100 text-yellow-700'
                       : 'bg-red-100 text-red-700'
@@ -288,7 +288,7 @@ function MembersTab({ members, admin }: any) {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-3 py-1 bg-[#0d7e4d] text-white rounded-lg text-xs font-bold hover:shadow-md transition-all"
+                    className="px-3 py-1 bg-[#16357a] text-white rounded-lg text-xs font-bold hover:shadow-md transition-all"
                   >
                     View
                   </motion.button>
@@ -318,7 +318,7 @@ function KYCTab({ documents }: any) {
         >
           <div className="flex justify-between items-start mb-3">
             <div>
-              <h3 className="font-black text-[#0d7e4d]">{doc.memberName}</h3>
+              <h3 className="font-black text-[#16357a]">{doc.memberName}</h3>
               <p className="text-sm text-gray-600">{doc.memberPhone}</p>
             </div>
             <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">
@@ -330,7 +330,7 @@ function KYCTab({ documents }: any) {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex-1 px-4 py-2 bg-green-500 text-white font-bold rounded-lg hover:shadow-md transition-all"
+              className="flex-1 px-4 py-2 bg-blue-1000 text-white font-bold rounded-lg hover:shadow-md transition-all"
             >
                Approve
             </motion.button>
@@ -364,7 +364,7 @@ function DisputesTab({ disputes }: any) {
         >
           <div className="flex justify-between items-start mb-3">
             <div>
-              <h3 className="font-black text-[#0d7e4d]">
+              <h3 className="font-black text-[#16357a]">
                 {dispute.complainantName} vs {dispute.respondentName}
               </h3>
               <p className="text-sm text-gray-600">{dispute.description}</p>
@@ -388,7 +388,7 @@ function DisputesTab({ disputes }: any) {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex-1 px-4 py-2 bg-green-500 text-white font-bold rounded-lg hover:shadow-md transition-all"
+              className="flex-1 px-4 py-2 bg-blue-1000 text-white font-bold rounded-lg hover:shadow-md transition-all"
             >
               ✓ Resolve
             </motion.button>
@@ -417,27 +417,27 @@ function FinanceTab({ records }: any) {
       </motion.div>
 
       <div className="bg-white rounded-2xl p-6 shadow-lg">
-        <h2 className="text-2xl font-black text-[#0d7e4d] mb-6">Transaction Records</h2>
+        <h2 className="text-2xl font-black text-[#16357a] mb-6">Transaction Records</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b-2 border-[#d4af37]">
-                <th className="text-left py-3 font-black text-[#0d7e4d]">Member</th>
-                <th className="text-left py-3 font-black text-[#0d7e4d]">Type</th>
-                <th className="text-left py-3 font-black text-[#0d7e4d]">Amount</th>
-                <th className="text-left py-3 font-black text-[#0d7e4d]">Status</th>
+                <th className="text-left py-3 font-black text-[#16357a]">Member</th>
+                <th className="text-left py-3 font-black text-[#16357a]">Type</th>
+                <th className="text-left py-3 font-black text-[#16357a]">Amount</th>
+                <th className="text-left py-3 font-black text-[#16357a]">Status</th>
               </tr>
             </thead>
             <tbody>
               {records.map((record: any) => (
                 <tr key={record.id} className="border-b border-gray-200 hover:bg-[#f5f3f0] transition-all">
-                  <td className="py-3 font-bold text-[#0d7e4d]">{record.memberName}</td>
+                  <td className="py-3 font-bold text-[#16357a]">{record.memberName}</td>
                   <td className="py-3 capitalize">{record.type}</td>
                   <td className="py-3 font-bold">ETB {record.amount}</td>
                   <td className="py-3">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                       record.status === 'completed'
-                        ? 'bg-green-100 text-green-700'
+                        ? 'bg-blue-100 text-blue-800'
                         : 'bg-yellow-100 text-yellow-700'
                     }`}>
                       {record.status.toUpperCase()}
@@ -461,13 +461,13 @@ function AdminUsersTab({ admin }: any) {
       animate={{ opacity: 1 }}
       className="bg-white rounded-2xl p-6 shadow-lg"
     >
-      <h2 className="text-2xl font-black text-[#0d7e4d] mb-6">Admin Users Management</h2>
+      <h2 className="text-2xl font-black text-[#16357a] mb-6">Admin Users Management</h2>
       <p className="text-gray-600 mb-6">Manage admin accounts, roles, and permissions</p>
 
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="px-6 py-3 bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all mb-6"
+        className="px-6 py-3 bg-gradient-to-r from-[#16357a] to-[#d4af37] text-white font-black rounded-full hover:shadow-lg transition-all mb-6"
       >
         Add New Admin
       </motion.button>
@@ -475,7 +475,7 @@ function AdminUsersTab({ admin }: any) {
       <div className="bg-[#f5f3f0] border-2 border-[#d4af37] rounded-lg p-4">
         <div className="flex items-center gap-4">
           <div>
-            <p className="font-black text-[#0d7e4d]">{admin.fullName}</p>
+            <p className="font-black text-[#16357a]">{admin.fullName}</p>
             <p className="text-sm text-gray-600">{admin.email}</p>
             <p className="text-xs font-bold text-[#d4af37]">{admin.role.replace('_', ' ').toUpperCase()}</p>
           </div>

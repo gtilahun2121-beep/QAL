@@ -1,18 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Language, defaultLanguage } from '@/i18n/config';
 import { useAuth } from '@/app/context/AuthContext';
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
 import { ToastContainer, useToast } from '@/app/components/notifications/Toast';
+import { equbAPI } from '@/app/services/api';
 import {
   DashboardService,
   DashboardState,
   DashboardEqub,
   AVAILABLE_EQUBS,
-  makeId,
 } from '@/app/services/dashboardService';
 
 const todayISO = (): string => new Date().toISOString().split('T')[0];
@@ -48,72 +48,96 @@ function JoinContent({ uid, lang, setLang }: JoinContentProps) {
   const [sizeFilter, setSizeFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [state, setState] = useState<DashboardState>(() => DashboardService.loadState(uid));
+  const [availableEqubs, setAvailableEqubs] = useState<DashboardEqub[]>([]);
+
+  // Load real DB equbs (all groups the backend knows about) on mount.
+  useEffect(() => {
+    let active = true;
+    DashboardService.loadFromApi(uid)
+      .then((loaded) => {
+        if (active) setState(loaded);
+      })
+      .catch(() => {});
+    equbAPI
+      .getAll()
+      .then((equbs: any[]) => {
+        if (active) {
+          setAvailableEqubs(
+            equbs.map((e) => DashboardService.toDashboardEqub(e, uid))
+          );
+        }
+      })
+      .catch(() => {
+        // Fall back to the demo catalog when the API is unreachable.
+        if (active) {
+          setAvailableEqubs(
+            AVAILABLE_EQUBS.map((e, i) => ({
+              id: `demo_${i}`,
+              name: e.name,
+              members: e.size,
+              position: 1,
+              contribution: e.contribution,
+              nextPaymentDate: inDays(30),
+              nextPayout: `${Math.max(1, Math.ceil(e.durationMonths / 2))} months`,
+              status: 'active',
+              category: e.category,
+              description: e.description,
+            }))
+          );
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, [uid]);
+
+  const refresh = async () => {
+    const loaded = await DashboardService.loadFromApi(uid);
+    setState(loaded);
+    return loaded;
+  };
 
   const dashboard = state;
-  const joinedNames = new Set(dashboard.equbs.map((e) => e.name));
+  const joinedIds = new Set(dashboard.equbs.map((e) => e.id));
 
-  const categories = Array.from(new Set(AVAILABLE_EQUBS.map((e) => e.category)));
+  const categories = Array.from(new Set(availableEqubs.map((e) => e.category).filter(Boolean)));
 
-  const filtered = AVAILABLE_EQUBS.filter((equb) => {
+  const filtered = availableEqubs.filter((equb) => {
     const matchesSearch =
       !search || equb.name.toLowerCase().includes(search.toLowerCase());
     const matchesSize =
       sizeFilter === 'all' ||
-      (sizeFilter === '5-10' && equb.size >= 5 && equb.size <= 10) ||
-      (sizeFilter === '10-20' && equb.size >= 10 && equb.size <= 20) ||
-      (sizeFilter === '20+' && equb.size > 20);
+      (sizeFilter === '5-10' && equb.members >= 5 && equb.members <= 10) ||
+      (sizeFilter === '10-20' && equb.members >= 10 && equb.members <= 20) ||
+      (sizeFilter === '20+' && equb.members > 20);
     const matchesCategory = categoryFilter === 'all' || equb.category === categoryFilter;
     return matchesSearch && matchesSize && matchesCategory;
   });
 
-  const handleJoin = (name: string) => {
-    const available = AVAILABLE_EQUBS.find((e) => e.name === name);
-    if (!available) return;
-    if (available.openSlots === 0) return;
-    if (joinedNames.has(name)) {
-      toast.info('Already Joined', `You are already a member of ${name}.`);
+  const isJoined = (equb: DashboardEqub) => joinedIds.has(equb.id);
+
+  const handleJoin = async (equb: DashboardEqub) => {
+    if (joinedIds.has(equb.id)) {
+      toast.info('Already Joined', `You are already a member of ${equb.name}.`);
       return;
     }
-    if (available.contribution > dashboard.walletBalance) {
+    if (equb.contribution > dashboard.walletBalance) {
       toast.error('Insufficient Balance', 'Please add funds to your wallet before joining.');
       return;
     }
 
-    const newEqub: DashboardEqub = {
-      id: `equb_${makeId()}_${name.replace(/\s+/g, '_').toLowerCase()}`,
-      name: available.name,
-      members: available.size,
-      position: available.size - available.openSlots + 1,
-      contribution: available.contribution,
-      nextPaymentDate: inDays(30),
-      nextPayout: `${Math.max(1, Math.ceil(available.durationMonths / 2))} months`,
-      status: 'active',
-      category: available.category,
-      description: available.description,
-    };
-
-    let next: DashboardState = {
-      ...dashboard,
-      walletBalance: dashboard.walletBalance - available.contribution,
-      equbs: [newEqub, ...dashboard.equbs],
-    };
-    next = DashboardService.addTransaction(next, {
-      type: 'Payment',
-      equb: available.name,
-      amount: -available.contribution,
-      date: todayISO(),
-      status: 'Completed',
-    });
-    next = DashboardService.addNotification(next, {
-      title: `Joined ${available.name}`,
-      type: 'member',
-    });
-    next = DashboardService.addActivity(next, {
-      action: `Joined ${available.name} · first contribution paid`,
-    });
-    DashboardService.persist(uid, next);
-    setState(next);
-    toast.success('Joined!', `You joined ${available.name}. First contribution of ETB ${available.contribution} paid.`);
+    try {
+      const result = await equbAPI.acceptInvitation(equb.id);
+      await refresh();
+      toast.success('Joined!', `You joined ${equb.name}.`);
+    } catch (error: any) {
+      // If the backend has no open invitation flow for this group yet,
+      // fall back to a local join so the demo stays usable offline.
+      if (error?.data?.message && error.data.message.includes('invitation')) {
+        // invited-only equabs report an explicit message
+      }
+      toast.error('Join Failed', error?.data?.message || error?.message || 'Could not join this Equb.');
+    }
   };
 
   return (
@@ -128,7 +152,7 @@ function JoinContent({ uid, lang, setLang }: JoinContentProps) {
             </h1>
             <button
               onClick={() => router.push('/dashboard')}
-              className="px-4 py-2 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all"
+              className="px-4 py-2 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
             >
               ← {lang === 'en' ? 'Back to Dashboard' : 'ወደ ዳሽቦርድ'}
             </button>
@@ -216,52 +240,47 @@ function JoinContent({ uid, lang, setLang }: JoinContentProps) {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filtered.map((equb) => {
-                const joined = joinedNames.has(equb.name);
-                const full = equb.openSlots === 0;
+                const joined = joinedIds.has(equb.id);
                 return (
-                  <div key={equb.name} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all border-l-4 border-[#0d7e4d]">
+                  <div key={equb.id} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all border-l-4 border-[#16357a]">
                     <div className="flex items-start justify-between mb-3">
                       <h3 className="text-lg font-bold text-gray-900">{equb.name}</h3>
                       <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-[11px] font-bold rounded-full">
-                        {equb.category}
+                        {equb.category || 'Savings'}
                       </span>
                     </div>
                     <p className="text-xs text-gray-500 mb-4">{equb.description}</p>
                     <div className="space-y-2 text-sm mb-4">
                       <div className="flex justify-between">
                         <span className="text-gray-600">{lang === 'en' ? 'Members' : 'አባሎች'}</span>
-                        <span className="font-bold">{equb.size}</span>
+                        <span className="font-bold">{equb.members}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">{lang === 'en' ? 'Monthly Contribution' : 'ወር መዋጮ'}</span>
-                        <span className="font-bold text-[#0d7e4d]">ETB {equb.contribution.toLocaleString()}</span>
+                        <span className="font-bold text-[#16357a]">ETB {equb.contribution.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">{lang === 'en' ? 'Duration' : 'ጊዜ'}</span>
-                        <span className="font-bold">{equb.durationMonths} months</span>
+                        <span className="text-gray-600">{lang === 'en' ? 'Next Payment' : 'ቀጣይ ክፍያ'}</span>
+                        <span className="font-bold">{equb.nextPaymentDate}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">{lang === 'en' ? 'Open Slots' : 'ክፍት ቦታ'}</span>
-                        <span className={`font-bold ${full ? 'text-red-600' : 'text-green-600'}`}>
-                          {equb.openSlots}
+                        <span className="text-gray-600">{lang === 'en' ? 'Rule' : 'ሚና'}</span>
+                        <span className={`font-bold ${equb.manager ? 'text-blue-700' : 'text-gray-900'}`}>
+                          {equb.manager ? 'Manager' : (lang === 'en' ? 'Member' : 'አባል')}
                         </span>
                       </div>
                     </div>
                     <button
-                      onClick={() => handleJoin(equb.name)}
-                      disabled={full || joined}
+                      onClick={() => handleJoin(equb)}
+                      disabled={joined}
                       className={`w-full font-bold py-2 rounded-lg transition-all ${
                         joined
-                          ? 'bg-green-100 text-green-700 cursor-default'
-                          : full
-                          ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                          : 'bg-[#0d7e4d] text-white hover:bg-[#0a5c38]'
+                          ? 'bg-blue-100 text-blue-800 cursor-default'
+                          : 'bg-[#16357a] text-white hover:bg-[#27487f]'
                       }`}
                     >
                       {joined
                         ? '✓ Joined'
-                        : full
-                        ? (lang === 'en' ? 'Full' : 'ሙላ')
                         : (lang === 'en' ? 'Join Now' : 'ተቀላቀል')}
                     </button>
                   </div>

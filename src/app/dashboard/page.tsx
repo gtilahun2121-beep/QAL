@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Language, defaultLanguage } from '@/i18n/config';
@@ -8,6 +8,7 @@ import { useAuth } from '@/app/context/AuthContext';
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
 import { ToastContainer, useToast } from '@/app/components/notifications/Toast';
+import { equbAPI, walletAPI } from '@/app/services/api';
 import {
   DashboardService,
   DashboardState,
@@ -81,6 +82,27 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
   const [state, setState] = useState<DashboardState>(() => DashboardService.loadState(uid));
   const [now] = useState(() => Date.now());
 
+  // Load the user's real DB-backed dashboard (equbs + wallet balance) on mount.
+  useEffect(() => {
+    let active = true;
+    DashboardService.loadFromApi(uid)
+      .then((loaded) => {
+        if (active) setState(loaded);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [uid]);
+
+  // Actions that mutate the DB update local cache optimistically, then
+  // re-fetch the authoritative API state so balances / lists stay correct.
+  const refresh = async () => {
+    const loaded = await DashboardService.loadFromApi(uid);
+    setState(loaded);
+    return loaded;
+  };
+
   // Support deep links like /dashboard?equb=<id> or /dashboard?create=1
   const [selectedEqub, setSelectedEqub] = useState<DashboardEqub | null>(() => {
     try {
@@ -137,34 +159,27 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
     router.push('/');
   };
 
-  const handleDeposit = () => {
+  const handleDeposit = async () => {
     const amount = Number(depositAmount);
     if (!amount || amount <= 0) {
       toast.error('Invalid Amount', 'Please enter a valid deposit amount.');
       return;
     }
-    let next = { ...dashboard, walletBalance: dashboard.walletBalance + amount };
-    next = DashboardService.addTransaction(next, {
-      type: 'Deposit',
-      equb: 'Bank Transfer',
-      amount,
-      date: todayISO(),
-      status: 'Completed',
-    });
-    next = DashboardService.addNotification(next, {
-      title: `Deposited ${amount.toLocaleString()} ETB`,
-      type: 'payment',
-    });
-    next = DashboardService.addActivity(next, {
-      action: `Deposited ${amount.toLocaleString()} ETB`,
-    });
-    persist(next);
-    setShowDeposit(false);
-    setDepositAmount('');
-    toast.success('Deposit Successful', `${amount.toLocaleString()} ETB added to your wallet.`);
+    try {
+      const result = await walletAPI.deposit(amount);
+      await refresh();
+      setShowDeposit(false);
+      setDepositAmount('');
+      toast.success(
+        'Deposit Successful',
+        `${amount.toLocaleString()} ETB added to your wallet.`
+      );
+    } catch (error: any) {
+      toast.error('Deposit Failed', error?.data?.message || error?.message || 'Could not deposit funds.');
+    }
   };
 
-  const handleWithdraw = () => {
+  const handleWithdraw = async () => {
     const amount = Number(withdrawForm.amount);
     if (!amount || amount <= 0) {
       toast.error('Invalid Amount', 'Please enter a valid withdrawal amount.');
@@ -178,26 +193,18 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
       toast.error('Phone Required', 'Enter the phone number to withdraw to.');
       return;
     }
-    const methodName = PAYMENT_METHODS.find((m) => m.id === withdrawForm.method)?.name || 'Telebirr';
-    let next = { ...dashboard, walletBalance: dashboard.walletBalance - amount };
-    next = DashboardService.addTransaction(next, {
-      type: 'Withdrawal',
-      equb: `${methodName} (${withdrawForm.phone})`,
-      amount: -amount,
-      date: todayISO(),
-      status: 'Completed',
-    });
-    next = DashboardService.addNotification(next, {
-      title: `Withdrew ${amount.toLocaleString()} ETB`,
-      type: 'payment',
-    });
-    next = DashboardService.addActivity(next, {
-      action: `Withdrew ${amount.toLocaleString()} ETB via ${methodName}`,
-    });
-    persist(next);
-    setShowWithdraw(false);
-    setWithdrawForm({ method: 'telebirr', phone: '', amount: '' });
-    toast.success('Withdrawal Successful', `${amount.toLocaleString()} ETB sent to ${withdrawForm.phone}.`);
+    try {
+      await walletAPI.withdraw(amount);
+      await refresh();
+      setShowWithdraw(false);
+      setWithdrawForm({ method: 'telebirr', phone: '', amount: '' });
+      toast.success(
+        'Withdrawal Successful',
+        `${amount.toLocaleString()} ETB sent to ${withdrawForm.phone}.`
+      );
+    } catch (error: any) {
+      toast.error('Withdrawal Failed', error?.data?.message || error?.message || 'Could not withdraw funds.');
+    }
   };
 
   const openPaymentFor = (equb: DashboardEqub) => {
@@ -205,7 +212,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
     setShowPayment(true);
   };
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     const equb = dashboard.equbs.find((e) => e.id === paymentForm.equbId);
     const amount = Number(paymentForm.amount);
     if (!equb) {
@@ -220,28 +227,25 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
       toast.error('Insufficient Balance', 'Please deposit funds before making a payment.');
       return;
     }
-    const methodName = PAYMENT_METHODS.find((m) => m.id === paymentForm.method)?.name || 'Telebirr';
-    let next = { ...dashboard, walletBalance: dashboard.walletBalance - amount };
-    next = DashboardService.addTransaction(next, {
-      type: 'Payment',
-      equb: equb.name,
-      amount: -amount,
-      date: todayISO(),
-      status: 'Completed',
-    });
-    next = DashboardService.addNotification(next, {
-      title: `Payment to ${equb.name} successful`,
-      type: 'payment',
-    });
-    next = DashboardService.addActivity(next, {
-      action: `Paid ETB ${amount.toLocaleString()} to ${equb.name} via ${methodName}`,
-    });
-    persist(next);
-    setShowPayment(false);
-    toast.success('Payment Successful', `${amount.toLocaleString()} ETB paid to ${equb.name}.`);
+    try {
+      // Fully DB-backed payment: debit the wallet and record the contribution.
+      await walletAPI.withdraw(amount);
+      await equbAPI.contribute(equb.id, {
+        amount,
+        paymentMethod: paymentForm.method === 'telebirr' ? 'telebirr' : 'wallet',
+      });
+      await refresh();
+      setShowPayment(false);
+      toast.success(
+        'Payment Successful',
+        `${amount.toLocaleString()} ETB paid to ${equb.name}.`
+      );
+    } catch (error: any) {
+      toast.error('Payment Failed', error?.data?.message || error?.message || 'Could not record payment.');
+    }
   };
 
-  const handleCreateEqub = () => {
+  const handleCreateEqub = async () => {
     const name = createForm.name.trim();
     const amount = Number(createForm.amount);
     const members = Number(createForm.members);
@@ -257,44 +261,33 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
       toast.error('Invalid Members', 'An Equb needs at least 2 members.');
       return;
     }
-    const newEqub: DashboardEqub = {
-      id: `equb_${Date.now()}`,
-      name,
-      members,
-      position: 1,
-      contribution: amount,
-      nextPaymentDate: todayISO(),
-      nextPayout: `${Math.max(1, Math.ceil(members / 2))} months`,
-      status: 'active',
-      category: createForm.category,
-      description: createForm.description.trim() || 'A new Equb circle.',
-      manager: true,
-    };
-    let next: DashboardState = {
-      ...dashboard,
-      equbs: [newEqub, ...dashboard.equbs],
-    };
-    next = DashboardService.addTransaction(next, {
-      type: 'Payment',
-      equb: name,
-      amount: -amount,
-      date: todayISO(),
-      status: 'Completed',
-    });
-    next = DashboardService.addNotification(next, {
-      title: `Equb "${name}" created`,
-      type: 'member',
-    });
-    next = DashboardService.addActivity(next, {
-      action: `Created "${name}" and paid first contribution`,
-    });
-    persist(next);
-    setShowCreate(false);
-    setCreateForm({ name: '', category: 'Savings', amount: '', members: '', description: '' });
-    toast.success('Equb Created', `${name} is now active. Your first contribution was paid.`);
+    try {
+      const result = await equbAPI.create({
+        name,
+        category: createForm.category,
+        contributionAmount: amount,
+        totalMembers: members,
+        description: createForm.description.trim() || 'A new Equb circle.',
+        startDate: todayISO(),
+      });
+      const equbId = result?.equbId || result?.equb?.id;
+      if (equbId) {
+        // The host's first contribution is recorded immediately.
+        await equbAPI.contribute(equbId, {
+          amount,
+          paymentMethod: 'wallet',
+        }).catch(() => {});
+      }
+      await refresh();
+      setShowCreate(false);
+      setCreateForm({ name: '', category: 'Savings', amount: '', members: '', description: '' });
+      toast.success('Equb Created', `${name} is now active.`);
+    } catch (error: any) {
+      toast.error('Creation Failed', error?.data?.message || error?.message || 'Could not create the Equb.');
+    }
   };
 
-  const handleInvite = () => {
+  const handleInvite = async () => {
     const phones = invitePhones
       .split(',')
       .map((p) => p.trim())
@@ -303,19 +296,21 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
       toast.error('No Phone Numbers', 'Enter at least one phone number to invite.');
       return;
     }
-    const countLabel = phones.length === 1 ? '1 friend' : `${phones.length} friends`;
-    let next = dashboard;
-    next = DashboardService.addNotification(next, {
-      title: `Invited ${countLabel}`,
-      type: 'member',
-    });
-    next = DashboardService.addActivity(next, {
-      action: `Invited ${countLabel}: ${phones.join(', ')}`,
-    });
-    persist(next);
-    setShowInvite(false);
-    setInvitePhones('');
-    toast.success('Invites Sent', `Invitation sent to ${phones.join(', ')}.`);
+    // Pick the currently-viewed equb, or the first one if none selected.
+    const targetEqub = selectedEqub ?? dashboard.equbs[0];
+    if (!targetEqub) {
+      toast.error('No Equbs', 'Create or join an Equb before inviting friends.');
+      return;
+    }
+    try {
+      await equbAPI.inviteMembers(targetEqub.id, phones);
+      await refresh();
+      setShowInvite(false);
+      setInvitePhones('');
+      toast.success('Invites Sent', `Invitation sent to ${phones.join(', ')}.`);
+    } catch (error: any) {
+      toast.error('Invite Failed', error?.data?.message || error?.message || 'Could not send invites.');
+    }
   };
 
   const handleSupport = () => {
@@ -430,7 +425,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                     onClick={step.onClick}
                     disabled={done}
                     className={`bg-white p-4 rounded-lg text-center hover:shadow-lg transition-all cursor-pointer ${
-                      done ? 'opacity-60 border-2 border-green-300' : ''
+                      done ? 'opacity-60 border-2 border-blue-300' : ''
                     }`}
                   >
                     <p className="font-bold text-sm text-blue-900">{step.label}</p>
@@ -444,25 +439,25 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Wallet Balance */}
-          <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-300 rounded-lg p-6 shadow-md">
+          <div className="bg-gradient-to-br from-blue-100 to-blue-100 border border-blue-300 rounded-lg p-6 shadow-md">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-green-700 font-bold text-sm">
+              <p className="text-blue-800 font-bold text-sm">
                 {lang === 'en' ? 'Wallet Balance' : 'ዋሊት ሚዛን'}
               </p>
             </div>
-            <p className="text-3xl font-black text-green-900">
+            <p className="text-3xl font-black text-blue-950">
               ETB {dashboard.walletBalance.toLocaleString()}
             </p>
             <div className="mt-3 flex gap-2">
               <button
                 onClick={() => setShowDeposit(true)}
-                className="flex-1 px-3 py-1.5 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-700 transition-all"
+                className="flex-1 px-3 py-1.5 bg-blue-700 text-white text-xs font-bold rounded-lg hover:bg-blue-800 transition-all"
               >
                  Deposit
               </button>
               <button
                 onClick={() => setShowWithdraw(true)}
-                className="flex-1 px-3 py-1.5 border-2 border-green-600 text-green-700 text-xs font-bold rounded-lg hover:bg-green-600 hover:text-white transition-all"
+                className="flex-1 px-3 py-1.5 border-2 border-blue-700 text-blue-800 text-xs font-bold rounded-lg hover:bg-blue-700 hover:text-white transition-all"
               >
                  Withdraw
               </button>
@@ -558,7 +553,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                                Manager
                             </span>
                           )}
-                          <span className="px-3 py-1 bg-green-100 text-green-800 font-bold text-xs rounded-full">
+                          <span className="px-3 py-1 bg-blue-100 text-blue-900 font-bold text-xs rounded-full">
                              {lang === 'en' ? 'Active' : 'ንቅናቄ'}
                           </span>
                         </div>
@@ -604,7 +599,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                         </button>
                         <button
                           onClick={() => openPaymentFor(equb)}
-                          className="px-4 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-all text-sm"
+                          className="px-4 py-2 bg-blue-700 text-white font-bold rounded-lg hover:bg-blue-800 transition-all text-sm"
                         >
                            {lang === 'en' ? 'Make Payment' : 'ክፍያ ክፍል'}
                         </button>
@@ -630,7 +625,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                 </button>
                 <button
                   onClick={() => setShowCreate(true)}
-                  className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-4 rounded-lg font-bold hover:shadow-lg transition-all text-center"
+                  className="bg-gradient-to-r from-blue-700 to-blue-800 text-white px-6 py-4 rounded-lg font-bold hover:shadow-lg transition-all text-center"
                 >
                    {lang === 'en' ? 'Create an Equb' : 'Equb ፍጠር'}
                 </button>
@@ -719,7 +714,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                 setSupportCategory(lang === 'en' ? 'Live Chat' : 'ቀጥታ ውይይት');
                 setShowSupport(true);
               }}
-              className="px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-all"
+              className="px-6 py-3 bg-blue-700 text-white font-bold rounded-lg hover:bg-blue-800 transition-all"
             >
                {lang === 'en' ? 'Live Chat' : 'ቀጥታ ውይይት'}
             </button>
@@ -772,7 +767,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                 onClick={() => {
                   openPaymentFor(selectedEqub);
                 }}
-                className="px-4 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-all"
+                className="px-4 py-3 bg-blue-700 text-white font-bold rounded-lg hover:bg-blue-800 transition-all"
               >
                  Make Payment
               </button>
@@ -808,7 +803,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                   value={createForm.name}
                   onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
                   placeholder="e.g. Neighborhood Savings"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#0d7e4d]"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#16357a]"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -819,7 +814,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                     value={createForm.amount}
                     onChange={(e) => setCreateForm({ ...createForm, amount: e.target.value })}
                     placeholder="500"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#0d7e4d]"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#16357a]"
                   />
                 </div>
                 <div>
@@ -829,7 +824,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                     value={createForm.members}
                     onChange={(e) => setCreateForm({ ...createForm, members: e.target.value })}
                     placeholder="12"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#0d7e4d]"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#16357a]"
                   />
                 </div>
               </div>
@@ -838,7 +833,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                 <select
                   value={createForm.category}
                   onChange={(e) => setCreateForm({ ...createForm, category: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#0d7e4d]"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#16357a]"
                 >
                   {CREATE_CATEGORIES.map((c) => (
                     <option key={c} value={c}>{c}</option>
@@ -852,7 +847,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                   onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })}
                   placeholder="What is this Equb about?"
                   rows={2}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#0d7e4d]"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#16357a]"
                 />
               </div>
               <p className="text-xs text-gray-500">
@@ -867,7 +862,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                 </button>
                 <button
                   onClick={handleCreateEqub}
-                  className="flex-1 px-4 py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all"
+                  className="flex-1 px-4 py-3 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
                 >
                   {lang === 'en' ? 'Create Equb' : 'Equb ፍጠር'}
                 </button>
@@ -902,7 +897,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                       amount: eq ? String(eq.contribution) : paymentForm.amount,
                     });
                   }}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#0d7e4d]"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#16357a]"
                 >
                   <option value="">{lang === 'en' ? 'Select an Equb' : 'Equb ይምረጡ'}</option>
                   {dashboard.equbs.map((eq) => (
@@ -918,7 +913,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                   type="number"
                   value={paymentForm.amount}
                   onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#0d7e4d]"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#16357a]"
                 />
               </div>
               <div>
@@ -930,7 +925,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                       onClick={() => setPaymentForm({ ...paymentForm, method: m.id })}
                       className={`p-2 rounded-lg border-2 transition-all text-center ${
                         paymentForm.method === m.id
-                          ? 'border-[#0d7e4d] bg-green-50 font-bold'
+                          ? 'border-[#16357a] bg-blue-100 font-bold'
                           : 'border-gray-200 bg-gray-50 hover:border-gray-300'
                       }`}
                     >
@@ -941,7 +936,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
               </div>
               <div className="flex justify-between items-center bg-gray-50 rounded-lg p-3">
                 <span className="text-sm text-gray-600">Available</span>
-                <span className="font-black text-green-700">
+                <span className="font-black text-blue-800">
                   ETB {dashboard.walletBalance.toLocaleString()}
                 </span>
               </div>
@@ -954,7 +949,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                 </button>
                 <button
                   onClick={handlePayment}
-                  className="flex-1 px-4 py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all"
+                  className="flex-1 px-4 py-3 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
                 >
                   {lang === 'en' ? 'Pay Now' : 'ክፈል'}
                 </button>
@@ -984,7 +979,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                   value={depositAmount}
                   onChange={(e) => setDepositAmount(e.target.value)}
                   placeholder="Enter amount"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#0d7e4d]"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#16357a]"
                 />
               </div>
               <div className="flex gap-3">
@@ -999,7 +994,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                 </button>
                 <button
                   onClick={handleDeposit}
-                  className="flex-1 px-4 py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all"
+                  className="flex-1 px-4 py-3 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
                 >
                   {lang === 'en' ? 'Deposit' : 'ተወገዱ'}
                 </button>
@@ -1033,7 +1028,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                       onClick={() => setWithdrawForm({ ...withdrawForm, method: m.id })}
                       className={`p-3 rounded-lg border-2 transition-all text-center ${
                         withdrawForm.method === m.id
-                          ? 'border-[#0d7e4d] bg-green-50 font-bold'
+                          ? 'border-[#16357a] bg-blue-100 font-bold'
                           : 'bg-gray-50 border-gray-200 hover:border-gray-300'
                       }`}
                     >
@@ -1051,7 +1046,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                   value={withdrawForm.phone}
                   onChange={(e) => setWithdrawForm({ ...withdrawForm, phone: e.target.value })}
                   placeholder="+2519xxxxxxxx"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#0d7e4d]"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#16357a]"
                 />
               </div>
               <div>
@@ -1064,7 +1059,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                   value={withdrawForm.amount}
                   onChange={(e) => setWithdrawForm({ ...withdrawForm, amount: e.target.value })}
                   placeholder="Enter amount"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#0d7e4d]"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#16357a]"
                 />
               </div>
               <div className="flex gap-3 pt-2">
@@ -1079,7 +1074,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                 </button>
                 <button
                   onClick={handleWithdraw}
-                  className="flex-1 px-4 py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all"
+                  className="flex-1 px-4 py-3 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
                 >
                   {lang === 'en' ? 'Withdraw' : 'ዘግቡ'}
                 </button>
@@ -1111,7 +1106,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                   onChange={(e) => setInvitePhones(e.target.value)}
                   placeholder="+251911111111, +251922222222"
                   rows={3}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#0d7e4d]"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#16357a]"
                 />
               </div>
               <div className="flex gap-3">
@@ -1123,7 +1118,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                 </button>
                 <button
                   onClick={handleInvite}
-                  className="flex-1 px-4 py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all"
+                  className="flex-1 px-4 py-3 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
                 >
                   {lang === 'en' ? 'Send Invites' : 'ጋብዝ'}
                 </button>
@@ -1153,7 +1148,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                   onChange={(e) => setSupportMessage(e.target.value)}
                   rows={4}
                   placeholder={lang === 'en' ? 'Type your message...' : 'መልእክትዎን ይጻፉ...'}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#0d7e4d]"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#16357a]"
                 />
               </div>
               <div className="flex gap-3">
@@ -1165,7 +1160,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                 </button>
                 <button
                   onClick={handleSupport}
-                  className="flex-1 px-4 py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all"
+                  className="flex-1 px-4 py-3 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
                 >
                   {lang === 'en' ? 'Send' : 'ላክ'}
                 </button>

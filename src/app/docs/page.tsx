@@ -44,9 +44,9 @@ function DocsContent() {
               <Link
                 key={idx}
                 href={`${section.href}?lang=${lang}`}
-                className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-8 border border-gray-200 hover:border-emerald-400 hover:shadow-lg transition-all"
+                className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-8 border border-gray-200 hover:border-blue-400 hover:shadow-lg transition-all"
               >
-                <h3 className="font-bold text-lg text-gray-900 hover:text-emerald-600 transition-colors">
+                <h3 className="font-bold text-lg text-gray-900 hover:text-blue-700 transition-colors">
                   {section.title}
                 </h3>
               </Link>

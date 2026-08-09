@@ -42,14 +42,14 @@ export function Toast({ toast, onClose }: ToastProps) {
   };
 
   const colorMap = {
-    success: 'from-[#0d7e4d] to-[#d4af37]',
-    error: 'from-[#ce1126] to-red-600',
+    success: 'from-[#16357a] to-[#d4af37]',
+    error: 'from-[#27487f] to-red-600',
     info: 'from-blue-500 to-blue-600',
     warning: 'from-yellow-500 to-yellow-600',
   };
 
   const bgColorMap = {
-    success: 'bg-[#0d7e4d]/10 border-[#0d7e4d]',
+    success: 'bg-[#16357a]/10 border-[#16357a]',
     error: 'bg-red-100 border-red-500',
     info: 'bg-blue-100 border-blue-500',
     warning: 'bg-yellow-100 border-yellow-500',

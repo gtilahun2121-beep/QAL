@@ -1,15 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  /* Ethiopian color palette - vibrant and culturally inspired */
-  --background: #faf9f7;
-  --foreground: #1a1a1a;
-  --primary-emerald: #0d7e4d;
+  /* Navy color palette - sleek and professional */
+  --background: #0a1f3d;
+  --foreground: #f6f8fb;
+  --primary-navy: #0a1f3d;
+  --primary-navy-light: #16357a;
+  --primary-navy-soft: #27487f;
   --primary-gold: #d4af37;
-  --primary-red: #ce1126;
-  --accent-orange: #ff8c00;
-  --accent-purple: #7b2cbf;
-  --secondary-slate: #5a5a5a;
+  --accent-steel: #4a6fa5;
+  --accent-cyan: #00a8cc;
+  --secondary-slate: #5a6b80;
   --font-sans: var(--font-geist-sans), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
 }
@@ -22,39 +23,39 @@
 }
 
 body {
-  background: linear-gradient(135deg, #faf9f7 0%, #f0ede8 100%);
-  color: var(--foreground);
+  background: linear-gradient(135deg, #0a1f3d 0%, #16357a 100%);
+  color: #f6f8fb;
   font-family: var(--font-sans);
   overflow-x: hidden;
   min-height: 100vh;
 }
 
-/* Ethiopian pattern background - inspired by Addis Ababa cityscape */
+/* Navy pattern background - subtle grid inspired by maritime depth */
 .pattern-eth {
   background: 
-    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(210, 175, 55, 0.03) 2px, rgba(210, 175, 55, 0.03) 4px),
-    repeating-linear-gradient(-45deg, transparent, transparent 2px, rgba(206, 17, 38, 0.02) 2px, rgba(206, 17, 38, 0.02) 4px);
+    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(212, 175, 55, 0.04) 2px, rgba(212, 175, 55, 0.04) 4px),
+    repeating-linear-gradient(-45deg, transparent, transparent 2px, rgba(169, 197, 255, 0.05) 2px, rgba(169, 197, 255, 0.05) 4px);
 }
 
-/* Ethiopian cross pattern inspired by traditional designs */
+/* Navy cross pattern */
 .pattern-cross {
   background-image:
-    linear-gradient(0deg, rgba(13, 126, 77, 0.05) 2px, transparent 2px),
+    linear-gradient(0deg, rgba(22, 53, 122, 0.06) 2px, transparent 2px),
     linear-gradient(90deg, rgba(212, 175, 55, 0.05) 2px, transparent 2px);
   background-size: 40px 40px;
 }
 
-/* Neon glow effects for Ethiopian aesthetics */
-.glow-eth-emerald {
-  text-shadow: 0 0 10px rgba(13, 126, 77, 0.5), 0 0 20px rgba(13, 126, 77, 0.3);
+/* Neon glow effects for navy aesthetics */
+.glow-eth-navy {
+  text-shadow: 0 0 10px rgba(22, 53, 122, 0.5), 0 0 20px rgba(22, 53, 122, 0.3);
 }
 
 .glow-eth-gold {
   text-shadow: 0 0 10px rgba(212, 175, 55, 0.6), 0 0 20px rgba(212, 175, 55, 0.3);
 }
 
-.glow-eth-red {
-  text-shadow: 0 0 10px rgba(206, 17, 38, 0.5), 0 0 20px rgba(206, 17, 38, 0.2);
+.glow-eth-cyan {
+  text-shadow: 0 0 10px rgba(0, 168, 204, 0.5), 0 0 20px rgba(0, 168, 204, 0.25);
 }
 
 /* Custom Scrollbar for Code/Logs windows */
@@ -76,25 +77,25 @@ body {
 
 /* Glassmorphism Classes */
 .glass-panel {
-  background: rgba(250, 249, 247, 0.8);
+  background: rgba(22, 53, 122, 0.55);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 2px solid rgba(212, 175, 55, 0.3);
-  box-shadow: 0 8px 32px rgba(13, 126, 77, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .glass-panel-light {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(10, 31, 61, 0.75);
   backdrop-filter: blur(8px);
-  border: 2px solid rgba(206, 17, 38, 0.2);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 2px solid rgba(212, 175, 55, 0.25);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
 }
 
-/* Ethiopian card hover effects */
+/* Navy card hover effects */
 .card-eth {
-  background: linear-gradient(135deg, #ffffff 0%, #f5f3f0 100%);
+  background: linear-gradient(135deg, #16357a 0%, #0a1f3d 100%);
   border: 2px solid transparent;
-  border-image: linear-gradient(135deg, #0d7e4d, #d4af37) 1;
+  border-image: linear-gradient(135deg, #16357a, #0a1f3d) 1;
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
   overflow: hidden;
@@ -107,7 +108,7 @@ body {
   left: -2px;
   right: -2px;
   bottom: -2px;
-  background: linear-gradient(135deg, #0d7e4d, #d4af37, #ce1126);
+  background: linear-gradient(135deg, #16357a, #27487f, #00a8cc);
   border-radius: inherit;
   opacity: 0;
   z-index: -1;
@@ -116,29 +117,29 @@ body {
 
 .card-eth:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(13, 126, 77, 0.25), 0 0 30px rgba(212, 175, 55, 0.15);
-  border-color: #0d7e4d;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(212, 175, 55, 0.15);
+  border-color: #16357a;
 }
 
 .card-eth:hover::before {
   opacity: 0.1;
 }
 
-/* Phone Bezel Shadow - Enhanced for Ethiopian theme */
+/* Phone Bezel Shadow - Enhanced for navy theme */
 .phone-shadow {
-  box-shadow: 0 25px 50px -12px rgba(13, 126, 77, 0.4), 0 0 40px 2px rgba(212, 175, 55, 0.2), 0 0 60px 4px rgba(206, 17, 38, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(22, 53, 122, 0.4), 0 0 40px 2px rgba(212, 175, 55, 0.2), 0 0 60px 4px rgba(0, 168, 204, 0.1);
 }
 
-/* Ethiopian celebration pulse */
+/* Navy celebration pulse */
 @keyframes pulse-eth-celebration {
   0% {
-    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.8), 0 0 0 0 rgba(13, 126, 77, 0.6), 0 0 0 0 rgba(206, 17, 38, 0.4);
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.8), 0 0 0 0 rgba(22, 53, 122, 0.6), 0 0 0 0 rgba(0, 168, 204, 0.4);
   }
   50% {
-    box-shadow: 0 0 0 10px rgba(212, 175, 55, 0), 0 0 0 20px rgba(13, 126, 77, 0), 0 0 0 30px rgba(206, 17, 38, 0);
+    box-shadow: 0 0 0 10px rgba(212, 175, 55, 0), 0 0 0 20px rgba(22, 53, 122, 0), 0 0 0 30px rgba(0, 168, 204, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0), 0 0 0 0 rgba(13, 126, 77, 0), 0 0 0 0 rgba(206, 17, 38, 0);
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0), 0 0 0 0 rgba(22, 53, 122, 0), 0 0 0 0 rgba(0, 168, 204, 0);
   }
 }
 
@@ -202,7 +203,7 @@ body {
 /* USSD Screen styling */
 .ussd-screen {
   font-family: 'Courier New', Courier, monospace;
-  background-color: #556b2f;
-  color: #000000;
-  text-shadow: 0.5px 0.5px 0px rgba(255, 255, 255, 0.2);
+  background-color: #16357a;
+  color: #eef2f8;
+  text-shadow: 0.5px 0.5px 0px rgba(0, 0, 0, 0.4);
 }

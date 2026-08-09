@@ -1,15 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Language, defaultLanguage } from '@/i18n/config';
 import { useAuth } from '@/app/context/AuthContext';
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
 import { ToastContainer, useToast } from '@/app/components/notifications/Toast';
+import { walletAPI } from '@/app/services/api';
 import { DashboardService, DashboardState } from '@/app/services/dashboardService';
-
-const todayISO = (): string => new Date().toISOString().split('T')[0];
 
 const PAYMENT_METHODS = [
   { id: 'telebirr', name: 'Telebirr', },
@@ -53,34 +52,45 @@ function WalletContent({ uid, lang, setLang }: WalletContentProps) {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('telebirr');
   const [phoneNumber, setPhoneNumber] = useState('');
 
+  useEffect(() => {
+    let active = true;
+    DashboardService.loadFromApi(uid)
+      .then((loaded) => {
+        if (active) setState(loaded);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [uid]);
+
+  const refresh = async () => {
+    const loaded = await DashboardService.loadFromApi(uid);
+    setState(loaded);
+    return loaded;
+  };
+
   const dashboard = state;
   const balance = dashboard.walletBalance;
 
-  const handleDeposit = () => {
+  const handleDeposit = async () => {
     const amount = parseFloat(depositAmount);
     if (!depositAmount || amount <= 0) {
       toast.error('Invalid Amount', 'Please enter a valid amount.');
       return;
     }
-    let next = { ...dashboard, walletBalance: balance + amount };
-    next = DashboardService.addTransaction(next, {
-      type: 'Deposit',
-      equb: 'Bank Transfer',
-      amount,
-      date: todayISO(),
-      status: 'Completed',
-    });
-    next = DashboardService.addActivity(next, {
-      action: `Deposited ${amount.toLocaleString()} ETB`,
-    });
-    DashboardService.persist(uid, next);
-    setState(next);
-    setShowDepositModal(false);
-    setDepositAmount('');
-    toast.success('Deposit Successful', `${amount.toLocaleString()} ETB added to your wallet.`);
+    try {
+      await walletAPI.deposit(amount);
+      await refresh();
+      setShowDepositModal(false);
+      setDepositAmount('');
+      toast.success('Deposit Successful', `${amount.toLocaleString()} ETB added to your wallet.`);
+    } catch (error: any) {
+      toast.error('Deposit Failed', error?.data?.message || error?.message || 'Could not deposit funds.');
+    }
   };
 
-  const handleWithdraw = () => {
+  const handleWithdraw = async () => {
     const amount = parseFloat(withdrawAmount);
     if (!withdrawAmount || amount <= 0) {
       toast.error('Invalid Amount', 'Please enter a valid amount.');
@@ -95,26 +105,17 @@ function WalletContent({ uid, lang, setLang }: WalletContentProps) {
       return;
     }
 
-    const methodName = PAYMENT_METHODS.find((m) => m.id === selectedPaymentMethod)?.name || 'Bank Transfer';
-
-    let next = { ...dashboard, walletBalance: balance - amount };
-    next = DashboardService.addTransaction(next, {
-      type: 'Withdrawal',
-      equb: `${methodName} (${phoneNumber})`,
-      amount: -amount,
-      date: todayISO(),
-      status: 'Completed',
-    });
-    next = DashboardService.addActivity(next, {
-      action: `Withdrew ${amount.toLocaleString()} ETB via ${methodName}`,
-    });
-    DashboardService.persist(uid, next);
-    setState(next);
-    setShowWithdrawModal(false);
-    setWithdrawAmount('');
-    setPhoneNumber('');
-    setSelectedPaymentMethod('telebirr');
-    toast.success('Withdrawal Successful', `${amount.toLocaleString()} ETB sent to ${phoneNumber}.`);
+    try {
+      await walletAPI.withdraw(amount);
+      await refresh();
+      setShowWithdrawModal(false);
+      setWithdrawAmount('');
+      setPhoneNumber('');
+      setSelectedPaymentMethod('telebirr');
+      toast.success('Withdrawal Successful', `${amount.toLocaleString()} ETB sent to ${phoneNumber}.`);
+    } catch (error: any) {
+      toast.error('Withdrawal Failed', error?.data?.message || error?.message || 'Could not withdraw funds.');
+    }
   };
 
   return (
@@ -129,20 +130,20 @@ function WalletContent({ uid, lang, setLang }: WalletContentProps) {
             </h1>
             <button
               onClick={() => router.push('/dashboard')}
-              className="px-4 py-2 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all"
+              className="px-4 py-2 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
             >
               ← {lang === 'en' ? 'Back to Dashboard' : 'ወደ ዳሽቦርድ'}
             </button>
           </div>
 
           {/* Wallet Balance */}
-          <div className="bg-gradient-to-r from-[#0d7e4d] to-[#d4af37] text-white rounded-2xl shadow-lg p-8 mb-8">
+          <div className="bg-gradient-to-r from-[#16357a] to-[#d4af37] text-white rounded-2xl shadow-lg p-8 mb-8">
             <p className="text-sm opacity-90">{lang === 'en' ? 'Current Balance' : 'አሁን ሚዛን'}</p>
             <h2 className="text-5xl font-black mb-4">ETB {balance.toLocaleString()}</h2>
             <div className="flex gap-4">
               <button
                 onClick={() => setShowDepositModal(true)}
-                className="bg-white text-[#0d7e4d] font-bold px-6 py-2 rounded-lg hover:shadow-lg transition-all"
+                className="bg-white text-[#16357a] font-bold px-6 py-2 rounded-lg hover:shadow-lg transition-all"
               >
                 {lang === 'en' ? 'Deposit' : 'ተወገዱ'}
               </button>
@@ -173,10 +174,10 @@ function WalletContent({ uid, lang, setLang }: WalletContentProps) {
                       <p className="text-sm text-gray-500">{txn.date}</p>
                     </div>
                     <div className="text-right">
-                      <p className={`font-bold text-lg ${txn.amount < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                      <p className={`font-bold text-lg ${txn.amount < 0 ? 'text-red-600' : 'text-blue-700'}`}>
                         {txn.amount < 0 ? '-' : '+'}ETB {Math.abs(txn.amount).toLocaleString()}
                       </p>
-                      <p className="text-xs text-green-600">✓ {txn.status}</p>
+                      <p className="text-xs text-blue-700">✓ {txn.status}</p>
                     </div>
                   </div>
                 ))}
@@ -199,7 +200,7 @@ function WalletContent({ uid, lang, setLang }: WalletContentProps) {
                   value={depositAmount}
                   onChange={(e) => setDepositAmount(e.target.value)}
                   placeholder="Enter amount"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#0d7e4d]"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#16357a]"
                 />
               </div>
               <div className="flex gap-3">
@@ -214,7 +215,7 @@ function WalletContent({ uid, lang, setLang }: WalletContentProps) {
                 </button>
                 <button
                   onClick={handleDeposit}
-                  className="flex-1 px-4 py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all"
+                  className="flex-1 px-4 py-3 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
                 >
                   Deposit
                 </button>
@@ -239,7 +240,7 @@ function WalletContent({ uid, lang, setLang }: WalletContentProps) {
                       onClick={() => setSelectedPaymentMethod(method.id)}
                       className={`p-3 rounded-lg border-2 transition-all text-center ${
                         selectedPaymentMethod === method.id
-                          ? 'border-[#0d7e4d] bg-green-50 font-bold'
+                          ? 'border-[#16357a] bg-blue-100 font-bold'
                           : 'bg-gray-50 border-gray-200 hover:border-gray-300'
                       }`}
                     >
@@ -258,7 +259,7 @@ function WalletContent({ uid, lang, setLang }: WalletContentProps) {
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   placeholder="+2519xxxxxxxx"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#0d7e4d]"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#16357a]"
                 />
               </div>
 
@@ -270,7 +271,7 @@ function WalletContent({ uid, lang, setLang }: WalletContentProps) {
                   value={withdrawAmount}
                   onChange={(e) => setWithdrawAmount(e.target.value)}
                   placeholder="Enter amount"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#0d7e4d]"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#16357a]"
                 />
               </div>
 
@@ -287,7 +288,7 @@ function WalletContent({ uid, lang, setLang }: WalletContentProps) {
                 </button>
                 <button
                   onClick={handleWithdraw}
-                  className="flex-1 px-4 py-3 bg-[#0d7e4d] text-white font-bold rounded-lg hover:bg-[#0a5c38] transition-all"
+                  className="flex-1 px-4 py-3 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all"
                 >
                   Withdraw
                 </button>
