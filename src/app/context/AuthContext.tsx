@@ -14,6 +14,7 @@ interface User {
   profession: string;
   role: UserRole;
   createdAt: string;
+  pin?: string;
 }
 
 interface AuthContextType {
@@ -36,6 +37,7 @@ interface SignupData {
   profession: string;
   fayda: string;
   guarantor: string;
+  pin?: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -86,18 +88,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setUser(userData);
       setRole(userData.role);
-      
-      // Store user and token in localStorage
-      localStorage.setItem('qalnet_user', JSON.stringify(userData));
+
+      // Persist user with PIN stored locally for PIN verification (local fallback)
+      const storedUser: User = {
+        ...userData,
+        pin,
+      };
+      localStorage.setItem('qalnet_user', JSON.stringify(storedUser));
       localStorage.setItem('authToken', response.accessToken);
-      
+
       // Store refresh token as httpOnly would in production
       if (response.refreshToken) {
         localStorage.setItem('refreshToken', response.refreshToken);
       }
     } catch (error) {
-      const message = error instanceof APIError 
-        ? error.data?.message || error.message 
+      const message = error instanceof APIError
+        ? error.data?.message || error.message
         : error instanceof Error ? error.message : 'Sign in failed';
       throw new Error(message);
     } finally {
@@ -105,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const signup = useCallback(async (data: SignupData) => {
+const signup = useCallback(async (data: SignupData) => {
     setIsLoading(true);
     try {
       // Call backend API
@@ -135,18 +141,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setUser(userData);
       setRole(userData.role);
-      
-      // Store user and token in localStorage
-      localStorage.setItem('qalnet_user', JSON.stringify(userData));
+
+      // Persist user with PIN stored locally for PIN verification (local fallback)
+      const storedUser: User = {
+        ...userData,
+        pin: data.pin,
+      };
+      localStorage.setItem('qalnet_user', JSON.stringify(storedUser));
       localStorage.setItem('authToken', response.accessToken);
-      
-      // Store refresh token
+
+      // Store refresh token as httpOnly would in production
       if (response.refreshToken) {
         localStorage.setItem('refreshToken', response.refreshToken);
       }
     } catch (error) {
-      const message = error instanceof APIError 
-        ? error.data?.message || error.message 
+      const message = error instanceof APIError
+        ? error.data?.message || error.message
         : error instanceof Error ? error.message : 'Sign up failed';
       throw new Error(message);
     } finally {

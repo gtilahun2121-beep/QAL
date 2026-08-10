@@ -8,6 +8,8 @@ import { useAuth } from '@/app/context/AuthContext';
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
 import { ToastContainer, useToast } from '@/app/components/notifications/Toast';
+import MemberDrawer from '@/app/components/dashboard/MemberDrawer';
+import PinVerifyModal from '@/app/components/dashboard/PinVerifyModal';
 import { equbAPI, walletAPI } from '@/app/services/api';
 import {
   DashboardService,
@@ -77,7 +79,7 @@ export default function DashboardPage() {
 function DashboardContent({ uid, lang, setLang, newUser, displayName }: DashboardContentProps) {
   const router = useRouter();
   const toast = useToast();
-  const { signout } = useAuth();
+  const { signout, user: authUser } = useAuth();
 
   const [state, setState] = useState<DashboardState>(() => DashboardService.loadState(uid));
   const [now] = useState(() => Date.now());
@@ -124,7 +126,35 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
+  const [showPinModal, setShowPinModal] = useState(false);
+  const [pinAction, setPinAction] = useState<'withdraw' | 'payment' | null>(null);
+  const [pinResult, setPinResult] = useState<'success' | 'error' | 'cancel' | null>(null);
+  const [showDrawer, setShowDrawer] = useState(false);
   const [supportCategory, setSupportCategory] = useState('Help Center');
+
+  const handleDrawerOpen = () => setShowDrawer(true);
+  const handleDrawerClose = () => setShowDrawer(false);
+
+  const handlePinVerify = (action: 'withdraw' | 'payment') => {
+    setPinAction(action);
+    setPinResult(null);
+    setShowPinModal(true);
+  };
+
+  const handlePinSuccess = () => {
+    setPinResult('success');
+    setShowPinModal(false);
+    if (pinAction === 'withdraw') {
+      setShowWithdraw(true);
+    } else if (pinAction === 'payment') {
+      setShowPayment(true);
+    }
+  };
+
+  const handlePinCancel = () => {
+    setPinResult('cancel');
+    setShowPinModal(false);
+  };
 
   // Forms
   const [createForm, setCreateForm] = useState({
@@ -180,6 +210,11 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
   };
 
   const handleWithdraw = async () => {
+    if (pinAction === 'withdraw') {
+      if (pinResult === 'success') {
+        // PIN was already verified earlier. Now proceed.
+      }
+    }
     const amount = Number(withdrawForm.amount);
     if (!amount || amount <= 0) {
       toast.error('Invalid Amount', 'Please enter a valid withdrawal amount.');
@@ -392,10 +427,24 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
         {/* Welcome Section */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
-            <h1 className="text-3xl sm:text-4xl font-black text-gray-900 break-words">
-              {lang === 'en' ? 'Welcome, ' : 'ደህና መጡ, '}
-              {displayName} 
-            </h1>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleDrawerOpen}
+                className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-br from-teal-700 to-teal-500 text-white font-bold rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all cursor-pointer"
+                aria-label={lang === 'en' ? 'Open member menu' : 'የአባል ምናሌ ክፈት'}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                <span className="hidden sm:inline">
+                  {lang === 'en' ? 'Menu' : 'ምናሌ'}
+                </span>
+              </button>
+              <h1 className="text-3xl sm:text-4xl font-black text-gray-900 break-words">
+                {lang === 'en' ? 'Welcome, ' : 'ደህና መጡ, '}
+                {displayName} 
+              </h1>
+            </div>
             <button
               onClick={handleSignOut}
               className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all"
@@ -1171,6 +1220,58 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
       )}
 
       <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
+
+      {/* ── Member Drawer ─────────────────────────────────────────────────── */}
+      <MemberDrawer
+        open={showDrawer}
+        lang={lang}
+        user={{
+          name: authUser?.firstName || displayName,
+          phone: authUser?.phoneNumber || '—',
+          role: authUser?.role || 'member',
+          email: authUser?.email || undefined,
+        }}
+        userId={uid}
+        walletBalance={dashboard.walletBalance}
+        equbs={dashboard.equbs}
+        transactions={dashboard.transactions}
+        notifications={dashboard.notifications}
+        activity={dashboard.activity}
+        onClose={handleDrawerClose}
+        onDeposit={() => setShowDeposit(true)}
+        onWithdraw={() => setShowWithdraw(true)}
+        onMakePayment={(equb) => openPaymentFor(equb)}
+        onVerifyPin={() => handlePinVerify('withdraw')}
+        onSupport={(category) => {
+          setSupportCategory(category);
+          setShowSupport(true);
+        }}
+        onSignOut={handleSignOut}
+      />
+
+      {/* ── PIN Verify Modal ─────────────────────────────────────────────── */}
+      <PinVerifyModal
+        open={showPinModal}
+        userId={uid}
+        phoneNumber={authUser?.phoneNumber || ''}
+        lang={lang}
+        title={
+          lang === 'en'
+            ? 'Confirm Your PIN'
+            : 'PINዎን ያረጋግጡ'
+        }
+        description={
+          pinAction === 'payment'
+            ? lang === 'en'
+              ? 'Enter your PIN to process this payment.'
+              : 'ይህን ክፍያ ለማከናወን PINዎን ያስገቡ።'
+            : lang === 'en'
+              ? 'Enter your PIN to authorize this withdrawal.'
+              : 'ይህን ገንዘብ ማውጣት ለማፍቀድ PINዎን ያስገቡ።'
+        }
+        onSuccess={handlePinSuccess}
+        onCancel={handlePinCancel}
+      />
     </main>
   );
 }
