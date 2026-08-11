@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Language, languages } from '@/i18n/config';
 import { translations } from '@/i18n/translations';
 
@@ -55,8 +56,8 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group min-w-0">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-[#d4af37] to-[#27487f] rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
-              <span className="text-[#0a1f3d] font-black text-lg">Q</span>
+            <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden shadow-lg flex-shrink-0">
+              <Image src="/logo.png" alt="QalNet logo" fill className="object-cover" />
             </div>
             <div>
               <span className="font-black text-xl sm:text-2xl text-white drop-shadow-lg truncate">QalNet</span>
@@ -92,19 +93,6 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
               ))}
             </select>
 
-            {/* Sign Up Button */}
-            {!isAuthenticated && (
-              <button
-                onClick={() => {
-                  if (onSignUpClick) onSignUpClick();
-                  else router.push('/?auth=1');
-                }}
-                className="hidden sm:inline-block px-6 py-2 bg-white text-[#0a1f3d] font-bold rounded-full hover:shadow-lg transition-all text-sm"
-              >
-                 Sign Up
-              </button>
-            )}
-
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -116,36 +104,38 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
             </button>
 
             {/* Admin button: ensure navigation — create dev admin if missing then navigate */}
-            <button
-              onClick={() => {
-                try {
-                  const token = localStorage.getItem('qalnet_admin_token');
-                  if (!token) {
-                    const demo = 'admin_demo';
-                    localStorage.setItem('qalnet_admin_token', demo);
-                    localStorage.setItem(`qalnet_admin_${demo}`, JSON.stringify({
-                      fullName: 'System Admin',
-                      role: 'system_admin',
-                      permissions: ['view_members', 'approve_kyc', 'manage_disputes', 'view_financial_records', 'manage_admin_users'],
-                    }));
-                    // also set role key expected by admin page
-                    localStorage.setItem('qalnet_admin_role', 'system_admin');
+            {!admin && (
+              <button
+                onClick={() => {
+                  try {
+                    const token = localStorage.getItem('qalnet_admin_token');
+                    if (!token) {
+                      const demo = 'admin_demo';
+                      localStorage.setItem('qalnet_admin_token', demo);
+                      localStorage.setItem(`qalnet_admin_${demo}`, JSON.stringify({
+                        fullName: 'System Admin',
+                        role: 'system_admin',
+                        permissions: ['view_members', 'approve_kyc', 'manage_disputes', 'view_financial_records', 'manage_admin_users'],
+                      }));
+                      // also set role key expected by admin page
+                      localStorage.setItem('qalnet_admin_role', 'system_admin');
+                    }
+                  } catch (e) {
+                    // ignore
                   }
-                } catch (e) {
-                  // ignore
-                }
-                // Navigate using explicit origin to avoid relative routing mismatches
-                try {
-                  window.location.href = `${window.location.origin}/admin/dashboard`;
-                } catch (e) {
-                  // fallback
-                  window.location.href = '/admin/dashboard';
-                }
-              }}
-              className="inline-flex items-center px-4 py-2 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all"
-            >
-              Admin
-            </button>
+                  // Navigate using explicit origin to avoid relative routing mismatches
+                  try {
+                    window.location.href = `${window.location.origin}/admin/dashboard`;
+                  } catch (e) {
+                    // fallback
+                    window.location.href = '/admin/dashboard';
+                  }
+                }}
+                className="inline-flex items-center px-4 py-2 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all"
+              >
+                Admin
+              </button>
+            )}
 
             {/* Show system admin if logged in - placed at far right with dropdown */}
             {admin && (
@@ -211,18 +201,6 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
                 {item.label}
               </Link>
             ))}
-            {!isAuthenticated && (
-              <button
-                onClick={() => {
-                  if (onSignUpClick) onSignUpClick();
-                  else router.push('/?auth=1');
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full px-4 py-3 bg-white text-[#0a1f3d] font-bold rounded-lg"
-              >
-                 Sign Up
-              </button>
-            )}
           </div>
         )}
       </nav>
