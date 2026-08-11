@@ -125,88 +125,167 @@ export default function AdminDashboard() {
 
       <div className="min-h-screen bg-gradient-to-br from-[#f5f3f0] to-[#ece8e3] py-8">
         <div className="max-w-7xl mx-auto px-4">
-          {/* Admin Header */}
+          {/* Top header area */}
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="bg-gradient-to-r from-purple-600 to-red-600 rounded-2xl p-6 text-white mb-8 shadow-xl"
+            className="bg-white rounded-2xl p-6 mb-6 shadow-md"
           >
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-              <div className="min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-black mb-1 break-words">Admin Dashboard</h1>
-                <p className="text-sm break-words">
-                  Role: <span className="font-black">{roleDisplay[admin.role].name}</span> | Email: {admin.email}
-                </p>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-black text-[#16357a]">Good evening, Admin 👋</h1>
+                <p className="text-sm text-gray-600">Here's the current status of the QalNet platform.</p>
               </div>
-              <motion.button
-                onClick={() => {
-                  localStorage.removeItem('qalnet_admin_token');
-                  localStorage.removeItem('qalnet_admin_role');
-                  window.location.href = '/auth';
-                }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-full sm:w-auto px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full font-bold transition-all"
-              >
-                 Logout
-              </motion.button>
+              <div className="flex items-center gap-3">
+                <div className="text-sm text-gray-600">Aug 9, 2026 · 10:45 PM</div>
+                <button className="px-4 py-2 bg-[#16357a] text-white rounded-lg font-bold">Export Report</button>
+              </div>
             </div>
           </motion.div>
 
-          {/* Navigation Tabs */}
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-8"
-          >
-            {[
-              { id: 'overview', label: 'Overview', permission: null },
-              { id: 'members', label: 'Members', permission: 'view_members' },
-              { id: 'kyc', label: 'KYC', permission: 'approve_kyc' },
-              { id: 'disputes', label: 'Disputes', permission: 'manage_disputes' },
-              { id: 'finance', label: 'Finance', permission: 'view_financial_records' },
-              { id: 'admin', label: 'Admin', permission: 'manage_admin_users' },
-            ].map(
-              (tab) =>
-                (tab.permission === null || hasPermission(tab.permission)) && (
-                  <motion.button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id as any)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`py-3 px-3 font-black rounded-lg transition-all text-sm sm:text-base ${
-                      activeTab === tab.id
-                        ? 'bg-gradient-to-r from-purple-600 to-red-600 text-white shadow-lg'
-                        : 'bg-white text-[#16357a] border-2 border-[#d4af37] hover:shadow-md'
-                    }`}
-                  >
-                    {tab.label}
-                  </motion.button>
-                )
-            )}
-          </motion.div>
+          {/* Main grid: left nav, main content, right sidebar */}
+          <div className="grid grid-cols-12 gap-6">
+            {/* Left navigation (small) */}
+            <aside className="col-span-12 md:col-span-2">
+              <div className="bg-white rounded-2xl p-4 shadow-md sticky top-6">
+                {/* Reuse LeftNav if present; fallback to simple list */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <div className="mb-4">
+                  <h3 className="font-black text-[#16357a]">QalNet</h3>
+                </div>
+                <ul className="space-y-2 text-sm">
+                  <li className="px-3 py-2 bg-[#e8f6f3] rounded-lg font-bold text-[#16357a]">Dashboard</li>
+                  <li className="px-3 py-2 rounded-lg hover:bg-gray-50">Users</li>
+                  <li className="px-3 py-2 rounded-lg hover:bg-gray-50">Equbs</li>
+                  <li className="px-3 py-2 rounded-lg hover:bg-gray-50">Transactions</li>
+                  <li className="px-3 py-2 rounded-lg hover:bg-gray-50">Withdrawals</li>
+                  <li className="px-3 py-2 rounded-lg hover:bg-gray-50">Verifications</li>
+                </ul>
+              </div>
+            </aside>
 
-          {/* Content Sections */}
-          {activeTab === 'overview' && (
-            <OverviewTab members={members} kycDocs={kycDocs} disputes={disputes} records={records} />
-          )}
-          {activeTab === 'members' && hasPermission('view_members') && (
-            <MembersTab members={members} admin={admin} />
-          )}
-          {activeTab === 'kyc' && hasPermission('approve_kyc') && (
-            <KYCTab documents={kycDocs} />
-          )}
-          {activeTab === 'disputes' && hasPermission('manage_disputes') && (
-            <DisputesTab disputes={disputes} />
-          )}
-          {activeTab === 'finance' && hasPermission('view_financial_records') && (
-            <FinanceTab records={records} />
-          )}
-          {activeTab === 'admin' && hasPermission('manage_admin_users') && (
-            <AdminUsersTab admin={admin} />
-          )}
+            {/* Main content */}
+            <main className="col-span-12 md:col-span-7">
+              {/* KPI Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <StatCard label="Total Users" value="12,485" sub="+8.4% this month" />
+                <StatCard label="Active Equbs" value="342" sub="+12.1% this month" />
+                <StatCard label="Total Contributions" value="ETB 4.82M" sub="+15.8% this month" />
+                <StatCard label="Pending Payments" value="47" sub="Requires attention" />
+              </div>
+
+              {/* Platform activity chart */}
+              <div className="bg-white rounded-2xl p-6 shadow-md mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-black text-lg text-[#16357a]">Platform Activity</h3>
+                  <div className="text-sm text-gray-600">7 Days · Contributions</div>
+                </div>
+                <div className="h-48 bg-gradient-to-b from-teal-50 to-white rounded-lg flex items-end justify-center">
+                  {/* Placeholder chart */}
+                  <div className="w-full h-full flex items-end">
+                    <div className="mx-auto w-[85%] h-[80%] bg-gradient-to-t from-[#bdeedd] to-[#e6faf6] rounded-lg flex items-end justify-center">
+                      <div className="text-sm text-gray-600 p-4">[Chart Placeholder]</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Transactions + Recent Activity */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="bg-white rounded-2xl p-6 shadow-md">
+                  <h4 className="font-black text-[#16357a] mb-4">Recent Transactions</h4>
+                  <div className="space-y-3 text-sm">
+                    {records.map((r: any) => (
+                      <div key={r.id} className="flex justify-between items-center">
+                        <div>
+                          <div className="font-bold">{r.memberName}</div>
+                          <div className="text-xs text-gray-500">{r.description}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-black">ETB {r.amount}</div>
+                          <div className="text-xs text-gray-500">{new Date(r.date).toLocaleTimeString()}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl p-6 shadow-md">
+                  <h4 className="font-black text-[#16357a] mb-4">Member Verification</h4>
+                  <div className="space-y-3 text-sm">
+                    {kycDocs.map((d: any) => (
+                      <div key={d.id} className="flex items-center justify-between">
+                        <div>
+                          <div className="font-bold">{d.memberName}</div>
+                          <div className="text-xs text-gray-500">Submitted {new Date(d.submittedAt).toLocaleHoursString?.() || 'recently'}</div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button className="px-3 py-1 bg-green-100 text-green-800 rounded-lg text-xs font-bold">Approve</button>
+                          <button className="px-3 py-1 bg-red-100 text-red-700 rounded-lg text-xs font-bold">Reject</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </main>
+
+            {/* Right sidebar */}
+            <aside className="col-span-12 md:col-span-3">
+              <div className="space-y-4">
+                <div className="bg-white rounded-2xl p-4 shadow-md">
+                  <h4 className="font-black text-[#16357a] mb-3">Pending Actions</h4>
+                  <ul className="space-y-3 text-sm">
+                    <li className="flex items-center justify-between bg-red-50 p-3 rounded-lg">
+                      <div>
+                        <div className="font-bold">18 Equbs awaiting approval</div>
+                        <div className="text-xs text-gray-500">Review new Equb registrations</div>
+                      </div>
+                      <button className="px-3 py-1 bg-white text-[#16357a] rounded-lg text-xs font-bold">Review</button>
+                    </li>
+                    <li className="flex items-center justify-between bg-yellow-50 p-3 rounded-lg">
+                      <div>
+                        <div className="font-bold">31 users awaiting verification</div>
+                        <div className="text-xs text-gray-500">Identity verification required</div>
+                      </div>
+                      <button className="px-3 py-1 bg-white text-[#16357a] rounded-lg text-xs font-bold">Review</button>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="bg-white rounded-2xl p-4 shadow-md">
+                  <h4 className="font-black text-[#16357a] mb-3">Top Equbs</h4>
+                  <ul className="space-y-3 text-sm">
+                    <li className="flex items-center justify-between">
+                      <div>
+                        <div className="font-bold">WDR Telebirr Equb</div>
+                        <div className="text-xs text-gray-500">12 Members</div>
+                      </div>
+                      <div className="text-sm font-black text-green-700">ETB 1,100</div>
+                    </li>
+                    <li className="flex items-center justify-between">
+                      <div>
+                        <div className="font-bold">Family Equb</div>
+                        <div className="text-xs text-gray-500">8 Members</div>
+                      </div>
+                      <div className="text-sm font-black text-green-700">ETB 500</div>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="bg-white rounded-2xl p-4 shadow-md">
+                  <h4 className="font-black text-[#16357a] mb-3">Quick Actions</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button className="px-3 py-3 rounded-lg bg-green-50 text-[#16357a] font-bold">Add User</button>
+                    <button className="px-3 py-3 rounded-lg bg-blue-50 text-[#16357a] font-bold">Create Equb</button>
+                    <button className="px-3 py-3 rounded-lg bg-gray-50 text-[#16357a] font-bold">View Reports</button>
+                    <button className="px-3 py-3 rounded-lg bg-indigo-50 text-[#16357a] font-bold">System Settings</button>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
         </div>
       </div>
 

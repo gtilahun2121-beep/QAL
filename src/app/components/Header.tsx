@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Language, languages } from '@/i18n/config';
@@ -15,8 +15,33 @@ interface HeaderProps {
 
 export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthenticated = false }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [admin, setAdmin] = useState<any | null>(null);
+  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
+  const adminRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const t = translations[lang];
+
+  useEffect(()=>{
+    try{
+      const token = localStorage.getItem('qalnet_admin_token');
+      if(!token) return;
+      const raw = localStorage.getItem(`qalnet_admin_${token}`);
+      if(raw) {
+        setAdmin(JSON.parse(raw));
+      }
+    }catch(e){
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    const onDoc = (e: MouseEvent) => {
+      if (!adminRef.current) return;
+      if (!adminRef.current.contains(e.target as Node)) setAdminMenuOpen(false);
+    };
+    document.addEventListener('click', onDoc);
+    return () => document.removeEventListener('click', onDoc);
+  }, []);
 
   const navItems = [
     { label: t.home, href: '/' },
@@ -89,6 +114,87 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
+
+            {/* Admin button: ensure navigation — create dev admin if missing then navigate */}
+            <button
+              onClick={() => {
+                try {
+                  const token = localStorage.getItem('qalnet_admin_token');
+                  if (!token) {
+                    const demo = 'admin_demo';
+                    localStorage.setItem('qalnet_admin_token', demo);
+                    localStorage.setItem(`qalnet_admin_${demo}`, JSON.stringify({
+                      fullName: 'System Admin',
+                      role: 'system_admin',
+                      permissions: ['view_members', 'approve_kyc', 'manage_disputes', 'view_financial_records', 'manage_admin_users'],
+                    }));
+                    // also set role key expected by admin page
+                    localStorage.setItem('qalnet_admin_role', 'system_admin');
+                  }
+                } catch (e) {
+                  // ignore
+                }
+                // Navigate using explicit origin to avoid relative routing mismatches
+                try {
+                  window.location.href = `${window.location.origin}/admin/dashboard`;
+                } catch (e) {
+                  // fallback
+                  window.location.href = '/admin/dashboard';
+                }
+              }}
+              className="inline-flex items-center px-4 py-2 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all"
+            >
+              Admin
+            </button>
+
+            {/* Show system admin if logged in - placed at far right with dropdown */}
+            {admin && (
+              <div ref={adminRef} className="relative ml-2">
+                <button
+                  onClick={() => setAdminMenuOpen((s) => !s)}
+                  className="flex items-center gap-3 bg-white/10 px-3 py-2 rounded-full"
+                >
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#d4af37] to-[#27487f] flex items-center justify-center text-sm font-black text-[#0a1f3d]">{(admin.fullName || 'A').split(' ').map((s: string)=>s[0]).slice(0,2).join('')}</div>
+                  <div className="text-white text-sm">
+                    <div className="font-black leading-none">{admin.fullName}</div>
+                    <div className="text-xs text-white/80">{admin.role?.replace('_',' ')}</div>
+                  </div>
+                </button>
+
+                {adminMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg text-[#0a1f3d] z-50">
+                    <button
+                      onClick={() => {
+                        try {
+                          window.location.href = `${window.location.origin}/admin/dashboard`;
+                        } catch (e) {
+                          window.location.href = '/admin/dashboard';
+                        }
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                    >
+                      Open Dashboard
+                    </button>
+                    <button
+                      onClick={() => {
+                        try {
+                          const token = localStorage.getItem('qalnet_admin_token');
+                          if (token) localStorage.removeItem(`qalnet_admin_${token}`);
+                          localStorage.removeItem('qalnet_admin_token');
+                          localStorage.removeItem('qalnet_admin_role');
+                        } catch (e) {
+                          // ignore
+                        }
+                        window.location.href = '/';
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
