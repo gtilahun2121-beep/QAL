@@ -26,6 +26,7 @@ interface AuthContextType {
   signup: (data: SignupData) => Promise<void>;
   signout: () => void;
   resetPin: (phoneNumber: string, newPin: string) => Promise<void>;
+  updateProfile: (patch: Partial<User>) => Promise<void>;
 }
 
 interface SignupData {
@@ -190,6 +191,15 @@ const signup = useCallback(async (data: SignupData) => {
     }
   }, [signout]);
 
+  const updateProfile = useCallback(async (patch: Partial<User>) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev, ...patch };
+      localStorage.setItem('qalnet_user', JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   const value: AuthContextType = {
     user,
     role,
@@ -199,6 +209,7 @@ const signup = useCallback(async (data: SignupData) => {
     signup,
     signout,
     resetPin,
+    updateProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

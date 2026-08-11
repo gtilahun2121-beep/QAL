@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -13,12 +13,17 @@ import {
   Dispute,
   FinancialRecord,
   Permission,
+  Equb,
+  AuditLog,
 } from '@/app/types/admin';
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
 import { Language, defaultLanguage } from '@/i18n/config';
+import { downloadCSV, formatDateShort } from '@/app/utils/csv';
+import { DonutChart, TrendChart, HorizontalBars } from '@/app/utils/charts';
+import { adminAPI } from '@/app/services/api';
 
-type TabId = 'overview' | 'members' | 'kyc' | 'disputes' | 'finance' | 'admin';
+type TabId = 'overview' | 'members' | 'kyc' | 'disputes' | 'finance' | 'equbs' | 'reports' | 'audit' | 'admin';
 
 const STORAGE_KEYS = {
   members: 'qalnet_admin_members',
@@ -26,6 +31,8 @@ const STORAGE_KEYS = {
   disputes: 'qalnet_admin_disputes',
   finance: 'qalnet_admin_finance',
   admins: 'qalnet_admin_admins',
+  equbs: 'qalnet_admin_equbs',
+  audit: 'qalnet_admin_audit',
 } as const;
 
 function loadStored<T>(key: string, fallback: T): T {
@@ -233,12 +240,129 @@ const seedAdmins: AdminUser[] = [
   },
 ];
 
+const seedEqubs: Equb[] = [
+  {
+    id: 'eq1',
+    name: 'Gold Equb',
+    category: 'Savings',
+    contributionAmount: 5000,
+    totalMembers: 12,
+    membersJoined: 12,
+    status: 'active',
+    managerName: 'Aisha Mohammed',
+    managerPhone: '+251911223344',
+    startDate: new Date().toISOString(),
+    currentRound: 3,
+    totalRounds: 12,
+    description: 'A trusted monthly savings circle.',
+    collectedAmount: 132000,
+  },
+  {
+    id: 'eq2',
+    name: 'Business Boost',
+    category: 'Business',
+    contributionAmount: 10000,
+    totalMembers: 15,
+    membersJoined: 12,
+    status: 'pending',
+    managerName: 'Dawit Tesfaye',
+    managerPhone: '+251933445566',
+    startDate: new Date().toISOString(),
+    currentRound: 1,
+    totalRounds: 18,
+    description: 'Capital pooling for small business owners.',
+    collectedAmount: 0,
+  },
+  {
+    id: 'eq3',
+    name: 'Education Fund',
+    category: 'Education',
+    contributionAmount: 7500,
+    totalMembers: 10,
+    membersJoined: 10,
+    status: 'active',
+    managerName: 'Sara Girma',
+    managerPhone: '+251944556677',
+    startDate: new Date().toISOString(),
+    currentRound: 5,
+    totalRounds: 12,
+    description: 'Save together for school and tuition costs.',
+    collectedAmount: 337500,
+  },
+  {
+    id: 'eq4',
+    name: 'Family Circle',
+    category: 'Community',
+    contributionAmount: 6000,
+    totalMembers: 12,
+    membersJoined: 8,
+    status: 'paused',
+    managerName: 'Tigst Kebede',
+    managerPhone: '+251922334455',
+    startDate: new Date().toISOString(),
+    currentRound: 2,
+    totalRounds: 24,
+    description: 'A long-term community savings circle.',
+    collectedAmount: 72000,
+  },
+  {
+    id: 'eq5',
+    name: 'Investment Club',
+    category: 'Business',
+    contributionAmount: 15000,
+    totalMembers: 20,
+    membersJoined: 20,
+    status: 'completed',
+    managerName: 'Aisha Mohammed',
+    managerPhone: '+251911223344',
+    startDate: new Date().toISOString(),
+    currentRound: 20,
+    totalRounds: 20,
+    description: 'High-contribution circle for serious investors.',
+    collectedAmount: 5700000,
+  },
+];
+
+const seedAuditLogs: AuditLog[] = [
+  {
+    id: 'audit1',
+    adminId: 'admin1',
+    adminEmail: 'super@qalnet.com',
+    action: 'Created admin account',
+    targetType: 'admin',
+    targetId: 'admin2',
+    timestamp: new Date(Date.now() - 3600_000).toISOString(),
+  },
+  {
+    id: 'audit2',
+    adminId: 'admin1',
+    adminEmail: 'super@qalnet.com',
+    action: 'Approved KYC document',
+    targetType: 'kyc',
+    targetId: 'kyc1',
+    timestamp: new Date(Date.now() - 7200_000).toISOString(),
+  },
+  {
+    id: 'audit3',
+    adminId: 'admin2',
+    adminEmail: 'kyc@qalnet.com',
+    action: 'Rejected KYC document',
+    targetType: 'kyc',
+    targetId: 'kyc3',
+    changes: { reason: 'Document blurry, please resubmit' },
+    timestamp: new Date(Date.now() - 86400_000).toISOString(),
+  },
+];
+
 const navItems: { id: TabId; label: string; icon: string }[] = [
   { id: 'overview', label: 'Overview', icon: 'M3 12l9-9 9 9M5 10v10h14V10' },
   { id: 'members', label: 'Members', icon: 'M17 20v-1a4 4 0 00-4-4H7a4 4 0 00-4 4v1M10 12a4 4 0 100-8 4 4 0 000 8zM21 20v-1a4 4 0 00-3-3.87M16 4.13a4 4 0 010 7.75' },
   { id: 'kyc', label: 'KYC Verification', icon: 'M9 12h6m-6 4h6M9 8h.01M15 4H7a2 2 0 00-2 2v14l4-2 4 2 4-2 2 2V6a2 2 0 00-2-2h-2z' },
   { id: 'disputes', label: 'Disputes', icon: 'M12 3v18m0-18a7 7 0 017 7c0 1.6-.5 3-1.4 4.2L12 21l-5.6-8.8A7 7 0 0112 3z' },
   { id: 'finance', label: 'Finance', icon: 'M3 6h18M3 10h18M3 14h18M3 18h18M7 6v12m10-12v12' },
+  { id: 'equbs', label: 'Equbs', icon: 'M12 12a5 5 0 100-10 5 5 0 000 10zM3 21a9 9 0 0118 0' },
+  { id: 'reports', label: 'Reports', icon: 'M3 3v18h18M7 15v-4M12 15V7M17 15v-6' },
+  { id: 'audit', label: 'Audit Log', icon: 'M9 12h6m-6 4h6M9 8h.01M15 4H7a2 2 0 00-2 2v14l4-2 4 2 4-2 2 2V6a2 2 0 00-2-2h-2z' },
   { id: 'admin', label: 'Admin Users', icon: 'M12 12a5 5 0 100-10 5 5 0 000 10zM3 21a9 9 0 0118 0' },
 ];
 
@@ -252,6 +376,7 @@ export default function AdminDashboard() {
   const [admin, setAdmin] = useState<AdminUser | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [loading, setLoading] = useState(true);
+  const [unauthorized, setUnauthorized] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
 
   const [members, setMembers] = useState<Member[]>(() => loadStored(STORAGE_KEYS.members, seedMembers));
@@ -259,11 +384,118 @@ export default function AdminDashboard() {
   const [disputes, setDisputes] = useState<Dispute[]>(() => loadStored(STORAGE_KEYS.disputes, seedDisputes));
   const [finance, setFinance] = useState<FinancialRecord[]>(() => loadStored(STORAGE_KEYS.finance, seedFinance));
   const [admins, setAdmins] = useState<AdminUser[]>(() => loadStored(STORAGE_KEYS.admins, seedAdmins));
+  const [equbs, setEqubs] = useState<Equb[]>(() => loadStored(STORAGE_KEYS.equbs, seedEqubs));
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() => loadStored(STORAGE_KEYS.audit, seedAuditLogs));
 
   const notify = useCallback((type: 'success' | 'error' | 'info', message: string) => {
     setToast({ type, message });
     window.setTimeout(() => setToast(null), 3000);
   }, []);
+
+  const logAction = useCallback(
+    (action: string, target?: { targetType?: string; targetId?: string; changes?: Record<string, any> }) => {
+      setAuditLogs((prev) =>
+        [
+          {
+            id: `audit_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            adminId: admin?.id || 'admin_demo',
+            adminEmail: admin?.email || 'admin@qalnet.com',
+            action,
+            ...target,
+            timestamp: new Date().toISOString(),
+          },
+          ...prev,
+        ].slice(0, 300)
+      );
+    },
+    [admin]
+  );
+
+  const handleEqubStatus = (id: string, status: Equb['status']) => {
+    const equb = equbs.find((e) => e.id === id);
+    setEqubs((prev) => prev.map((e) => (e.id === id ? { ...e, status } : e)));
+    logAction(
+      status === 'rejected'
+        ? 'Rejected Equb request'
+        : status === 'active'
+          ? 'Approved Equb request'
+          : `Changed equb status to ${status}`,
+      {
+        targetType: 'equb',
+        targetId: id,
+        changes: { from: equb?.status, to: status },
+      }
+    );
+    notify('info', `Equb ${equb?.name || id} set to ${status}`);
+
+    // Persist the decision to the backend so the member's dashboard updates.
+    adminAPI
+      .setEqubStatus(id, status)
+      .then(() => {})
+      .catch(() => {});
+  };
+
+  const handleEqubApprove = (id: string) => handleEqubStatus(id, 'active');
+  const handleEqubReject = (id: string) => handleEqubStatus(id, 'rejected');
+
+  const exportMembers = () =>
+    downloadCSV('qalnet-members', members, [
+      { key: 'fullName', label: 'Full Name' },
+      { key: 'phoneNumber', label: 'Phone' },
+      { key: 'email', label: 'Email' },
+      { key: 'faydaNumber', label: 'Fayda Number' },
+      { key: 'status', label: 'Status' },
+      { key: 'kycStatus', label: 'KYC' },
+      { key: 'registeredAt', label: 'Registered', value: (m) => formatDateShort(m.registeredAt) },
+      { key: 'lastActive', label: 'Last Active', value: (m) => (m.lastActive ? formatDateShort(m.lastActive) : '—') },
+    ]);
+
+  const exportFinance = () =>
+    downloadCSV('qalnet-finance', finance, [
+      { key: 'memberName', label: 'Member' },
+      { key: 'type', label: 'Type' },
+      { key: 'amount', label: 'Amount' },
+      { key: 'currency', label: 'Currency' },
+      { key: 'description', label: 'Description' },
+      { key: 'status', label: 'Status' },
+      { key: 'date', label: 'Date', value: (r) => formatDateShort(r.date) },
+    ]);
+
+  const exportDisputes = () =>
+    downloadCSV('qalnet-disputes', disputes, [
+      { key: 'complainantName', label: 'Complainant' },
+      { key: 'respondentName', label: 'Respondent' },
+      { key: 'description', label: 'Description' },
+      { key: 'priority', label: 'Priority' },
+      { key: 'status', label: 'Status' },
+      { key: 'assignedTo', label: 'Assigned To' },
+      { key: 'createdAt', label: 'Created', value: (d) => formatDateShort(d.createdAt) },
+      { key: 'resolvedAt', label: 'Resolved', value: (d) => (d.resolvedAt ? formatDateShort(d.resolvedAt) : '—') },
+    ]);
+
+  const exportEqubs = () =>
+    downloadCSV('qalnet-equbs', equbs, [
+      { key: 'name', label: 'Name' },
+      { key: 'category', label: 'Category' },
+      { key: 'contributionAmount', label: 'Contribution (ETB)' },
+      { key: 'membersJoined', label: 'Members Joined' },
+      { key: 'totalMembers', label: 'Total Members' },
+      { key: 'status', label: 'Status' },
+      { key: 'managerName', label: 'Manager' },
+      { key: 'currentRound', label: 'Round' },
+      { key: 'totalRounds', label: 'Total Rounds' },
+      { key: 'collectedAmount', label: 'Collected (ETB)' },
+    ]);
+
+  const exportAudit = () =>
+    downloadCSV('qalnet-audit-log', auditLogs, [
+      { key: 'timestamp', label: 'When', value: (a) => new Date(a.timestamp).toLocaleString() },
+      { key: 'adminEmail', label: 'Admin' },
+      { key: 'action', label: 'Action' },
+      { key: 'targetType', label: 'Target Type' },
+      { key: 'targetId', label: 'Target ID' },
+      { key: 'changes', label: 'Changes', value: (a) => (a.changes ? JSON.stringify(a.changes) : '') },
+    ]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.members, JSON.stringify(members));
@@ -280,60 +512,143 @@ export default function AdminDashboard() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.admins, JSON.stringify(admins));
   }, [admins]);
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.equbs, JSON.stringify(equbs));
+  }, [equbs]);
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.audit, JSON.stringify(auditLogs));
+  }, [auditLogs]);
 
   useEffect(() => {
-    let adminToken = localStorage.getItem('qalnet_admin_token');
-    let adminRole = localStorage.getItem('qalnet_admin_role');
+    // Security: the admin dashboard is a restricted area. It requires a valid
+    // admin session created by the admin login flow — it never auto-creates one.
+    const adminToken = localStorage.getItem('qalnet_admin_token');
+    const adminRole = localStorage.getItem('qalnet_admin_role');
 
-    if (!adminToken || !adminRole) {
-      const demo = 'admin_demo';
-      localStorage.setItem('qalnet_admin_token', demo);
-      localStorage.setItem(
-        `qalnet_admin_${demo}`,
-        JSON.stringify({
-          fullName: 'System Admin',
-          role: 'super_admin',
-          email: 'admin@qalnet.com',
-          permissions: rolePermissions.super_admin,
-        }),
-      );
-      localStorage.setItem('qalnet_admin_role', 'super_admin');
-      adminToken = demo;
-      adminRole = 'super_admin';
-    }
+    const validRoles: AdminRole[] = ['super_admin', 'kyc_approver', 'dispute_manager', 'finance_auditor'];
 
-    const adminData = localStorage.getItem(`qalnet_admin_${adminToken}`);
-    if (adminData) {
-      const parsed = JSON.parse(adminData);
+    const isValid = (): boolean => {
+      if (!adminToken || !adminRole) return false;
+      if (adminToken === 'admin_demo') return false; // legacy open-by-default backdoor
+      if (!validRoles.includes(adminRole as AdminRole)) return false;
+      const raw = localStorage.getItem(`qalnet_admin_${adminToken}`);
+      if (!raw) return false;
+      const parsed = JSON.parse(raw);
+      if (!parsed || parsed.role !== adminRole) return false;
+      if (parsed.status && parsed.status !== 'active') return false;
+      return true;
+    };
+
+    try {
+      if (!isValid()) {
+        localStorage.removeItem('qalnet_admin_token');
+        localStorage.removeItem('qalnet_admin_role');
+        localStorage.removeItem('qalnet_admin_admin_demo');
+        setUnauthorized(true);
+        setLoading(false);
+        router.replace('/admin/login');
+        return;
+      }
+
+      const parsed = JSON.parse(localStorage.getItem(`qalnet_admin_${adminToken}`) as string);
       setAdmin({
-        id: 'admin_demo',
-        email: parsed.email || 'admin@qalnet.com',
-        role: (parsed.role === 'system_admin' ? 'super_admin' : parsed.role) as AdminRole,
+        id: parsed.id || adminToken,
+        email: parsed.email || adminToken,
+        role: parsed.role as AdminRole,
         fullName: parsed.fullName || 'System Admin',
         passwordHash: '',
-        mfaEnabled: false,
-        mfaMethod: 'email',
-        createdAt: new Date().toISOString(),
+        mfaEnabled: Boolean(parsed.mfaEnabled),
+        mfaMethod: parsed.mfaMethod || 'email',
+        createdAt: parsed.createdAt || new Date().toISOString(),
+        lastLogin: parsed.lastLogin,
         status: 'active',
-        permissions: (parsed.permissions || rolePermissions.super_admin) as Permission[],
+        permissions: (parsed.permissions || rolePermissions[parsed.role as AdminRole]) as Permission[],
       });
-    } else {
-      setAdmin({
-        id: 'admin_demo',
-        email: 'admin@qalnet.com',
-        role: 'super_admin',
-        fullName: 'System Admin',
-        passwordHash: '',
-        mfaEnabled: false,
-        mfaMethod: 'email',
-        createdAt: new Date().toISOString(),
-        status: 'active',
-        permissions: rolePermissions.super_admin,
-      });
+    } catch (error) {
+      localStorage.removeItem('qalnet_admin_token');
+      localStorage.removeItem('qalnet_admin_role');
+      setUnauthorized(true);
+      router.replace('/admin/login');
     }
 
     setLoading(false);
   }, [router]);
+
+  // Sync live platform data (member-created Equbs + registered members) from
+  // the backend into the admin console so admin approval decisions reflect
+  // real activity. Runs once on mount; backend data takes precedence.
+  const syncedRef = useRef(false);
+  useEffect(() => {
+    if (syncedRef.current) return;
+    syncedRef.current = true;
+
+    const loadLive = async () => {
+      try {
+        const [liveEqubs, liveMembers] = await Promise.all([
+          adminAPI.getEqubs().catch(() => [] as any[]),
+          adminAPI.getMembers().catch(() => [] as any[]),
+        ]);
+
+        if (Array.isArray(liveEqubs) && liveEqubs.length > 0) {
+          const liveNames = new Set(liveEqubs.map((e: Equb) => e.name.trim().toLowerCase()));
+          setEqubs((prev) => [
+            ...liveEqubs.map((e: any) => ({
+              id: e.id,
+              name: e.name,
+              category: e.category,
+              contributionAmount: Number(e.contributionAmount) || 0,
+              totalMembers: Number(e.totalMembers) || 0,
+              membersJoined: Number(e.membersJoined) || 0,
+              status: e.status as Equb['status'],
+              managerName: e.managerName || '—',
+              managerPhone: e.managerPhone || '',
+              startDate: e.startDate || new Date().toISOString(),
+              currentRound: Number(e.currentRound) || 0,
+              totalRounds: Number(e.totalRounds) || 1,
+              description: e.description,
+              collectedAmount: Number(e.collectedAmount) || 0,
+            })),
+            ...prev.filter((p) => !liveNames.has(p.name.trim().toLowerCase())),
+          ]);
+        }
+
+        if (Array.isArray(liveMembers) && liveMembers.length > 0) {
+          const livePhones = new Set(liveMembers.map((m: any) => m.phoneNumber));
+          setMembers((prev) => [
+            ...liveMembers.map((m: any) => ({
+              id: m.id || `member_${m.phoneNumber}`,
+              phoneNumber: m.phoneNumber,
+              fullName: [m.firstName, m.lastName].filter(Boolean).join(' ') || m.phoneNumber,
+              pin: '',
+              faydaNumber: m.faydaNumber || '',
+              email: m.email,
+              status: 'active' as const,
+              kycStatus: 'pending' as const,
+              registeredAt: m.createdAt || new Date().toISOString(),
+              lastActive: m.lastActive,
+            })),
+            ...prev.filter((p) => !livePhones.has(p.phoneNumber)),
+          ]);
+        }
+
+        setAuditLogs((prev) => [
+          {
+            id: `audit_sync_${Date.now()}`,
+            adminId: admin?.id || 'admin',
+            adminEmail: admin?.email || 'admin@qalnet.com',
+            action: 'Synchronized live platform data',
+            targetType: 'system',
+            timestamp: new Date().toISOString(),
+          },
+          ...prev,
+        ].slice(0, 300));
+      } catch (error) {
+        console.warn('Admin live data sync failed:', error);
+      }
+    };
+
+    loadLive();
+  }, [admin]);
 
   const hasPermission = useCallback(
     (permission: Permission) => admin?.permissions.includes(permission) ?? false,
@@ -348,8 +663,11 @@ export default function AdminDashboard() {
       openDisputes: countBy(disputes, (d) => d.status === 'open' || d.status === 'investigating'),
       totalFinance: finance.reduce((sum, r) => sum + (r.status === 'completed' ? r.amount : 0), 0),
       pendingPayouts: countBy(finance, (r) => r.status === 'pending'),
+      totalEqubs: equbs.length,
+      activeEqubs: countBy(equbs, (e) => e.status === 'active'),
+      totalCollected: equbs.reduce((sum, e) => sum + (e.collectedAmount || 0), 0),
     }),
-    [members, kycDocs, disputes, finance],
+    [members, kycDocs, disputes, finance, equbs],
   );
 
   if (loading || !admin) {
@@ -357,7 +675,9 @@ export default function AdminDashboard() {
       <div className="min-h-screen flex items-center justify-center bg-[#f5f3f0]">
         <div className="text-center">
           <div className="animate-spin w-10 h-10 border-4 border-[#16357a] border-t-transparent rounded-full mx-auto mb-4" />
-          <div className="text-xl font-black text-[#16357a]">Loading dashboard...</div>
+          <div className="text-xl font-black text-[#16357a]">
+            {unauthorized ? 'Redirecting to Admin Login...' : 'Loading dashboard...'}
+          </div>
         </div>
       </div>
     );
@@ -370,6 +690,7 @@ export default function AdminDashboard() {
       ),
     );
     setMembers((prev) => prev.map((m) => (m.id === doc.memberId ? { ...m, kycStatus: 'approved' } : m)));
+    logAction('Approved KYC document', { targetType: 'kyc', targetId: doc.id, changes: { member: doc.memberName } });
     notify('success', `KYC approved for ${doc.memberName}`);
   };
 
@@ -380,17 +701,29 @@ export default function AdminDashboard() {
       prev.map((d) => (d.id === doc.id ? { ...d, status: 'rejected', rejectionReason: reason } : d)),
     );
     setMembers((prev) => prev.map((m) => (m.id === doc.memberId ? { ...m, kycStatus: 'rejected' } : m)));
+    logAction('Rejected KYC document', { targetType: 'kyc', targetId: doc.id, changes: { reason } });
     notify('info', `KYC rejected for ${doc.memberName}`);
   };
 
   const handleToggleMemberStatus = (member: Member) => {
     const next = member.status === 'active' ? 'suspended' : 'active';
     setMembers((prev) => prev.map((m) => (m.id === member.id ? { ...m, status: next } : m)));
+    logAction(`Member ${next === 'active' ? 'reactivated' : 'suspended'}`, {
+      targetType: 'member',
+      targetId: member.id,
+      changes: { from: member.status, to: next },
+    });
     notify('info', `${member.fullName} ${next === 'active' ? 'reactivated' : 'suspended'}`);
   };
 
   const handleMemberStatusChange = (id: string, status: Member['status']) => {
+    const member = members.find((m) => m.id === id);
     setMembers((prev) => prev.map((m) => (m.id === id ? { ...m, status } : m)));
+    logAction(`Member status changed to ${status}`, {
+      targetType: 'member',
+      targetId: id,
+      changes: { from: member?.status, to: status },
+    });
   };
 
   const handleDisputeStatus = (id: string, status: Dispute['status']) => {
@@ -406,11 +739,13 @@ export default function AdminDashboard() {
           : d,
       ),
     );
+    logAction(`Dispute ${id} set to ${status}`, { targetType: 'dispute', targetId: id, changes: { status } });
     notify('info', `Dispute ${id} set to ${status}`);
   };
 
   const handleDisputePriority = (id: string, priority: Dispute['priority']) => {
     setDisputes((prev) => prev.map((d) => (d.id === id ? { ...d, priority } : d)));
+    logAction(`Dispute ${id} priority set to ${priority}`, { targetType: 'dispute', targetId: id, changes: { priority } });
     notify('info', `Dispute ${id} priority set to ${priority}`);
   };
 
@@ -421,11 +756,17 @@ export default function AdminDashboard() {
       date: new Date().toISOString(),
     };
     setFinance((prev) => [newRecord, ...prev]);
+    logAction('Added financial record', {
+      targetType: 'finance',
+      targetId: newRecord.id,
+      changes: { amount: newRecord.amount, type: newRecord.type, member: newRecord.memberName },
+    });
     notify('success', 'Financial record added');
   };
 
   const handleFinanceStatus = (id: string, status: FinancialRecord['status']) => {
     setFinance((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
+    logAction(`Financial record ${id} marked ${status}`, { targetType: 'finance', targetId: id, changes: { status } });
     notify('info', `Record ${id} marked ${status}`);
   };
 
@@ -450,18 +791,23 @@ export default function AdminDashboard() {
         status: 'active',
       },
     ]);
+    logAction('Created admin account', { targetType: 'admin', targetId: `admin_${Date.now()}`, changes: { email: data.email, role: data.role } });
     notify('success', `Admin ${data.fullName} created`);
   };
 
   const handleRemoveAdmin = (id: string) => {
+    const removed = admins.find((a) => a.id === id);
     setAdmins((prev) => prev.filter((a) => a.id !== id));
+    logAction('Removed admin account', { targetType: 'admin', targetId: id, changes: { email: removed?.email } });
     notify('info', 'Admin removed');
   };
 
   const handleAdminRoleChange = (id: string, role: AdminRole) => {
-    setAdmins((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, role, permissions: rolePermissions[role] } : a)),
+    const prev = admins.find((a) => a.id === id);
+    setAdmins((prevAdmins) =>
+      prevAdmins.map((a) => (a.id === id ? { ...a, role, permissions: rolePermissions[role] } : a)),
     );
+    logAction('Admin role updated', { targetType: 'admin', targetId: id, changes: { from: prev?.role, to: role } });
     notify('info', 'Admin role updated');
   };
 
@@ -563,9 +909,13 @@ export default function AdminDashboard() {
                       kycDocs={kycDocs}
                       disputes={disputes}
                       finance={finance}
+                      equbs={equbs}
+                      auditLogs={auditLogs}
                       onNavigate={setActiveTab}
                       onKycApprove={handleKycApprove}
                       onKycReject={handleKycReject}
+                      onExportMembers={exportMembers}
+                      onExportFinance={exportFinance}
                     />
                   )}
                   {activeTab === 'members' && (
@@ -576,6 +926,7 @@ export default function AdminDashboard() {
                       onStatusChange={handleMemberStatusChange}
                       onApproveKyc={handleKycApprove}
                       onRejectKyc={handleKycReject}
+                      onExport={exportMembers}
                     />
                   )}
                   {activeTab === 'kyc' && (
@@ -586,6 +937,7 @@ export default function AdminDashboard() {
                       disputes={disputes}
                       onStatusChange={handleDisputeStatus}
                       onPriorityChange={handleDisputePriority}
+                      onExport={exportDisputes}
                     />
                   )}
                   {activeTab === 'finance' && (
@@ -594,7 +946,36 @@ export default function AdminDashboard() {
                       hasPermission={hasPermission}
                       onAdd={handleAddFinance}
                       onStatusChange={handleFinanceStatus}
+                      onExport={exportFinance}
                     />
+                  )}
+                  {activeTab === 'equbs' && (
+                    <EqubsTab
+                      equbs={equbs}
+                      hasPermission={hasPermission}
+                      onStatusChange={handleEqubStatus}
+                      onApprove={handleEqubApprove}
+                      onReject={handleEqubReject}
+                      onExport={exportEqubs}
+                    />
+                  )}
+                  {activeTab === 'reports' && (
+                    <ReportsTab
+                      stats={stats}
+                      members={members}
+                      finance={finance}
+                      disputes={disputes}
+                      equbs={equbs}
+                      auditLogs={auditLogs}
+                      onExportMembers={exportMembers}
+                      onExportFinance={exportFinance}
+                      onExportDisputes={exportDisputes}
+                      onExportEqubs={exportEqubs}
+                      onExportAudit={exportAudit}
+                    />
+                  )}
+                  {activeTab === 'audit' && (
+                    <AuditTab auditLogs={auditLogs} onExport={exportAudit} />
                   )}
                   {activeTab === 'admin' && (
                     <AdminUsersTab
@@ -633,18 +1014,144 @@ function StatCard({ label, value, sub, accent }: any) {
   );
 }
 
-function OverviewTab({ stats, members, kycDocs, disputes, finance, onNavigate, onKycApprove, onKycReject }: any) {
+function OverviewTab({ stats, members, kycDocs, disputes, finance, equbs, auditLogs, onNavigate, onKycApprove, onKycReject, onExportMembers, onExportFinance }: any) {
   const pendingKyc = kycDocs.filter((d: any) => d.status === 'pending');
   const recentFinance = finance.slice(0, 5);
   const activeDisputes = disputes.filter((d: any) => d.status === 'open' || d.status === 'investigating');
 
+  const financeByType = [
+    { label: 'Payments', value: finance.filter((r: any) => r.type === 'payment').reduce((s: number, r: any) => s + r.amount, 0), color: '#0d9488' },
+    { label: 'Payouts', value: finance.filter((r: any) => r.type === 'payout').reduce((s: number, r: any) => s + r.amount, 0), color: '#7c3aed' },
+    { label: 'Fees', value: finance.filter((r: any) => r.type === 'fee').reduce((s: number, r: any) => s + r.amount, 0), color: '#f59e0b' },
+    { label: 'Refunds', value: finance.filter((r: any) => r.type === 'refund').reduce((s: number, r: any) => s + r.amount, 0), color: '#ef4444' },
+  ].filter((s) => s.value > 0);
+
+  const kycDonut = [
+    { label: 'Approved', value: members.filter((m: any) => m.kycStatus === 'approved').length, color: '#10b981' },
+    { label: 'Pending', value: members.filter((m: any) => m.kycStatus === 'pending').length, color: '#f59e0b' },
+    { label: 'Rejected', value: members.filter((m: any) => m.kycStatus === 'rejected').length, color: '#ef4444' },
+  ];
+
+  const equbStatusDonut = [
+    { label: 'Active', value: equbs.filter((e: any) => e.status === 'active').length, color: '#10b981' },
+    { label: 'Pending', value: equbs.filter((e: any) => e.status === 'pending').length, color: '#f59e0b' },
+    { label: 'Paused', value: equbs.filter((e: any) => e.status === 'paused').length, color: '#6b7280' },
+    { label: 'Completed', value: equbs.filter((e: any) => e.status === 'completed').length, color: '#3b82f6' },
+  ];
+
+  const monthlyFinance = (() => {
+    const buckets = new Map<string, { inflow: number; outflow: number }>();
+    finance.forEach((r: any) => {
+      const d = new Date(r.date);
+      if (Number.isNaN(d.getTime())) return;
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const b = buckets.get(key) || { inflow: 0, outflow: 0 };
+      if (r.type === 'payment' || r.type === 'fee') b.inflow += r.amount;
+      else if (r.type === 'payout' || r.type === 'refund') b.outflow += r.amount;
+      buckets.set(key, b);
+    });
+    return Array.from(buckets.entries())
+      .sort((a, b) => (a[0] < b[0] ? -1 : 1))
+      .map(([key, b]) => ({
+        label: new Date(`${key}-01`).toLocaleDateString('en-US', { month: 'short' }),
+        value: b.inflow,
+        value2: b.outflow,
+      }));
+  })();
+
+  const recentAudit = auditLogs.slice(0, 4);
+
   return (
     <div className="space-y-6">
+      {/* Analytics charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="bg-white rounded-2xl p-6 shadow-md lg:col-span-2">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-black text-lg text-[#16357a]">Financial Flow</h3>
+            <button onClick={() => onNavigate('finance')} className="text-xs font-bold text-[#16357a] hover:underline">
+              View all →
+            </button>
+          </div>
+          {monthlyFinance.length === 0 ? (
+            <p className="text-sm text-gray-500 text-center py-10">No financial data yet</p>
+          ) : (
+            <TrendChart data={monthlyFinance} height={210} color="#16357a" color2="#d4af37" />
+          )}
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 shadow-md">
+          <h3 className="font-black text-lg text-[#16357a] mb-4">Finance by Type</h3>
+          {financeByType.length === 0 ? (
+            <p className="text-sm text-gray-500 text-center py-8">No records yet</p>
+          ) : (
+            <DonutChart
+              segments={financeByType}
+              size={150}
+              centerValue="ETB"
+              centerLabel={stats.totalFinance.toLocaleString()}
+            />
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="bg-white rounded-2xl p-6 shadow-md">
+          <h3 className="font-black text-[#16357a] mb-4">Members by KYC Status</h3>
+          <DonutChart segments={kycDonut} size={140} centerValue={String(stats.totalMembers)} centerLabel="members" />
+        </div>
+        <div className="bg-white rounded-2xl p-6 shadow-md">
+          <h3 className="font-black text-[#16357a] mb-4">Equbs by Status</h3>
+          <DonutChart segments={equbStatusDonut} size={140} centerValue={String(stats.totalEqubs)} centerLabel="equbs" />
+        </div>
+        <div className="bg-white rounded-2xl p-6 shadow-md">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-black text-[#16357a]">Recent Activity</h3>
+            <button onClick={() => onNavigate('audit')} className="text-xs font-bold text-[#16357a] hover:underline">
+              View all →
+            </button>
+          </div>
+          {recentAudit.length === 0 ? (
+            <p className="text-sm text-gray-500 text-center py-6">No activity yet</p>
+          ) : (
+            <div className="space-y-2 text-sm">
+              {recentAudit.map((a: any) => (
+                <div key={a.id} className="flex items-start justify-between gap-2 border-b border-gray-100 pb-2 last:border-0">
+                  <div>
+                    <div className="font-bold text-[#16357a] text-xs">{a.action}</div>
+                    <div className="text-[11px] text-gray-500">{a.adminEmail}</div>
+                  </div>
+                  <div className="text-[10px] text-gray-400 shrink-0">
+                    {new Date(a.timestamp).toLocaleDateString()}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Total Members" value={stats.totalMembers} sub={`${stats.activeMembers} active`} accent="border-[#16357a]" />
         <StatCard label="Pending KYC" value={stats.pendingKyc} sub="Awaiting review" accent="border-yellow-400" />
         <StatCard label="Open Disputes" value={stats.openDisputes} sub="Needs attention" accent="border-red-500" />
         <StatCard label="Completed Finance" value={`ETB ${stats.totalFinance.toLocaleString()}`} sub={`${stats.pendingPayouts} pending payouts`} accent="border-green-500" />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard label="Total Equbs" value={stats.totalEqubs} sub={`${stats.activeEqubs} active`} accent="border-teal-500" />
+        <StatCard label="Total Collected" value={`ETB ${stats.totalCollected.toLocaleString()}`} sub="Across all equbs" accent="border-[#d4af37]" />
+        <StatCard label="Audit Entries" value={auditLogs.length} sub="Tracked actions" accent="border-purple-500" />
+        <div className="bg-white rounded-xl p-4 border-t-4 border-[#16357a] shadow-md">
+          <p className="text-sm text-gray-600">Quick Reports</p>
+          <div className="flex gap-2 mt-2">
+            <button onClick={onExportMembers} className="px-3 py-1.5 bg-[#16357a] text-white text-xs font-bold rounded-lg hover:bg-[#27487f]">
+              Members CSV
+            </button>
+            <button onClick={onExportFinance} className="px-3 py-1.5 bg-[#d4af37] text-[#0a1f3d] text-xs font-bold rounded-lg hover:bg-yellow-500">
+              Finance CSV
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -797,9 +1304,332 @@ function OverviewTab({ stats, members, kycDocs, disputes, finance, onNavigate, o
   );
 }
 
+/* ============================= Equbs ============================= */
+
+function EqubsTab({ equbs, hasPermission, onStatusChange, onApprove, onReject, onExport }: any) {
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState<'all' | Equb['status']>('all');
+
+  const filtered = equbs.filter((e: Equb) => {
+    if (filter !== 'all' && e.status !== filter) return false;
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      e.name.toLowerCase().includes(q) ||
+      (e.category || '').toLowerCase().includes(q) ||
+      (e.managerName || '').toLowerCase().includes(q) ||
+      (e.managerPhone || '').includes(q)
+    );
+  });
+
+  const statusBadge: Record<string, string> = {
+    active: 'bg-green-100 text-green-800',
+    pending: 'bg-yellow-100 text-yellow-700',
+    paused: 'bg-gray-100 text-gray-600',
+    completed: 'bg-blue-100 text-blue-800',
+    rejected: 'bg-red-100 text-red-700',
+  };
+
+  const statuses: Equb['status'][] = ['active', 'pending', 'paused', 'completed', 'rejected'];
+  const pendingCount = equbs.filter((e: Equb) => e.status === 'pending').length;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-black text-[#16357a]">Equbs Management</h2>
+          <p className="text-sm text-gray-600">View and manage every Equb on the platform</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search name, category, manager..."
+            className="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#16357a]"
+          />
+          <button
+            onClick={onExport}
+            className="px-4 py-2 bg-[#16357a] text-white rounded-lg text-sm font-bold hover:bg-[#27487f]"
+          >
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {(['all', 'active', 'pending', 'paused', 'completed', 'rejected'] as const).map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+              filter === f ? 'bg-[#16357a] text-white' : 'bg-white text-[#16357a] hover:bg-gray-100'
+            }`}
+          >
+            {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {pendingCount > 0 && (
+        <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl px-4 py-3 text-sm text-yellow-800 font-semibold">
+          ⏳ {pendingCount} Equb request{pendingCount > 1 ? 's' : ''} waiting for your approval
+        </div>
+      )}
+
+      {filtered.length === 0 && (
+        <div className="bg-white rounded-2xl p-10 text-center text-gray-500 shadow-md">No Equbs found</div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {filtered.map((equb: Equb) => (
+          <motion.div key={equb.id} className="bg-white rounded-xl p-5 border-l-4 border-[#16357a] shadow-md">
+            <div className="flex justify-between items-start mb-3">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#16357a] to-[#d4af37] text-white flex items-center justify-center font-black text-lg">
+                  {equb.name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <h3 className="font-black text-[#16357a]">{equb.name}</h3>
+                  <p className="text-xs text-gray-500">
+                    {equb.category} · Round {equb.currentRound}/{equb.totalRounds}
+                  </p>
+                </div>
+              </div>
+              <span className={`px-3 py-1 rounded-full text-xs font-black ${statusBadge[equb.status]}`}>
+                {equb.status.toUpperCase()}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm mb-3">
+              <div>
+                <p className="text-xs text-gray-500 font-semibold">Contribution</p>
+                <p className="font-black text-[#16357a]">ETB {equb.contributionAmount.toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-semibold">Members</p>
+                <p className="font-black text-[#16357a]">
+                  {equb.membersJoined}/{equb.totalMembers}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-semibold">Collected</p>
+                <p className="font-black text-green-700">ETB {(equb.collectedAmount || 0).toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-semibold">Manager</p>
+                <p className="font-bold text-[#16357a] text-xs truncate">{equb.managerName}</p>
+              </div>
+            </div>
+
+            <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-3">
+              <div
+                className="h-full bg-gradient-to-r from-[#16357a] to-[#d4af37] rounded-full"
+                style={{ width: `${Math.min(100, (equb.membersJoined / Math.max(equb.totalMembers, 1)) * 100)}%` }}
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              <span className="text-xs font-bold text-gray-500">Status:</span>
+              {statuses.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => onStatusChange(equb.id, s)}
+                  disabled={equb.status === s}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                    equb.status === s
+                      ? 'bg-[#16357a] text-white'
+                      : 'bg-gray-100 text-[#16357a] hover:bg-gray-200'
+                  }`}
+                >
+                  {s.charAt(0).toUpperCase() + s.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            {equb.status === 'pending' && (
+              <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-100">
+                <button
+                  onClick={() => onApprove(equb.id)}
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700 transition-all"
+                >
+                  ✓ Approve Request
+                </button>
+                <button
+                  onClick={() => onReject(equb.id)}
+                  className="flex-1 px-4 py-2 border-2 border-red-500 text-red-600 rounded-lg text-sm font-bold hover:bg-red-50 transition-all"
+                >
+                  ✕ Reject Request
+                </button>
+              </div>
+            )}
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ============================= Reports ============================= */
+
+function ReportsTab({ stats, members, finance, disputes, equbs, auditLogs, onExportMembers, onExportFinance, onExportDisputes, onExportEqubs, onExportAudit }: any) {
+  const exportButtons = [
+    { label: 'Members Report', desc: `${members.length} members · CSV`, onClick: onExportMembers, color: 'from-[#16357a] to-[#27487f]' },
+    { label: 'Financial Report', desc: `${finance.length} records · CSV`, onClick: onExportFinance, color: 'from-green-600 to-green-700' },
+    { label: 'Disputes Report', desc: `${disputes.length} disputes · CSV`, onClick: onExportDisputes, color: 'from-red-500 to-red-600' },
+    { label: 'Equbs Report', desc: `${equbs.length} equbs · CSV`, onClick: onExportEqubs, color: 'from-yellow-500 to-orange-500' },
+    { label: 'Audit Log Report', desc: `${auditLogs.length} entries · CSV`, onClick: onExportAudit, color: 'from-purple-600 to-purple-700' },
+  ];
+
+  const categoryTotals = equbs.reduce((acc: any, e: any) => {
+    const cat = e.category || 'Other';
+    acc[cat] = (acc[cat] || 0) + (e.collectedAmount || 0);
+    return acc;
+  }, {});
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl p-6 shadow-md">
+        <h2 className="text-2xl font-black text-[#16357a] mb-2">Reports & Exports</h2>
+        <p className="text-sm text-gray-600 mb-5">Download CSV exports of all platform data for offline analysis.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {exportButtons.map((b) => (
+            <button
+              key={b.label}
+              onClick={b.onClick}
+              className={`bg-gradient-to-r ${b.color} text-white rounded-xl p-4 text-left shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all`}
+            >
+              <p className="font-black">{b.label}</p>
+              <p className="text-xs opacity-80 mt-1">{b.desc}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="bg-white rounded-2xl p-6 shadow-md">
+          <h3 className="font-black text-[#16357a] mb-4">Collection by Category</h3>
+          {Object.keys(categoryTotals).length === 0 ? (
+            <p className="text-sm text-gray-500 text-center py-8">No equb data</p>
+          ) : (
+            <HorizontalBars
+              data={Object.entries(categoryTotals).map(([label, value]: any) => ({
+                label,
+                value,
+              }))}
+              prefix="ETB "
+            />
+          )}
+        </div>
+        <div className="bg-white rounded-2xl p-6 shadow-md">
+          <h3 className="font-black text-[#16357a] mb-4">Platform Snapshot</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-[#f5f3f0] rounded-xl p-3">
+              <p className="text-xs text-gray-500 font-semibold">Total Members</p>
+              <p className="text-2xl font-black text-[#16357a]">{stats.totalMembers}</p>
+            </div>
+            <div className="bg-[#f5f3f0] rounded-xl p-3">
+              <p className="text-xs text-gray-500 font-semibold">Total Equbs</p>
+              <p className="text-2xl font-black text-[#16357a]">{stats.totalEqubs}</p>
+            </div>
+            <div className="bg-[#f5f3f0] rounded-xl p-3">
+              <p className="text-xs text-gray-500 font-semibold">Finance Volume</p>
+              <p className="text-2xl font-black text-green-700">ETB {stats.totalFinance.toLocaleString()}</p>
+            </div>
+            <div className="bg-[#f5f3f0] rounded-xl p-3">
+              <p className="text-xs text-gray-500 font-semibold">Collected</p>
+              <p className="text-2xl font-black text-[#d4af37]">ETB {stats.totalCollected.toLocaleString()}</p>
+            </div>
+            <div className="bg-[#f5f3f0] rounded-xl p-3">
+              <p className="text-xs text-gray-500 font-semibold">Open Disputes</p>
+              <p className="text-2xl font-black text-red-600">{stats.openDisputes}</p>
+            </div>
+            <div className="bg-[#f5f3f0] rounded-xl p-3">
+              <p className="text-xs text-gray-500 font-semibold">Audit Entries</p>
+              <p className="text-2xl font-black text-purple-600">{auditLogs.length}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================= Audit Log ============================= */
+
+function AuditTab({ auditLogs, onExport }: any) {
+  const [query, setQuery] = useState('');
+  const filtered = auditLogs.filter((a: AuditLog) => {
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      a.action.toLowerCase().includes(q) ||
+      a.adminEmail.toLowerCase().includes(q) ||
+      (a.targetType || '').toLowerCase().includes(q)
+    );
+  });
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-black text-[#16357a]">Audit Log</h2>
+          <p className="text-sm text-gray-600">Every administrative action, tracked.</p>
+        </div>
+        <div className="flex gap-2">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search actions, admins..."
+            className="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#16357a]"
+          />
+          <button onClick={onExport} className="px-4 py-2 bg-[#16357a] text-white rounded-lg text-sm font-bold hover:bg-[#27487f]">
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl p-6 shadow-lg">
+        {filtered.length === 0 ? (
+          <p className="text-center text-gray-500 py-10">No audit entries found</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b-2 border-[#d4af37]">
+                  <th className="text-left py-3 font-black text-[#16357a]">When</th>
+                  <th className="text-left py-3 font-black text-[#16357a]">Admin</th>
+                  <th className="text-left py-3 font-black text-[#16357a]">Action</th>
+                  <th className="text-left py-3 font-black text-[#16357a]">Target</th>
+                  <th className="text-left py-3 font-black text-[#16357a]">Changes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((a: AuditLog) => (
+                  <tr key={a.id} className="border-b border-gray-200 hover:bg-[#f5f3f0] transition-all">
+                    <td className="py-3 text-xs text-gray-500">{new Date(a.timestamp).toLocaleString()}</td>
+                    <td className="py-3 font-bold text-[#16357a]">{a.adminEmail}</td>
+                    <td className="py-3">{a.action}</td>
+                    <td className="py-3 text-xs">
+                      <span className="px-2 py-0.5 bg-gray-100 rounded text-gray-600 font-bold">{a.targetType || '—'}</span>
+                      {a.targetId && <span className="ml-1 text-gray-500">{a.targetId}</span>}
+                    </td>
+                    <td className="py-3 text-xs text-gray-500">
+                      {a.changes ? Object.entries(a.changes).map(([k, v]) => `${k}: ${v}`).join(', ') : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /* ============================= Members ============================= */
 
-function MembersTab({ members, hasPermission, onToggleStatus, onStatusChange, onApproveKyc, onRejectKyc }: any) {
+function MembersTab({ members, hasPermission, onToggleStatus, onStatusChange, onApproveKyc, onRejectKyc, onExport }: any) {
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<Member | null>(null);
 
@@ -814,12 +1644,20 @@ function MembersTab({ members, hasPermission, onToggleStatus, onStatusChange, on
     <div className="bg-white rounded-2xl p-6 shadow-lg">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h2 className="text-2xl font-black text-[#16357a]">Members Management</h2>
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search name, phone, email..."
-          className="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#16357a]"
-        />
+        <div className="flex flex-wrap gap-2">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search name, phone, email..."
+            className="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#16357a]"
+          />
+          <button
+            onClick={onExport}
+            className="px-4 py-2 bg-[#16357a] text-white rounded-lg text-sm font-bold hover:bg-[#27487f]"
+          >
+            Export CSV
+          </button>
+        </div>
       </div>
 
       {selected && (
@@ -1087,9 +1925,19 @@ function KYCTab({ documents, onApprove, onReject }: any) {
 
 /* ============================= Disputes ============================= */
 
-function DisputesTab({ disputes, onStatusChange, onPriorityChange }: any) {
+function DisputesTab({ disputes, onStatusChange, onPriorityChange, onExport }: any) {
   const [filter, setFilter] = useState<'all' | Dispute['status']>('all');
-  const filtered = disputes.filter((d: Dispute) => filter === 'all' || d.status === filter);
+  const [query, setQuery] = useState('');
+  const filtered = disputes.filter((d: Dispute) => {
+    if (filter !== 'all' && d.status !== filter) return false;
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      d.complainantName.toLowerCase().includes(q) ||
+      d.respondentName.toLowerCase().includes(q) ||
+      d.description.toLowerCase().includes(q)
+    );
+  });
 
   const statusFlow: Dispute['status'][] = ['open', 'investigating', 'resolved', 'closed'];
 
@@ -1106,7 +1954,23 @@ function DisputesTab({ disputes, onStatusChange, onPriorityChange }: any) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-2xl font-black text-[#16357a]">Dispute Management</h2>
         <div className="flex flex-wrap gap-2">
-          {filters.map((f) => (
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search complainant, respondent..."
+            className="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#16357a]"
+          />
+          <button
+            onClick={onExport}
+            className="px-4 py-2 bg-[#16357a] text-white rounded-lg text-sm font-bold hover:bg-[#27487f]"
+          >
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {filters.map((f) => (
             <button
               key={f.id}
               onClick={() => setFilter(f.id as any)}
@@ -1118,7 +1982,6 @@ function DisputesTab({ disputes, onStatusChange, onPriorityChange }: any) {
             </button>
           ))}
         </div>
-      </div>
 
       {filtered.length === 0 && (
         <div className="bg-white rounded-2xl p-10 text-center text-gray-500 shadow-md">No disputes found</div>
@@ -1203,8 +2066,9 @@ function DisputesTab({ disputes, onStatusChange, onPriorityChange }: any) {
 
 /* ============================= Finance ============================= */
 
-function FinanceTab({ records, hasPermission, onAdd, onStatusChange }: any) {
+function FinanceTab({ records, hasPermission, onAdd, onStatusChange, onExport }: any) {
   const [filter, setFilter] = useState<'all' | FinancialRecord['type']>('all');
+  const [query, setQuery] = useState('');
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({
     memberName: '',
@@ -1215,7 +2079,16 @@ function FinanceTab({ records, hasPermission, onAdd, onStatusChange }: any) {
     status: 'completed' as FinancialRecord['status'],
   });
 
-  const filtered = records.filter((r: FinancialRecord) => filter === 'all' || r.type === filter);
+  const filtered = records.filter((r: FinancialRecord) => {
+    if (filter !== 'all' && r.type !== filter) return false;
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      r.memberName.toLowerCase().includes(q) ||
+      r.description.toLowerCase().includes(q) ||
+      r.status.toLowerCase().includes(q)
+    );
+  });
   const totals = {
     completed: records
       .filter((r: FinancialRecord) => r.status === 'completed')
@@ -1259,7 +2132,19 @@ function FinanceTab({ records, hasPermission, onAdd, onStatusChange }: any) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-2xl font-black text-[#16357a]">Financial Records</h2>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search member, description..."
+            className="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#16357a]"
+          />
+          <button
+            onClick={onExport}
+            className="px-4 py-2 bg-[#16357a] text-white rounded-lg text-sm font-bold hover:bg-[#27487f]"
+          >
+            Export CSV
+          </button>
           {filters.map((f) => (
             <button
               key={f.id}

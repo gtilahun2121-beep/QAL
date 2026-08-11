@@ -17,7 +17,7 @@ export interface DashboardEqub {
   contribution: number;
   nextPaymentDate: string; // ISO date
   nextPayout: string;      // human label, e.g. "3 months"
-  status: 'active' | 'pending_contribution';
+  status: 'active' | 'pending_contribution' | 'pending' | 'rejected';
   category?: string;
   description?: string;
   manager?: boolean;
@@ -128,118 +128,20 @@ export const makeId = (): string =>
 
 const today = (): string => new Date().toISOString();
 
+/**
+ * Neutral, per-user default dashboard state.
+ *
+ * Security / privacy: every account starts empty with their own ETB 0 wallet.
+ * No fake or shared data is shown — each member only ever sees their own
+ * balance, equbs and transactions loaded from the backend.
+ */
 function seedState(): DashboardState {
   return {
-    walletBalance: 12500,
-    equbs: [
-      {
-        id: 'equb_gold',
-        name: 'Gold Equb',
-        members: 12,
-        position: 3,
-        contribution: 500,
-        nextPaymentDate: '2026-08-10',
-        nextPayout: '3 months',
-        status: 'active',
-        category: 'Savings',
-        description: 'A trusted monthly savings circle.',
-      },
-      {
-        id: 'equb_community',
-        name: 'Community Fund',
-        members: 8,
-        position: 5,
-        contribution: 300,
-        nextPaymentDate: '2026-08-15',
-        nextPayout: '4 months',
-        status: 'active',
-        category: 'Community',
-        description: 'Local community savings and support.',
-      },
-      {
-        id: 'equb_business',
-        name: 'Business Support',
-        members: 15,
-        position: 7,
-        contribution: 1000,
-        nextPaymentDate: '2026-08-20',
-        nextPayout: '6 months',
-        status: 'active',
-        category: 'Business',
-        description: 'Support for entrepreneurs and vendors.',
-      },
-    ],
-    transactions: [
-      {
-        id: 'txn_1',
-        type: 'Payment',
-        equb: 'Gold Equb',
-        amount: -5000,
-        date: '2026-07-10',
-        status: 'Completed',
-      },
-      {
-        id: 'txn_2',
-        type: 'Payout',
-        equb: 'Community Fund',
-        amount: 8000,
-        date: '2026-07-05',
-        status: 'Completed',
-      },
-      {
-        id: 'txn_3',
-        type: 'Payment',
-        equb: 'Business Support',
-        amount: -1000,
-        date: '2026-07-01',
-        status: 'Completed',
-      },
-      {
-        id: 'txn_4',
-        type: 'Deposit',
-        equb: 'Bank Transfer',
-        amount: 10000,
-        date: '2026-06-28',
-        status: 'Completed',
-      },
-    ],
-    notifications: [
-      {
-        id: 'ntf_1',
-        title: 'Payment Due Tomorrow',
-        time: '1 day',
-        type: 'payment',
-      },
-      {
-        id: 'ntf_2',
-        title: 'New Member Joined',
-        time: '2 hours',
-        type: 'member',
-      },
-      {
-        id: 'ntf_3',
-        title: 'You Received Your Payout',
-        time: '1 week',
-        type: 'payout',
-      },
-    ],
-    activity: [
-      {
-        id: 'act_1',
-        action: 'Payment Completed',
-        time: '2 hours ago',
-      },
-      {
-        id: 'act_2',
-        action: 'Joined Gold Equb',
-        time: '1 day ago',
-      },
-      {
-        id: 'act_3',
-        action: 'Profile Updated',
-        time: '3 days ago',
-      },
-    ],
+    walletBalance: 0,
+    equbs: [],
+    transactions: [],
+    notifications: [],
+    activity: [],
     startedSteps: [],
   };
 }
@@ -280,9 +182,10 @@ export const DashboardService = {
     const local = this.loadState(userId);
 
     try {
-      const [equbs, wallet] = await Promise.all([
+      const [equbs, wallet, walletTxns] = await Promise.all([
         equbAPI.myEqubs(),
         walletAPI.get(),
+        walletAPI.transactions().catch(() => [] as any[]),
       ]);
 
       const dashboardState: DashboardState = {
@@ -291,10 +194,12 @@ export const DashboardService = {
         equbs: equbs.map((e: any) => this.toDashboardEqub(e, userId)),
       };
 
-      // Build transaction history from the user's real contributions + payouts.
+      // Build transaction history from the user's OWN wallet activity and
+      // their equb contributions — never from shared/seed data.
       const equbTxns = await this.fetchTransactionsEqubs(dashboardState.equbs);
-      if (equbTxns.length > 0) {
-        dashboardState.transactions = equbTxns;
+      const mergedTxns = this.mergeTransactions(walletTxns, equbTxns);
+      if (mergedTxns.length > 0) {
+        dashboardState.transactions = mergedTxns;
       }
 
       // Keep a mirror so the UI is instant on next visit.
@@ -304,6 +209,23 @@ export const DashboardService = {
       console.warn('Dashboard API load failed, using local state:', error);
       return local;
     }
+  },
+
+  /**
+   * Merges wallet deposits/withdrawals with equb contribution payments into
+   * one per-user transaction list, newest first.
+   */
+  mergeTransactions(walletTxns: any[], equbTxns: DashboardTransaction[]): DashboardTransaction[] {
+    const mapped: DashboardTransaction[] = (walletTxns || []).map((tx: any) => ({
+      id: `wallet_${tx.id || `${Date.now()}_${Math.random()}`}`,
+      type: tx.type === 'Deposit' ? 'Deposit' : tx.type === 'Withdrawal' ? 'Withdrawal' : 'Payment',
+      equb: tx.note || 'Wallet',
+      amount: Number(tx.amount) || 0,
+      date: tx.createdAt || new Date().toISOString(),
+      status: 'Completed',
+    }));
+
+    return [...mapped, ...equbTxns].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 30);
   },
 
   /**
@@ -328,7 +250,14 @@ export const DashboardService = {
         e.status === 'active' && Number(e.totalMembers) > 1
           ? `${Math.max(1, Math.ceil((Number(e.totalMembers) || currentRound) / 2))} months`
           : '—',
-      status: e.status === 'active' ? 'active' : 'pending_contribution',
+      status:
+        e.status === 'active'
+          ? 'active'
+          : e.status === 'pending'
+            ? 'pending'
+            : e.status === 'rejected'
+              ? 'rejected'
+              : 'pending_contribution',
       category: e.category,
       description: e.description,
       manager: Boolean(e.isManager),

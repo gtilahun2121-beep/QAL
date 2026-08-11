@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Language, defaultLanguage } from '@/i18n/config';
@@ -16,6 +16,10 @@ import {
   DashboardState,
   DashboardEqub,
 } from '@/app/services/dashboardService';
+import { downloadCSV, formatDateShort } from '@/app/utils/csv';
+import { DonutChart, TrendChart, HorizontalBars } from '@/app/utils/charts';
+
+const CHART_COLORS = ['#0d9488', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#14b8a6', '#6366f1', '#ec4899'];
 
 const PAYMENT_METHODS = [
   { id: 'telebirr', name: 'Telebirr' },
@@ -79,7 +83,7 @@ export default function DashboardPage() {
 function DashboardContent({ uid, lang, setLang, newUser, displayName }: DashboardContentProps) {
   const router = useRouter();
   const toast = useToast();
-  const { signout, user: authUser } = useAuth();
+  const { signout, user: authUser, updateProfile } = useAuth();
 
   const [state, setState] = useState<DashboardState>(() => DashboardService.loadState(uid));
   const [now] = useState(() => Date.now());
@@ -131,6 +135,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
   const [pinResult, setPinResult] = useState<'success' | 'error' | 'cancel' | null>(null);
   const [showDrawer, setShowDrawer] = useState(false);
   const [supportCategory, setSupportCategory] = useState('Help Center');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleDrawerOpen = () => setShowDrawer(true);
   const handleDrawerClose = () => setShowDrawer(false);
@@ -305,20 +310,17 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
         description: createForm.description.trim() || 'A new Equb circle.',
         startDate: todayISO(),
       });
-      const equbId = result?.equbId || result?.equb?.id;
-      if (equbId) {
-        // The host's first contribution is recorded immediately.
-        await equbAPI.contribute(equbId, {
-          amount,
-          paymentMethod: 'wallet',
-        }).catch(() => {});
-      }
+      // Security: a newly created Equb is a REQUEST (status 'pending'). It is
+      // activated only after an admin approves it — no money moves until then.
       await refresh();
       setShowCreate(false);
       setCreateForm({ name: '', category: 'Savings', amount: '', members: '', description: '' });
-      toast.success('Equb Created', `${name} is now active.`);
+      toast.success(
+        'Request Submitted',
+        `${name} was submitted to the admin for approval. You'll be notified once it's approved.`
+      );
     } catch (error: any) {
-      toast.error('Creation Failed', error?.data?.message || error?.message || 'Could not create the Equb.');
+      toast.error('Request Failed', error?.data?.message || error?.message || 'Could not submit the Equb request.');
     }
   };
 
@@ -405,15 +407,113 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
     },
   ];
 
-  const activeCount = dashboard.equbs.length;
-  const monthlyCommitment = dashboard.equbs.reduce((sum, e) => sum + e.contribution, 0);
-  const nextPayment = dashboard.equbs
+  const activeEqubs = dashboard.equbs.filter((e) => e.status === 'active');
+  const activeCount = activeEqubs.length;
+  const monthlyCommitment = activeEqubs.reduce((sum, e) => sum + e.contribution, 0);
+  const nextPayment = activeEqubs
     .map((e) => ({ equb: e, days: daysUntil(e.nextPaymentDate, now) }))
     .sort((a, b) => a.days - b.days)[0];
-  const nextPayoutLabel =
-    dashboard.equbs.find((e) => e.status === 'active')?.nextPayout || '—';
+  const nextPayoutLabel = activeEqubs.find((e) => e.status === 'active')?.nextPayout || '—';
 
   const t = (en: string, am: string) => (lang === 'en' ? en : am);
+
+  // ── Search & filter ────────────────────────────────────────────────────
+  const q = searchQuery.trim().toLowerCase();
+  const filteredEqubs = q
+    ? dashboard.equbs.filter(
+        (e) =>
+          e.name.toLowerCase().includes(q) ||
+          (e.category || '').toLowerCase().includes(q) ||
+          String(e.contribution).includes(q)
+      )
+    : dashboard.equbs;
+  const filteredTxns = q
+    ? dashboard.transactions.filter(
+        (tx) => tx.equb.toLowerCase().includes(q) || tx.type.toLowerCase().includes(q)
+      )
+    : dashboard.transactions;
+  const filteredNotifs = q
+    ? dashboard.notifications.filter((n) => n.title.toLowerCase().includes(q))
+    : dashboard.notifications;
+
+  const isSearching = q.length > 0;
+
+  // ── Analytics (charts) ─────────────────────────────────────────────────
+  const monthlyTrend = useMemo(() => {
+    const buckets = new Map<string, { inflow: number; outflow: number }>();
+    dashboard.transactions.forEach((tx) => {
+      const d = new Date(tx.date);
+      if (Number.isNaN(d.getTime())) return;
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const bucket = buckets.get(key) || { inflow: 0, outflow: 0 };
+      if (tx.amount >= 0) bucket.inflow += tx.amount;
+      else bucket.outflow += Math.abs(tx.amount);
+      buckets.set(key, bucket);
+    });
+    const sorted = Array.from(buckets.entries()).sort((a, b) => (a[0] < b[0] ? -1 : 1));
+    return sorted.map(([key, b]) => ({
+      label: new Date(`${key}-01`).toLocaleDateString('en-US', { month: 'short' }),
+      value: b.outflow,
+      value2: b.inflow,
+    }));
+  }, [dashboard.transactions]);
+
+  const donutSegments = activeEqubs.map((e, i) => ({
+    label: e.name,
+    value: e.contribution,
+    color: CHART_COLORS[i % CHART_COLORS.length],
+  }));
+  const spendingByCategory = useMemo(() => {
+    const byCat = new Map<string, number>();
+    activeEqubs.forEach((e) => {
+      const cat = e.category || 'Other';
+      byCat.set(cat, (byCat.get(cat) || 0) + e.contribution);
+    });
+    return Array.from(byCat.entries())
+      .map(([label, value], i) => ({
+        label,
+        value,
+        color: CHART_COLORS[i % CHART_COLORS.length],
+      }))
+      .sort((a, b) => b.value - a.value);
+  }, [activeEqubs]);
+
+  // ── Export helpers ─────────────────────────────────────────────────────
+  const exportTransactions = () => {
+    downloadCSV(`qalnet-transactions-${todayISO()}`, dashboard.transactions, [
+      { key: 'date', label: 'Date', value: (r) => formatDateShort(r.date) },
+      { key: 'type', label: 'Type' },
+      { key: 'equb', label: 'Equb' },
+      { key: 'amount', label: 'Amount (ETB)', value: (r) => r.amount },
+      { key: 'status', label: 'Status' },
+    ]);
+    toast.success('Export Ready', 'Your transactions were exported as CSV.');
+  };
+
+  const exportActivity = () => {
+    downloadCSV(`qalnet-activity-${todayISO()}`, dashboard.activity, [
+      { key: 'action', label: 'Action' },
+      { key: 'time', label: 'When' },
+    ]);
+    toast.success('Export Ready', 'Your activity log was exported as CSV.');
+  };
+
+  // ── Profile & settings ─────────────────────────────────────────────────
+  const handlePinChange = async (newPin: string) => {
+    await updateProfile({ pin: newPin } as Partial<{ pin: string }>);
+  };
+
+  const handleUpdateProfile = async (patch: { name?: string; email?: string }) => {
+    const next: Partial<{ firstName: string; lastName: string; email: string }> = {};
+    if (patch.name) {
+      const parts = patch.name.trim().split(/\s+/);
+      next.firstName = parts[0] || authUser?.firstName;
+      next.lastName = parts.slice(1).join(' ') || authUser?.lastName || '';
+    }
+    if (patch.email) next.email = patch.email.trim();
+    await updateProfile(next);
+    toast.success('Profile Updated', 'Your details were saved.');
+  };
 
   return (
     <main className="min-h-screen flex flex-col bg-gray-50">
@@ -428,8 +528,8 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
         }}
         uid={uid}
         unreadCount={dashboard.notifications.length}
-        searchValue={''}
-        onSearchChange={() => {}}
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
         onOpenMenu={handleDrawerOpen}
         onOpenNotifications={() => {}}
         onSignOut={handleSignOut}
@@ -587,6 +687,74 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
           </div>
         </div>
 
+        {/* Financial Overview / Analytics */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+              <div>
+                <h2 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                   {lang === 'en' ? 'Financial Overview' : 'የፋይናንስ አጠቃላይ እይታ'}
+                </h2>
+                <p className="text-xs text-gray-500 mt-1">
+                  {lang === 'en'
+                    ? 'Contributions vs. credits across your Equbs'
+                    : 'በEqubsዎ ላይ መዋጮ እና ገቢዎች'}
+                </p>
+              </div>
+              <button
+                onClick={exportTransactions}
+                className="flex items-center gap-2 px-4 py-2 border-2 border-teal-600 text-teal-700 text-xs font-bold rounded-xl hover:bg-teal-600 hover:text-white transition-all"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 3v12M7 10l5 5 5-5M4 21h16" />
+                </svg>
+                {lang === 'en' ? 'Export Transactions' : 'ግብይቶችን አስተላልፍ'}
+              </button>
+            </div>
+            {monthlyTrend.length === 0 ? (
+              <p className="text-sm text-gray-500 text-center py-10">
+                {lang === 'en'
+                  ? 'Complete a transaction to see your financial overview.'
+                  : 'የፋይናንስ እይታ ለማየት ግብይት ያከናውኑ።'}
+              </p>
+            ) : (
+              <TrendChart data={monthlyTrend} height={210} />
+            )}
+          </div>
+
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <h2 className="text-lg font-black text-gray-900 mb-4">
+                {lang === 'en' ? 'Contribution Split' : 'የመዋጮ ክፍፍል'}
+              </h2>
+              {donutSegments.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-6">
+                  {lang === 'en' ? 'No equbs to show' : 'የሚታይ Equb የለም'}
+                </p>
+              ) : (
+                <DonutChart
+                  segments={donutSegments}
+                  centerValue="ETB"
+                  centerLabel={monthlyCommitment.toLocaleString()}
+                />
+              )}
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <h2 className="text-lg font-black text-gray-900 mb-4">
+                {lang === 'en' ? 'Spending by Category' : 'በምድብ የተከፈለ ወጪ'}
+              </h2>
+              {spendingByCategory.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-6">
+                  {lang === 'en' ? 'No data yet' : 'እስካሁን መረጃ የለም'}
+                </p>
+              ) : (
+                <HorizontalBars data={spendingByCategory} prefix="ETB " />
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* Three Main Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
@@ -601,7 +769,19 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                 </span>
               </div>
 
-              {dashboard.equbs.length === 0 ? (
+              {isSearching && (
+                <div className="mb-4 px-4 py-2.5 bg-blue-50 border border-blue-100 rounded-xl text-xs text-blue-800 font-semibold flex items-center gap-2">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="M21 21l-4.3-4.3" />
+                  </svg>
+                  {lang === 'en'
+                    ? `Search results for "${searchQuery.trim()}" — ${filteredEqubs.length} equb(s), ${filteredTxns.length} transaction(s)`
+                    : `"${searchQuery.trim()}" ፍለጋ ውጤቶች — ${filteredEqubs.length} Equbs, ${filteredTxns.length} ግብይቶች`}
+                </div>
+              )}
+
+              {filteredEqubs.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center">
                     <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
@@ -611,18 +791,26 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                     </svg>
                   </div>
                   <p className="text-gray-600 mb-4">
-                    {lang === 'en' ? 'You haven\'t joined any Equb yet' : 'አሁንም Equb ተጠምዱ አልነበሩም'}
+                    {isSearching
+                      ? lang === 'en'
+                        ? 'No Equbs match your search.'
+                        : 'ከፍለጋዎ ጋር የሚመሳሰል Equb የለም።'
+                      : lang === 'en'
+                        ? 'You haven\'t joined any Equb yet'
+                        : 'አሁንም Equb ተጠምዱ አልነበሩም'}
                   </p>
-                  <button
-                    onClick={() => router.push('/join-equb')}
-                    className="px-6 py-2.5 bg-teal-600 text-white font-bold rounded-xl hover:bg-teal-700 transition-all"
-                  >
-                    {lang === 'en' ? 'Join an Equb' : 'Equb ተጠምዱ'}
-                  </button>
+                  {!isSearching && (
+                    <button
+                      onClick={() => router.push('/join-equb')}
+                      className="px-6 py-2.5 bg-teal-600 text-white font-bold rounded-xl hover:bg-teal-700 transition-all"
+                    >
+                      {lang === 'en' ? 'Join an Equb' : 'Equb ተጠምዱ'}
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {dashboard.equbs.map((equb) => (
+                  {filteredEqubs.map((equb) => (
                     <div
                       key={equb.id}
                       className="group bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-2xl p-5 hover:shadow-lg transition-all"
@@ -646,9 +834,21 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                               {lang === 'en' ? 'Manager' : 'ማናጀር'}
                             </span>
                           )}
-                          <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[11px] font-black rounded-full">
-                            {lang === 'en' ? 'Active' : 'ንቁ'}
-                          </span>
+                          {equb.status === 'pending' && (
+                            <span className="px-2.5 py-1 bg-yellow-100 text-yellow-700 text-[11px] font-black rounded-full">
+                              {lang === 'en' ? 'Pending Approval' : 'በመጠባበቅ ላይ'}
+                            </span>
+                          )}
+                          {equb.status === 'rejected' && (
+                            <span className="px-2.5 py-1 bg-red-100 text-red-700 text-[11px] font-black rounded-full">
+                              {lang === 'en' ? 'Rejected' : 'ውድቅ ተደርጓል'}
+                            </span>
+                          )}
+                          {equb.status === 'active' && (
+                            <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[11px] font-black rounded-full">
+                              {lang === 'en' ? 'Active' : 'ንቁ'}
+                            </span>
+                          )}
                         </div>
                       </div>
 
@@ -690,12 +890,29 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                         >
                           {lang === 'en' ? 'View Details' : 'ዝርዝር ይመልከቱ'}
                         </button>
-                        <button
-                          onClick={() => openPaymentFor(equb)}
-                          className="px-4 py-2 bg-teal-600 text-white font-bold rounded-xl hover:bg-teal-700 transition-all text-sm"
-                        >
-                           {lang === 'en' ? 'Make Payment' : 'ክፍያ ይክፈሉ'}
-                        </button>
+                        {equb.status === 'active' ? (
+                          <button
+                            onClick={() => openPaymentFor(equb)}
+                            className="px-4 py-2 bg-teal-600 text-white font-bold rounded-xl hover:bg-teal-700 transition-all text-sm"
+                          >
+                            {lang === 'en' ? 'Make Payment' : 'ክፍያ ይክፈሉ'}
+                          </button>
+                        ) : (
+                          <div
+                            className="px-4 py-2 bg-gray-100 text-gray-400 font-bold rounded-xl text-sm text-center"
+                            title={
+                              equb.status === 'pending'
+                                ? 'Waiting for admin approval'
+                                : 'This Equb request was not approved'
+                            }
+                          >
+                            {lang === 'en'
+                              ? equb.status === 'pending'
+                                ? 'Waiting for approval'
+                                : 'Not approved'
+                              : 'በመጠባበቅ ላይ'}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -737,10 +954,11 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                 </button>
                 <button
                   onClick={() => {
-                    if (dashboard.equbs.length > 0) {
-                      openPaymentFor(dashboard.equbs[0]);
+                    const firstActive = dashboard.equbs.find((e) => e.status === 'active');
+                    if (firstActive) {
+                      openPaymentFor(firstActive);
                     } else {
-                      toast.info('No Equbs', 'Join or create an Equb first.');
+                      toast.info('No Active Equbs', 'Join or create an Equb first and wait for approval.');
                     }
                   }}
                   className="flex items-center gap-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white px-5 py-4 rounded-xl font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all text-left"
@@ -782,12 +1000,18 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                  {lang === 'en' ? 'Notifications' : 'ማስታወቂያዎች'}
               </h2>
               <div className="space-y-3">
-                {dashboard.notifications.length === 0 ? (
+                {filteredNotifs.length === 0 ? (
                   <p className="text-sm text-gray-500 text-center py-6">
-                    {lang === 'en' ? 'No notifications yet' : 'እስካሁን ማስታወቂያ የለም'}
+                    {isSearching
+                      ? lang === 'en'
+                        ? 'No notifications match your search.'
+                        : 'ከፍለጋዎ ጋር የሚመሳሰል ማስታወቂያ የለም።'
+                      : lang === 'en'
+                        ? 'No notifications yet'
+                        : 'እስካሁን ማስታወቂያ የለም'}
                   </p>
                 ) : (
-                  dashboard.notifications.map((notif) => (
+                  filteredNotifs.map((notif) => (
                     <div
                       key={notif.id}
                       className="flex items-start gap-3 bg-gray-50 border border-gray-100 rounded-xl p-3 hover:shadow-md transition-all"
@@ -1365,6 +1589,11 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
           setShowSupport(true);
         }}
         onSignOut={handleSignOut}
+        onLanguageChange={setLang}
+        onExportTransactions={exportTransactions}
+        onExportActivity={exportActivity}
+        onUpdateProfile={handleUpdateProfile}
+        onChangePin={handlePinChange}
       />
 
       {/* ── PIN Verify Modal ─────────────────────────────────────────────── */}

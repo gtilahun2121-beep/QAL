@@ -11,6 +11,7 @@ import {
 } from '@/app/services/dashboardService';
 import PinSession from '@/app/services/pinSession';
 import ProfileAvatar from '@/app/components/dashboard/ProfileAvatar';
+import { downloadCSV, formatDateShort } from '@/app/utils/csv';
 
 interface MemberDrawerProps {
   open: boolean;
@@ -30,6 +31,11 @@ interface MemberDrawerProps {
   onVerifyPin: () => void;
   onSupport: (category: string) => void;
   onSignOut: () => void;
+  onLanguageChange?: (lang: Language) => void;
+  onExportTransactions?: () => void;
+  onExportActivity?: () => void;
+  onUpdateProfile?: (patch: { name?: string; email?: string }) => void | Promise<void>;
+  onChangePin?: (newPin: string) => void | Promise<void>;
 }
 
 type TabId =
@@ -245,12 +251,52 @@ export default function MemberDrawer({
   onVerifyPin,
   onSupport,
   onSignOut,
+  onLanguageChange,
+  onExportTransactions,
+  onExportActivity,
+  onUpdateProfile,
+  onChangePin,
 }: MemberDrawerProps) {
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
   const [settingsSub, setSettingsSub] = useState<SettingsSub>('information');
   const [remaining, setRemaining] = useState(PinSession.MAX_ATTEMPTS);
   const [locked, setLocked] = useState(false);
   const [now, setNow] = useState(Date.now());
+
+  // Profile editing
+  const [editName, setEditName] = useState(user.name);
+  const [editEmail, setEditEmail] = useState(user.email || '');
+  const [saved, setSaved] = useState(false);
+
+  // Change PIN flow
+  const [pinForm, setPinForm] = useState({ current: '', next: '', confirm: '' });
+  const [pinError, setPinError] = useState<string | null>(null);
+  const [pinBusy, setPinBusy] = useState(false);
+  const [pinSuccess, setPinSuccess] = useState(false);
+
+  // Notification preferences (persisted)
+  const NOTIF_KEY = `qalnet_notif_prefs_${userId}`;
+  const [notifPrefs, setNotifPrefs] = useState<Record<string, boolean>>(() => {
+    if (typeof window === 'undefined') return {};
+    try {
+      return JSON.parse(localStorage.getItem(NOTIF_KEY) || '{}');
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    setEditName(user.name);
+    setEditEmail(user.email || '');
+  }, [user.name, user.email]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(NOTIF_KEY, JSON.stringify(notifPrefs));
+    } catch {
+      // ignore storage errors
+    }
+  }, [notifPrefs, NOTIF_KEY]);
 
   useEffect(() => {
     if (!open) return;
@@ -294,6 +340,71 @@ export default function MemberDrawer({
   const go = (tab: TabId) => {
     setActiveTab(tab);
     if (tab === 'settings') setSettingsSub('information');
+  };
+
+  const saveProfile = async () => {
+    setSaved(false);
+    const patch: { name?: string; email?: string } = {};
+    if (editName.trim() && editName.trim() !== user.name) patch.name = editName.trim();
+    if (editEmail.trim() !== (user.email || '')) patch.email = editEmail.trim();
+    if (onUpdateProfile && (patch.name || patch.email)) {
+      await onUpdateProfile(patch);
+    }
+    setSaved(true);
+    window.setTimeout(() => setSaved(false), 2500);
+  };
+
+  const submitPinChange = async () => {
+    setPinError(null);
+    setPinSuccess(false);
+    if (!pinForm.next || pinForm.next.length !== 4 || !/^\d{4}$/.test(pinForm.next)) {
+      setPinError(t(lang, 'New PIN must be 4 digits.', 'አዲሱ PIN 4 አሃዝ መሆን አለበት።'));
+      return;
+    }
+    if (pinForm.next !== pinForm.confirm) {
+      setPinError(t(lang, 'PINs do not match.', 'PINዎች አይዛመዱም።'));
+      return;
+    }
+    setPinBusy(true);
+    try {
+      if (onChangePin) await onChangePin(pinForm.next);
+      setPinForm({ current: '', next: '', confirm: '' });
+      setPinSuccess(true);
+      window.setTimeout(() => setPinSuccess(false), 3000);
+    } catch {
+      setPinError(t(lang, 'Could not change PIN.', 'PIN መቀየር አልተቻለም።'));
+    } finally {
+      setPinBusy(false);
+    }
+  };
+
+  const toggleNotif = (label: string) => {
+    setNotifPrefs((prev) => ({ ...prev, [label]: !prev[label] }));
+  };
+
+  const localExportTransactions = () => {
+    if (onExportTransactions) {
+      onExportTransactions();
+    } else {
+      downloadCSV('qalnet-transactions', transactions, [
+        { key: 'date', label: 'Date', value: (r) => formatDateShort(r.date) },
+        { key: 'type', label: 'Type' },
+        { key: 'equb', label: 'Equb' },
+        { key: 'amount', label: 'Amount (ETB)', value: (r) => r.amount },
+        { key: 'status', label: 'Status' },
+      ]);
+    }
+  };
+
+  const localExportActivity = () => {
+    if (onExportActivity) {
+      onExportActivity();
+    } else {
+      downloadCSV('qalnet-activity', activity, [
+        { key: 'action', label: 'Action' },
+        { key: 'time', label: 'When' },
+      ]);
+    }
   };
 
   const initials = (user.name || 'M')
@@ -876,6 +987,26 @@ export default function MemberDrawer({
               {activeTab === 'reports' && (
                 <div className="space-y-3">
                   <SectionTitle>{t(lang, 'Reports', 'ሪፖርቶች')}</SectionTitle>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={localExportTransactions}
+                      className="flex items-center justify-center gap-2 py-2.5 bg-teal-600 text-white text-xs font-bold rounded-xl hover:bg-teal-700 transition-all"
+                    >
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 3v12M7 10l5 5 5-5M4 21h16" />
+                      </svg>
+                      {t(lang, 'Export Transactions', 'ግብይቶችን አስተላልፍ')}
+                    </button>
+                    <button
+                      onClick={localExportActivity}
+                      className="flex items-center justify-center gap-2 py-2.5 bg-purple-600 text-white text-xs font-bold rounded-xl hover:bg-purple-700 transition-all"
+                    >
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 3v12M7 10l5 5 5-5M4 21h16" />
+                      </svg>
+                      {t(lang, 'Export Activity', 'እንቅስቃሴ አስተላልፍ')}
+                    </button>
+                  </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="bg-white border border-teal-100 rounded-xl p-3 shadow-sm">
                       <p className="text-[10px] text-gray-500 font-semibold">{t(lang, 'Active Equbs', 'ንቁ Equbs')}</p>
@@ -974,18 +1105,31 @@ export default function MemberDrawer({
                   </div>
 
                   {settingsSub === 'information' && (
-                    <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm space-y-2">
+                    <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm space-y-3">
                       <p className="font-bold text-gray-900 text-sm">{t(lang, 'Personal Information', 'የግል መረጃ')}</p>
                       <p className="text-xs text-gray-500">
                         {t(lang, 'Update your email and profile details.', 'ኢሜይልዎን እና የመገለጫ ዝርዝሮችዎን ያዘምኑ።')}
                       </p>
-                      <div className="flex justify-between text-xs">
-                        <span className="text-gray-500">{t(lang, 'Name', 'ስም')}</span>
-                        <span className="font-bold text-gray-900">{user.name}</span>
+                      <div>
+                        <label className="block text-[11px] font-bold text-gray-500 mb-1">
+                          {t(lang, 'Full Name', 'ሙሉ ስም')}
+                        </label>
+                        <input
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-teal-600"
+                        />
                       </div>
-                      <div className="flex justify-between text-xs">
-                        <span className="text-gray-500">{t(lang, 'Email', 'ኢሜይል')}</span>
-                        <span className="font-bold text-gray-900">{user.email || '—'}</span>
+                      <div>
+                        <label className="block text-[11px] font-bold text-gray-500 mb-1">
+                          {t(lang, 'Email', 'ኢሜይል')}
+                        </label>
+                        <input
+                          value={editEmail}
+                          onChange={(e) => setEditEmail(e.target.value)}
+                          type="email"
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-teal-600"
+                        />
                       </div>
                       <div className="flex justify-between text-xs">
                         <span className="text-gray-500">{t(lang, 'Phone', 'ስልክ')}</span>
@@ -995,6 +1139,14 @@ export default function MemberDrawer({
                         <span className="text-gray-500">{t(lang, 'Role', 'ሚና')}</span>
                         <span className="font-bold text-gray-900 capitalize">{user.role}</span>
                       </div>
+                      <button
+                        onClick={saveProfile}
+                        className="w-full py-2.5 bg-teal-600 text-white text-xs font-bold rounded-xl hover:bg-teal-700 transition-all"
+                      >
+                        {saved
+                          ? t(lang, 'Saved ✓', 'ተቀምጧል ✓')
+                          : t(lang, 'Save Changes', 'ለውጦችን አስቀምጥ')}
+                      </button>
                     </div>
                   )}
 
@@ -1004,14 +1156,29 @@ export default function MemberDrawer({
                       <p className="text-xs text-gray-500">
                         {t(lang, 'Choose when you want to receive updates.', 'መቼ ማሳወቂያ እንደሚፈልጉ ይምረጡ።')}
                       </p>
-                      {['Payment reminders', 'Payout alerts', 'New member joined', 'Weekly summary'].map((label) => (
-                        <div key={label} className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-gray-700">{t(lang, label, label)}</span>
-                          <span className="w-9 h-5 bg-teal-600 rounded-full relative">
-                            <span className="absolute right-0.5 top-0.5 w-4 h-4 bg-white rounded-full" />
-                          </span>
-                        </div>
-                      ))}
+                      {['Payment reminders', 'Payout alerts', 'New member joined', 'Weekly summary'].map((label) => {
+                        const on = notifPrefs[label] ?? true;
+                        return (
+                          <div key={label} className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-gray-700">{t(lang, label, label)}</span>
+                            <button
+                              onClick={() => toggleNotif(label)}
+                              role="switch"
+                              aria-checked={on}
+                              className={`w-9 h-5 rounded-full relative transition-all ${on ? 'bg-teal-600' : 'bg-gray-300'}`}
+                            >
+                              <span
+                                className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${
+                                  on ? 'right-0.5' : 'left-0.5'
+                                }`}
+                              />
+                            </button>
+                          </div>
+                        );
+                      })}
+                      <p className="text-[10px] text-gray-400 pt-1">
+                        {t(lang, 'Preferences are saved automatically.', 'ምርጫዎች በራስ ይቀመጣሉ።')}
+                      </p>
                     </div>
                   )}
 
@@ -1075,6 +1242,44 @@ export default function MemberDrawer({
                           <p>✓ {t(lang, 'Account locks for 5 minutes after 3 failed attempts', 'ከ3 የተሳሳቱ ሙከራዎች በኋላ መለያ ለ5 ደቂቃ ይቆለፋል')}</p>
                           <p>✓ {t(lang, 'Required before withdrawals and payments', 'ከገንዘብ ከማውጣት እና ከክፍያ በፊት ያስፈልጋል')}</p>
                         </div>
+                      </div>
+
+                      <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm space-y-2">
+                        <p className="font-bold text-gray-900 text-sm">{t(lang, 'Change PIN', 'PIN ቀይር')}</p>
+                        <p className="text-xs text-gray-500">
+                          {t(lang, 'Set a new 4-digit PIN for withdrawals and payments.', 'አዲስ ባለ 4-አሃዝ PIN ያዘጋጁ።')}
+                        </p>
+                        <input
+                          value={pinForm.next}
+                          onChange={(e) => setPinForm({ ...pinForm, next: e.target.value.replace(/\D/g, '').slice(0, 4) })}
+                          type="password"
+                          inputMode="numeric"
+                          maxLength={4}
+                          placeholder={t(lang, 'New PIN', 'አዲስ PIN')}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-center tracking-[0.5em] focus:outline-none focus:border-teal-600"
+                        />
+                        <input
+                          value={pinForm.confirm}
+                          onChange={(e) => setPinForm({ ...pinForm, confirm: e.target.value.replace(/\D/g, '').slice(0, 4) })}
+                          type="password"
+                          inputMode="numeric"
+                          maxLength={4}
+                          placeholder={t(lang, 'Confirm new PIN', 'አዲሱን PIN ያረጋግጡ')}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-center tracking-[0.5em] focus:outline-none focus:border-teal-600"
+                        />
+                        {pinError && <p className="text-xs text-red-600 font-semibold">{pinError}</p>}
+                        {pinSuccess && (
+                          <p className="text-xs text-green-700 font-bold">
+                            {t(lang, 'PIN changed successfully.', 'PIN በተሳካ ሁኔታ ተቀይሯል።')}
+                          </p>
+                        )}
+                        <button
+                          onClick={submitPinChange}
+                          disabled={pinBusy}
+                          className="w-full py-2.5 bg-teal-600 text-white text-sm font-bold rounded-xl hover:bg-teal-700 disabled:opacity-50 transition-all"
+                        >
+                          {pinBusy ? t(lang, 'Saving...', 'በማስቀመጥ...') : t(lang, 'Update PIN', 'PIN ዘምን')}
+                        </button>
                       </div>
 
                       <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm space-y-2">
@@ -1161,11 +1366,17 @@ export default function MemberDrawer({
                     {t(lang, 'Choose your preferred language.', 'የሚመርጡትን ቋንቋ ይምረጡ።')}
                   </p>
                   <div className="grid grid-cols-2 gap-3">
-                    <button className={`p-4 rounded-xl border-2 text-left transition-all ${lang === 'en' ? 'border-teal-600 bg-teal-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
+                    <button
+                      onClick={() => onLanguageChange?.('en')}
+                      className={`p-4 rounded-xl border-2 text-left transition-all ${lang === 'en' ? 'border-teal-600 bg-teal-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}
+                    >
                       <p className="text-sm font-black text-gray-900">English</p>
                       <p className="text-[11px] text-gray-500">Default</p>
                     </button>
-                    <button className={`p-4 rounded-xl border-2 text-left transition-all ${lang === 'am' ? 'border-teal-600 bg-teal-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
+                    <button
+                      onClick={() => onLanguageChange?.('am')}
+                      className={`p-4 rounded-xl border-2 text-left transition-all ${lang === 'am' ? 'border-teal-600 bg-teal-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}
+                    >
                       <p className="text-sm font-black text-gray-900">አማርኛ</p>
                       <p className="text-[11px] text-gray-500">Amharic</p>
                     </button>

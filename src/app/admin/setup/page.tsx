@@ -109,7 +109,7 @@ export default function AdminSetupPage() {
                   transition={{ delay: 0.3 }}
                 >
                   <motion.a
-                    href="/auth?mode=admin"
+                    href="/admin/login"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="block py-3 bg-gradient-to-r from-purple-600 to-red-600 text-white font-black rounded-full hover:shadow-lg transition-all text-center"

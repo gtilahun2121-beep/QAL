@@ -74,6 +74,13 @@ export default function AdminLoginForm({ onSuccess, onError }: AdminLoginFormPro
         return;
       }
 
+      if (admin.status && admin.status !== 'active') {
+        setError('This admin account is not active');
+        onError?.('Account Disabled', 'This admin account is suspended or inactive.', 4000);
+        setLoading(false);
+        return;
+      }
+
       if (admin.mfaEnabled) {
         onSuccess?.('Password Verified', 'Enter your MFA code');
         setLoading(false);
@@ -83,6 +90,16 @@ export default function AdminLoginForm({ onSuccess, onError }: AdminLoginFormPro
         setLoading(false);
         onSuccess?.('Login Successful', `Welcome ${admin.fullName}!`);
         setStep('success');
+
+        // Store auth token on every successful login (not only MFA).
+        localStorage.setItem('qalnet_admin_token', email);
+        localStorage.setItem('qalnet_admin_role', admin.role);
+        try {
+          const next = { ...admin, lastLogin: new Date().toISOString() };
+          localStorage.setItem(`qalnet_admin_${email}`, JSON.stringify(next));
+        } catch (e) {
+          // ignore
+        }
       }
     }, 1000);
   };
@@ -115,6 +132,13 @@ export default function AdminLoginForm({ onSuccess, onError }: AdminLoginFormPro
         return;
       }
 
+      if (admin.status && admin.status !== 'active') {
+        setError('This admin account is not active');
+        onError?.('Account Disabled', 'This admin account is suspended or inactive.', 4000);
+        setLoading(false);
+        return;
+      }
+
       setAdminData(admin);
       setLoading(false);
       onSuccess?.('Login Successful', `Welcome ${admin.fullName}!`);
@@ -123,6 +147,12 @@ export default function AdminLoginForm({ onSuccess, onError }: AdminLoginFormPro
       // Store auth token
       localStorage.setItem('qalnet_admin_token', email);
       localStorage.setItem('qalnet_admin_role', admin.role);
+      try {
+        const next = { ...admin, lastLogin: new Date().toISOString() };
+        localStorage.setItem(`qalnet_admin_${email}`, JSON.stringify(next));
+      } catch (e) {
+        // ignore
+      }
     }, 1500);
   };
 

@@ -312,6 +312,17 @@ export const walletAPI = {
     }),
 
   /**
+   * Get the current user's own wallet transaction history
+   */
+  transactions: () =>
+    request<{ id: string; type: string; amount: number; currency: string; note: string; status: string; createdAt: string }[]>(
+      '/wallet/transactions',
+      {
+        method: 'GET',
+      }
+    ),
+
+  /**
    * Credit wallet
    */
   deposit: (amount: number) =>
@@ -334,6 +345,45 @@ export const walletAPI = {
         body: JSON.stringify({ amount }),
       }
     ),
+};
+
+/**
+ * Admin API Endpoints (guarded by the admin session token)
+ */
+export const adminAPI = {
+  adminHeaders(): Record<string, string> {
+    const token =
+      typeof window !== 'undefined' ? localStorage.getItem('qalnet_admin_token') : null;
+    return token ? { 'x-admin-token': token } : {};
+  },
+
+  /**
+   * List every Equb on the platform (admin view)
+   */
+  getEqubs: () =>
+    request<any[]>(`/admin/equbs`, {
+      method: 'GET',
+      headers: adminAPI.adminHeaders(),
+    }),
+
+  /**
+   * Approve / reject / pause / complete an Equb
+   */
+  setEqubStatus: (equbId: string, status: string) =>
+    request<any>(`/admin/equbs/${equbId}/status`, {
+      method: 'POST',
+      headers: adminAPI.adminHeaders(),
+      body: JSON.stringify({ status }),
+    }),
+
+  /**
+   * List every registered member (admin view)
+   */
+  getMembers: () =>
+    request<any[]>(`/admin/members`, {
+      method: 'GET',
+      headers: adminAPI.adminHeaders(),
+    }),
 };
 
 /**
@@ -402,6 +452,7 @@ export default {
   userAPI,
   equbAPI,
   walletAPI,
+  adminAPI,
   paymentService,
   healthAPI,
   request,

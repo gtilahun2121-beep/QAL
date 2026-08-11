@@ -25,7 +25,7 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
   useEffect(()=>{
     try{
       const token = localStorage.getItem('qalnet_admin_token');
-      if(!token) return;
+      if(!token || token === 'admin_demo') return;
       const raw = localStorage.getItem(`qalnet_admin_${token}`);
       if(raw) {
         setAdmin(JSON.parse(raw));
@@ -103,32 +103,14 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
               </svg>
             </button>
 
-            {/* Admin button: ensure navigation — create dev admin if missing then navigate */}
+            {/* Admin button: requires a real admin login (no auto-created demo admin) */}
             {!admin && (
               <button
                 onClick={() => {
                   try {
-                    const token = localStorage.getItem('qalnet_admin_token');
-                    if (!token) {
-                      const demo = 'admin_demo';
-                      localStorage.setItem('qalnet_admin_token', demo);
-                      localStorage.setItem(`qalnet_admin_${demo}`, JSON.stringify({
-                        fullName: 'System Admin',
-                        role: 'system_admin',
-                        permissions: ['view_members', 'approve_kyc', 'manage_disputes', 'view_financial_records', 'manage_admin_users'],
-                      }));
-                      // also set role key expected by admin page
-                      localStorage.setItem('qalnet_admin_role', 'system_admin');
-                    }
+                    window.location.href = `${window.location.origin}/admin/login`;
                   } catch (e) {
-                    // ignore
-                  }
-                  // Navigate using explicit origin to avoid relative routing mismatches
-                  try {
-                    window.location.href = `${window.location.origin}/admin/dashboard`;
-                  } catch (e) {
-                    // fallback
-                    window.location.href = '/admin/dashboard';
+                    window.location.href = '/admin/login';
                   }
                 }}
                 className="inline-flex items-center px-4 py-2 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all"

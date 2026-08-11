@@ -161,6 +161,24 @@ export interface FinancialRecord {
   equbId?: string;
 }
 
+// Platform Equb Structure (admin view)
+export interface Equb {
+  id: string;
+  name: string;
+  category: string;
+  contributionAmount: number;
+  totalMembers: number;
+  membersJoined: number;
+  status: 'active' | 'pending' | 'completed' | 'paused' | 'rejected';
+  managerName: string;
+  managerPhone: string;
+  startDate: string;
+  currentRound: number;
+  totalRounds: number;
+  description?: string;
+  collectedAmount?: number;
+}
+
 // MFA Challenge Structure
 export interface MFAChallenge {
   id: string;
