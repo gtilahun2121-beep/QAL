@@ -1,16 +1,27 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Language, defaultLanguage } from '@/i18n/config';
 import { translations } from '@/i18n/translations';
 import { useAuth } from './context/AuthContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import AuthModal from './components/modals/AuthModal';
+import { ToastContainer, useToast } from './components/notifications/Toast';
 
 export default function Home() {
+  return (
+    <Suspense>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+function HomeContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const toast = useToast();
   const [lang, setLang] = useState<Language>(defaultLanguage);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
@@ -21,6 +32,7 @@ export default function Home() {
   const handleAuthSuccess = (title: string, message: string, duration?: number) => {
     console.log(' handleAuthSuccess called - closing modal and redirecting to /dashboard');
     setShowAuthModal(false);
+    toast.success(title, message, duration || 3000);
     // Add a small delay to ensure modal closes before redirect
     setTimeout(() => {
       console.log(' Redirecting to /dashboard...');
@@ -29,8 +41,16 @@ export default function Home() {
   };
 
   const handleAuthError = (title: string, message: string, duration?: number) => {
-    // Error is already shown to user via toast, just keep modal open
+    toast.error(title, message, duration || 5000);
   };
+
+  useEffect(() => {
+    try {
+      if (searchParams?.get('auth') === '1') setShowAuthModal(true);
+    } catch (e) {
+      // ignore
+    }
+  }, [searchParams]);
 
   return (
     <main className="flex flex-col min-h-screen">
@@ -50,6 +70,8 @@ export default function Home() {
         onSuccess={handleAuthSuccess}
         onError={handleAuthError}
       />
+
+      <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
 
       {/* Homepage Content */}
       <div className="flex-grow">

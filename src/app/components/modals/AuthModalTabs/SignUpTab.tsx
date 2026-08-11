@@ -16,6 +16,7 @@ interface SignUpTabProps {
 
 export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }: SignUpTabProps) {
   const { signup, isLoading } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -286,6 +287,7 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
     }
 
     console.log(' PIN validation passed');
+    setSubmitting(true);
 
     try {
       console.log(' Calling signup() with data:', {
@@ -315,6 +317,8 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
       const message = error instanceof Error ? error.message : 'Registration failed';
       console.error(' Signup error:', message);
       onError?.('Error', message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -585,10 +589,10 @@ export default function SignUpTab({ lang = defaultLanguage, onSuccess, onError }
                 console.log('PIN length:', formData.pin.length);
                 handleSubmit();
               }}
-              disabled={isLoading}
+              disabled={isLoading || submitting}
               className="flex-1 py-3 bg-[#16357a] text-white font-bold rounded-lg hover:bg-[#27487f] transition-all disabled:opacity-50"
             >
-              {isLoading
+              {isLoading || submitting
                 ? ' Creating...'
                 : lang === 'en'
                 ? ' Create Account'

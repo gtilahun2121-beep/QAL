@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Language, languages } from '@/i18n/config';
 import ProfileAvatar from '@/app/components/dashboard/ProfileAvatar';
@@ -30,13 +30,34 @@ export default function MemberHeader({
   onOpenNotifications,
   onSignOut,
 }: MemberHeaderProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const ddRef = useRef<HTMLDivElement | null>(null);
   const t = (en: string, am: string) => (lang === 'en' ? en : am);
+
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (!ddRef.current) return;
+      if (!ddRef.current.contains(e.target as Node)) setDropdownOpen(false);
+    };
+    document.addEventListener('click', onClick);
+    return () => document.removeEventListener('click', onClick);
+  }, []);
 
   return (
     <header className="bg-gradient-to-r from-teal-800 to-teal-600 shadow-2xl sticky top-0 z-40">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex justify-between items-center gap-3">
+          {/* Drawer trigger (top-left) */}
+          <button
+            onClick={onOpenMenu}
+            className="p-2 -ml-1 hover:bg-white/20 rounded-full transition-all text-white flex-shrink-0"
+            aria-label={t('Menu', 'ምናሌ')}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group min-w-0">
             <div className="w-9 h-9 bg-gradient-to-br from-teal-500 to-purple-500 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
@@ -97,25 +118,31 @@ export default function MemberHeader({
               )}
             </button>
 
-            {/* Menu trigger */}
-            <button
-              onClick={onOpenMenu}
-              className="hidden sm:inline-flex p-2 hover:bg-white/20 rounded-full transition-all text-white"
-              aria-label={t('Menu', 'ምናሌ')}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
+            {/* Avatar + dropdown */}
+            <div className="relative" ref={ddRef}>
+              <button
+                onClick={() => { setDropdownOpen((s) => !s); }}
+                className="rounded-full ring-2 ring-white/40 hover:ring-white transition-all flex-shrink-0"
+                aria-label={t('Open profile', 'መገለጫ ክፈት')}
+              >
+                <ProfileAvatar uid={uid} name={user.name} size={38} />
+              </button>
 
-            {/* Avatar */}
-            <button
-              onClick={onOpenMenu}
-              className="rounded-full ring-2 ring-white/40 hover:ring-white transition-all flex-shrink-0"
-              aria-label={t('Open profile', 'መገለጫ ክፈት')}
-            >
-              <ProfileAvatar uid={uid} name={user.name} size={38} />
-            </button>
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg ring-1 ring-black/5 z-50">
+                  <div className="p-3 border-b border-gray-100">
+                    <p className="font-bold text-gray-900 truncate">{user.name}</p>
+                    <p className="text-xs text-gray-500 truncate">{user.email || user.phone}</p>
+                  </div>
+                  <div className="p-2">
+                    <button onClick={onOpenMenu} className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-gray-50">My Profile</button>
+                    <button onClick={onOpenNotifications} className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-gray-50">Notifications</button>
+                    <button onClick={() => onLanguageChange(lang === 'en' ? 'am' : 'en')} className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-gray-50">Language</button>
+                    <button onClick={onSignOut} className="w-full text-left px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-gray-50">Sign Out</button>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Sign out */}
             <button
@@ -124,49 +151,8 @@ export default function MemberHeader({
             >
               {t('Sign Out', 'ውጣ')}
             </button>
-
-            {/* Mobile menu toggle */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-1.5 hover:bg-white/20 rounded-full transition-all text-white"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
           </div>
         </div>
-
-        {/* Mobile search + actions */}
-        {mobileMenuOpen && (
-          <div className="md:hidden mt-3 space-y-3 bg-white/10 backdrop-blur-md rounded-2xl p-4">
-            <div className="flex items-center bg-white/15 rounded-full px-4 py-2 gap-2">
-              <svg className="w-4 h-4 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.3-4.3" />
-              </svg>
-              <input
-                type="text"
-                value={searchValue}
-                onChange={(e) => onSearchChange(e.target.value)}
-                placeholder={t('Search...', 'ይፈልጉ...')}
-                className="w-full bg-transparent text-white placeholder-white/70 text-sm outline-none"
-              />
-            </div>
-            <button
-              onClick={onOpenMenu}
-              className="w-full px-4 py-3 bg-white text-teal-800 font-bold rounded-xl"
-            >
-              {t('Member Menu', 'የአባል ምናሌ')}
-            </button>
-            <button
-              onClick={onSignOut}
-              className="w-full px-4 py-3 bg-red-600 text-white font-bold rounded-xl"
-            >
-              {t('Sign Out', 'ውጣ')}
-            </button>
-          </div>
-        )}
       </nav>
     </header>
   );

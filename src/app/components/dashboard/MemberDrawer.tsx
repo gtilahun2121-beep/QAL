@@ -133,7 +133,12 @@ const NAV_ITEMS: { id: TabId; labelEn: string; labelAm: string }[] = [
 ];
 
 function SectionTitle({ children }: { children: ReactNode }) {
-  return <h4 className="font-bold text-gray-900 text-sm mb-3">{children}</h4>;
+  return (
+    <h4 className="flex items-center gap-2 font-black text-gray-900 text-sm mb-3">
+      <span className="w-1 h-4 rounded-full bg-gradient-to-b from-teal-500 to-teal-600" />
+      {children}
+    </h4>
+  );
 }
 
 function Badge({ children, color = 'teal' }: { children: ReactNode; color?: string }) {
@@ -216,7 +221,7 @@ function MiniCalendar({ dueDay }: { dueDay: string }) {
 function ProgressBar({ value }: { value: number }) {
   const pct = Math.max(0, Math.min(100, value));
   return (
-    <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+    <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
       <div className="h-full bg-gradient-to-r from-teal-600 to-purple-500 rounded-full transition-all" style={{ width: `${pct}%` }} />
     </div>
   );
@@ -297,6 +302,8 @@ export default function MemberDrawer({
     .toUpperCase()
     .slice(0, 2);
 
+  const activeNav = NAV_ITEMS.find((n) => n.id === activeTab);
+
   return (
     <AnimatePresence>
       {open && (
@@ -317,38 +324,25 @@ export default function MemberDrawer({
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className="fixed left-0 top-0 bottom-0 w-[860px] max-w-[96vw] bg-gray-50 z-[60] shadow-2xl flex overflow-hidden"
+            className="fixed left-0 top-0 bottom-auto w-[860px] max-w-[96vw] max-h-[calc(100vh-1rem)] bg-gray-50 z-[60] shadow-2xl flex overflow-hidden rounded-br-3xl"
           >
             {/* ── Internal sidebar ─────────────────────────────── */}
-            <div className="w-[230px] shrink-0 bg-white border-r border-gray-200 flex flex-col">
+            <div className="w-[230px] shrink-0 bg-gradient-to-b from-gray-50 to-white border-r border-gray-200 flex flex-col">
               {/* Brand */}
               <div className="flex items-center gap-2.5 px-4 py-4 border-b border-gray-100">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-teal-600 to-teal-700 text-white flex items-center justify-center font-black text-sm">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-500 to-purple-600 text-white flex items-center justify-center font-black text-base shadow-md ring-1 ring-teal-500/20">
                   Q
                 </div>
                 <div>
-                  <p className="font-black text-gray-900 text-sm leading-tight">QalNet</p>
+                  <p className="font-black text-gray-900 text-sm leading-tight tracking-tight">QalNet</p>
                   <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">
                     {t(lang, 'Member Portal', 'የአባል ፖርታል')}
                   </p>
                 </div>
               </div>
 
-              {/* Close (mobile) */}
-              <div className="p-2">
-                <button
-                  onClick={onClose}
-                  className="w-full py-1.5 text-xs font-bold text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all flex items-center justify-center gap-1.5"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  {t(lang, 'Close', 'ዝጋ')}
-                </button>
-              </div>
-
               {/* Nav */}
-              <nav className="flex-1 overflow-y-auto px-2 pb-2">
+              <nav className="flex-1 overflow-y-auto px-2 pb-2 pt-3">
                 <div className="space-y-0.5">
                   {NAV_ITEMS.map((item) => {
                     const active = activeTab === item.id;
@@ -356,12 +350,13 @@ export default function MemberDrawer({
                       <button
                         key={item.id}
                         onClick={() => go(item.id)}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                        className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold transition-all ${
                           active
                             ? 'bg-teal-50 text-teal-700'
                             : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                         }`}
                       >
+                        {active && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r-full bg-teal-600" />}
                         <span className={`${active ? 'text-teal-600' : 'text-gray-400'}`}>{iconMap[item.id]}</span>
                         {t(lang, item.labelEn, item.labelAm)}
                       </button>
@@ -371,18 +366,22 @@ export default function MemberDrawer({
               </nav>
 
               {/* User card */}
-              <div className="border-t border-gray-100 p-3">
-                <div className="flex items-center gap-2.5 px-1 mb-2">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-teal-500 to-purple-600 text-white flex items-center justify-center font-black text-sm flex-shrink-0">
-                    {initials || 'M'}
+              <div className="p-3">
+                <div className="bg-gradient-to-br from-teal-700 to-teal-600 rounded-2xl p-3 text-white shadow-md">
+                  <div className="flex items-center gap-2.5 mb-2">
+                    <div className="w-9 h-9 rounded-full bg-white/20 ring-2 ring-white/40 text-white flex items-center justify-center font-black text-sm flex-shrink-0">
+                      {initials || 'M'}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-black text-sm truncate leading-tight">{user.name}</p>
+                      <p className="text-[10px] text-white/70 truncate leading-tight">{user.email || user.phone}</p>
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-black text-gray-900 text-sm truncate leading-tight">{user.name}</p>
-                    <p className="text-[10px] text-gray-500 truncate leading-tight">{user.email || user.phone}</p>
-                  </div>
-                  <Badge color="green">{t(lang, 'Active Member', 'ንቁ አባል')}</Badge>
+                  <span className="inline-block px-2 py-0.5 bg-white/20 rounded-full text-[9px] font-bold">
+                    {t(lang, 'Active Member', 'ንቁ አባል')}
+                  </span>
                 </div>
-                <div className="space-y-0.5">
+                <div className="mt-2 space-y-0.5">
                   <button
                     onClick={() => go('profile')}
                     className={`w-full text-left px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all flex items-center gap-2 ${
@@ -448,7 +447,27 @@ export default function MemberDrawer({
             </div>
 
             {/* ── Content area ─────────────────────────────────── */}
-            <div className="flex-1 overflow-y-auto p-5 bg-gray-50 space-y-4">
+            <div className="flex-1 overflow-y-auto bg-gray-50">
+              <div className="sticky top-0 z-10 bg-gray-50/95 backdrop-blur-sm border-b border-gray-200 px-5 py-4 flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-black text-teal-600 uppercase tracking-[0.2em]">
+                    {t(lang, 'Member Portal', 'የአባል ፖርታል')}
+                  </p>
+                  <h3 className="text-lg font-black text-gray-900 leading-tight truncate">
+                    {activeNav ? t(lang, activeNav.labelEn, activeNav.labelAm) : t(lang, 'Dashboard', 'ዳሽቦርድ')}
+                  </h3>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-gray-200 text-gray-500 hover:text-gray-900 hover:bg-gray-50 shadow-sm transition-all flex-shrink-0"
+                  aria-label={t(lang, 'Close', 'ዝጋ')}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="p-5 space-y-4">
               {activeTab === 'dashboard' && (
                 <div className="space-y-4">
                   <div>
@@ -462,11 +481,21 @@ export default function MemberDrawer({
 
                   {/* KPI cards */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-                      <p className="text-xs font-bold text-gray-500">
-                        {t(lang, 'Total Balance', 'ጠቅላላ ቀሪ ሂሳብ')}
-                      </p>
-                      <div className="flex items-end justify-between mt-2">
+                    <div className="relative overflow-hidden bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+                      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-teal-500 to-emerald-500" />
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs font-bold text-gray-500">
+                          {t(lang, 'Total Balance', 'ጠቅላላ ቀሪ ሂሳብ')}
+                        </p>
+                        <span className="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
+                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+                            <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+                            <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+                          </svg>
+                        </span>
+                      </div>
+                      <div className="flex items-end justify-between">
                         <p className="text-3xl font-black text-gray-900">ETB {walletBalance.toLocaleString()}</p>
                         {balancePctChange > 0 && (
                           <Badge color="green">+{balancePctChange}%</Badge>
@@ -476,11 +505,20 @@ export default function MemberDrawer({
                         {t(lang, 'from last month', 'ካለፈው ወር')}
                       </p>
                     </div>
-                    <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-                      <p className="text-xs font-bold text-gray-500">
-                        {t(lang, 'Total Saved', 'ጠቅላላ ቁጠባ')}
-                      </p>
-                      <div className="flex items-end justify-between mt-2">
+                    <div className="relative overflow-hidden bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+                      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-purple-500 to-fuchsia-500" />
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs font-bold text-gray-500">
+                          {t(lang, 'Total Saved', 'ጠቅላላ ቁጠባ')}
+                        </p>
+                        <span className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M12 6v12M8 10h4a2 2 0 0 1 0 4H8M8 12h4" />
+                          </svg>
+                        </span>
+                      </div>
+                      <div className="flex items-end justify-between">
                         <p className="text-3xl font-black text-teal-700">ETB {savedTotal.toLocaleString()}</p>
                         {growthPct > 0 && (
                           <Badge color="green">+{growthPct}%</Badge>
@@ -1134,6 +1172,7 @@ export default function MemberDrawer({
                   </div>
                 </div>
               )}
+              </div>
             </div>
           </motion.aside>
         </>

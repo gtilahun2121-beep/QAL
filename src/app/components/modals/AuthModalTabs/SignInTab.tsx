@@ -17,9 +17,11 @@ interface SignInTabProps {
 
 export default function SignInTab({ lang = defaultLanguage, onSuccess, onError }: SignInTabProps) {
   const { signin, isLoading } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({ phoneNumber: '+2519', pin: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleFieldChange = (field: string, value: string) => {
     let finalValue = value;
@@ -40,6 +42,9 @@ export default function SignInTab({ lang = defaultLanguage, onSuccess, onError }
     setFormData((prev) => ({ ...prev, [field]: finalValue }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: '' }));
+    }
+    if (errorMessage) {
+      setErrorMessage('');
     }
   };
 
@@ -64,18 +69,23 @@ export default function SignInTab({ lang = defaultLanguage, onSuccess, onError }
   };
 
   const handleSubmit = async () => {
-    try {
-      if (!validateForm()) {
-        onError?.('Validation Error', 'Please check your phone and PIN');
-        return;
-      }
+    if (!validateForm()) {
+      onError?.('Validation Error', 'Please check your phone and PIN');
+      return;
+    }
 
+    setSubmitting(true);
+    setErrorMessage('');
+    try {
       await signin(formData.phoneNumber, formData.pin);
       setSuccessMessage('✓ Signed in successfully!');
       onSuccess?.('Sign In Successful', 'Welcome back to QalNet!', 3000);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Sign in failed';
+      setErrorMessage(message);
       onError?.('Error', message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -108,13 +118,23 @@ export default function SignInTab({ lang = defaultLanguage, onSuccess, onError }
         error={errors.pin}
       />
 
+      {errorMessage && (
+        <div className="flex items-start gap-2 px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-sm font-semibold rounded-lg">
+          <svg className="w-4 h-4 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 8v4M12 16h.01" />
+          </svg>
+          <span>{errorMessage}</span>
+        </div>
+      )}
+
       <FormButton
         onClick={handleSubmit}
-        loading={isLoading}
-        disabled={isLoading}
+        loading={isLoading || submitting}
+        disabled={isLoading || submitting}
         variant="primary"
       >
-        {isLoading ? ' Processing...' : lang === 'en' ? 'Sign In' : lang === 'am' ? 'ወደ ውስጥ ግባ' : 'Seensa'}
+        {isLoading || submitting ? ' Processing...' : lang === 'en' ? 'Sign In' : lang === 'am' ? 'ወደ ውስጥ ግባ' : 'Seensa'}
       </FormButton>
 
       <p className="text-xs text-gray-500 text-center">

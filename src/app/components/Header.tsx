@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Language, languages } from '@/i18n/config';
 import { translations } from '@/i18n/translations';
@@ -14,6 +15,7 @@ interface HeaderProps {
 
 export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthenticated = false }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const router = useRouter();
   const t = translations[lang];
 
   const navItems = [
@@ -68,7 +70,10 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
             {/* Sign Up Button */}
             {!isAuthenticated && (
               <button
-                onClick={onSignUpClick}
+                onClick={() => {
+                  if (onSignUpClick) onSignUpClick();
+                  else router.push('/?auth=1');
+                }}
                 className="hidden sm:inline-block px-6 py-2 bg-white text-[#0a1f3d] font-bold rounded-full hover:shadow-lg transition-all text-sm"
               >
                  Sign Up
@@ -103,7 +108,8 @@ export default function Header({ lang, onLanguageChange, onSignUpClick, isAuthen
             {!isAuthenticated && (
               <button
                 onClick={() => {
-                  onSignUpClick?.();
+                  if (onSignUpClick) onSignUpClick();
+                  else router.push('/?auth=1');
                   setMobileMenuOpen(false);
                 }}
                 className="w-full px-4 py-3 bg-white text-[#0a1f3d] font-bold rounded-lg"

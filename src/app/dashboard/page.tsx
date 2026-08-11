@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Language, defaultLanguage } from '@/i18n/config';
 import { useAuth } from '@/app/context/AuthContext';
-import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
+import MemberHeader from '@/app/components/dashboard/MemberHeader';
 import { ToastContainer, useToast } from '@/app/components/notifications/Toast';
 import MemberDrawer from '@/app/components/dashboard/MemberDrawer';
 import PinVerifyModal from '@/app/components/dashboard/PinVerifyModal';
@@ -417,53 +417,55 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
 
   return (
     <main className="min-h-screen flex flex-col bg-gray-50">
-      <Header
+      <MemberHeader
         lang={lang}
         onLanguageChange={(newLang) => setLang(newLang)}
-        isAuthenticated={true}
+        user={{
+          name: authUser?.firstName || displayName,
+          phone: authUser?.phoneNumber || '—',
+          role: authUser?.role || 'member',
+          email: authUser?.email || undefined,
+        }}
+        uid={uid}
+        unreadCount={dashboard.notifications.length}
+        searchValue={''}
+        onSearchChange={() => {}}
+        onOpenMenu={handleDrawerOpen}
+        onOpenNotifications={() => {}}
+        onSignOut={handleSignOut}
       />
 
       <div className="flex-grow max-w-7xl mx-auto w-full px-4 py-8">
+          <div className="flex-1 min-w-0">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleDrawerOpen}
-                className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-br from-teal-700 to-teal-500 text-white font-bold rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all cursor-pointer"
-                aria-label={lang === 'en' ? 'Open member menu' : 'የአባል ምናሌ ክፈት'}
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-                <span className="hidden sm:inline">
-                  {lang === 'en' ? 'Menu' : 'ምናሌ'}
-                </span>
-              </button>
-              <h1 className="text-3xl sm:text-4xl font-black text-gray-900 break-words">
-                {lang === 'en' ? 'Welcome, ' : 'ደህና መጡ, '}
-                {displayName} 
-              </h1>
-            </div>
-            <button
-              onClick={handleSignOut}
-              className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all"
-            >
-              {lang === 'en' ? 'Sign Out' : 'ወጣ'}
-            </button>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+          <div>
+            <p className="text-xs font-black text-teal-600 uppercase tracking-[0.2em] mb-1">
+              {lang === 'en' ? 'Member Dashboard' : 'የአባል ዳሽቦርድ'}
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-black text-gray-900 break-words">
+              {lang === 'en' ? 'Welcome back, ' : 'እንኳን ደህና መጡ, '}
+              {displayName}
+            </h1>
+            <p className="text-gray-500 mt-1">
+              {lang === 'en'
+                ? "Here's what's happening with your Equbs today."
+                : 'ዛሬ በእርስዎ Equbs ውስጥ ያለው ሁኔታ ይኸውልዎ።'}
+            </p>
           </div>
-          <p className="text-gray-600">
-            {lang === 'en'
-              ? "Here's your Equb dashboard. Stay updated with your group savings."
-              : 'ይህ የእርስዎ Equb ዳሽቦርድ ነው።'}
-          </p>
+          <div className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl shadow-sm w-fit">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-sm font-bold text-gray-600">
+              {lang === 'en' ? 'Active Member' : 'ንቁ አባል'}
+            </span>
+          </div>
         </div>
 
         {/* Getting Started for New Users */}
         {isNewUser && (
-          <div className="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-lg mb-8">
-            <h2 className="text-lg font-bold text-blue-900 mb-4">
-              {lang === 'en' ? ' Getting Started' : ' ለመጀመር'}
+          <div className="bg-gradient-to-r from-teal-50 to-blue-50 border border-teal-100 rounded-2xl p-6 mb-8">
+            <h2 className="text-lg font-black text-teal-900 mb-4">
+              {lang === 'en' ? 'Getting Started' : 'ለመጀመር'}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               {startedSteps.map((step) => {
@@ -473,11 +475,11 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                     key={step.id}
                     onClick={step.onClick}
                     disabled={done}
-                    className={`bg-white p-4 rounded-lg text-center hover:shadow-lg transition-all cursor-pointer ${
-                      done ? 'opacity-60 border-2 border-blue-300' : ''
+                    className={`bg-white p-4 rounded-xl text-center hover:shadow-lg transition-all cursor-pointer ${
+                      done ? 'opacity-60 border-2 border-teal-300' : 'border-2 border-transparent'
                     }`}
                   >
-                    <p className="font-bold text-sm text-blue-900">{step.label}</p>
+                    <p className="font-bold text-sm text-teal-900">{step.label}</p>
                   </button>
                 );
               })}
@@ -488,95 +490,132 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Wallet Balance */}
-          <div className="bg-gradient-to-br from-blue-100 to-blue-100 border border-blue-300 rounded-lg p-6 shadow-md">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-blue-800 font-bold text-sm">
+          <div className="relative overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-teal-500 to-emerald-500" />
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-bold text-gray-500">
                 {lang === 'en' ? 'Wallet Balance' : 'ዋሊት ሚዛን'}
               </p>
+              <span className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+                  <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+                  <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+                </svg>
+              </span>
             </div>
-            <p className="text-3xl font-black text-blue-950">
+            <p className="text-3xl font-black text-gray-900 mb-4">
               ETB {dashboard.walletBalance.toLocaleString()}
             </p>
-            <div className="mt-3 flex gap-2">
+            <div className="flex gap-2">
               <button
                 onClick={() => setShowDeposit(true)}
-                className="flex-1 px-3 py-1.5 bg-blue-700 text-white text-xs font-bold rounded-lg hover:bg-blue-800 transition-all"
+                className="flex-1 px-3 py-2 bg-teal-600 text-white text-xs font-bold rounded-lg hover:bg-teal-700 transition-all"
               >
-                 Deposit
+                {lang === 'en' ? 'Deposit' : 'መግቢያ'}
               </button>
               <button
                 onClick={() => setShowWithdraw(true)}
-                className="flex-1 px-3 py-1.5 border-2 border-blue-700 text-blue-800 text-xs font-bold rounded-lg hover:bg-blue-700 hover:text-white transition-all"
+                className="flex-1 px-3 py-2 border-2 border-teal-600 text-teal-700 text-xs font-bold rounded-lg hover:bg-teal-600 hover:text-white transition-all"
               >
-                 Withdraw
+                {lang === 'en' ? 'Withdraw' : 'መውጫ'}
               </button>
             </div>
           </div>
 
           {/* Active Equbs */}
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-300 rounded-lg p-6 shadow-md">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-blue-700 font-bold text-sm">
-                {lang === 'en' ? 'Active Equbs' : 'ንቅናቄ Equbs'}
+          <div className="relative overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500" />
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-bold text-gray-500">
+                {lang === 'en' ? 'Active Equbs' : 'ንቁ Equbs'}
               </p>
+              <span className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 21v-1a6 6 0 0 1 12 0v1" />
+                  <path d="M19 8a3 3 0 0 1 0 6" />
+                  <path d="M22 21v-1a5 5 0 0 0-3-4.6" />
+                </svg>
+              </span>
             </div>
-            <p className="text-3xl font-black text-blue-900">{activeCount}</p>
-            <p className="text-xs text-blue-700 mt-2">
-              {lang === 'en' ? 'Groups you\'re part of' : 'ነዋ ክፍሎች'}
+            <p className="text-3xl font-black text-gray-900 mb-1">{activeCount}</p>
+            <p className="text-xs text-gray-500">
+              {lang === 'en' ? "Groups you're part of" : 'የተሳተፉባቸው ቡድኖች'}
             </p>
           </div>
 
           {/* Next Payment */}
-          <div className="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-300 rounded-lg p-6 shadow-md">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-orange-700 font-bold text-sm">
+          <div className="relative overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-orange-500 to-amber-500" />
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-bold text-gray-500">
                 {lang === 'en' ? 'Next Payment' : 'ቀጣይ ክፍያ'}
               </p>
+              <span className="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <path d="M16 2v4M8 2v4M3 10h18" />
+                </svg>
+              </span>
             </div>
-            <p className="text-3xl font-black text-orange-900">
-              {nextPayment ? (nextPayment.days === 0 ? 'Today' : `${nextPayment.days} days`) : '—'}
+            <p className="text-3xl font-black text-gray-900 mb-1">
+              {nextPayment ? (nextPayment.days === 0 ? t('Today', 'ዛሬ') : `${nextPayment.days} ${lang === 'en' ? 'days' : 'ቀናት'}`) : '—'}
             </p>
-            <p className="text-xs text-orange-700 mt-2">
+            <p className="text-xs text-gray-500 truncate">
               {nextPayment?.equb.name || (lang === 'en' ? 'No equb payments' : 'ክፍያ የለም')}
             </p>
           </div>
 
           {/* Next Payout */}
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-300 rounded-lg p-6 shadow-md">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-purple-700 font-bold text-sm">
+          <div className="relative overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-purple-500 to-fuchsia-500" />
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-bold text-gray-500">
                 {lang === 'en' ? 'Next Payout' : 'ቀጣይ ክፍሌ'}
               </p>
+              <span className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+                </svg>
+              </span>
             </div>
-            <p className="text-3xl font-black text-purple-900">{nextPayoutLabel}</p>
-            <p className="text-xs text-purple-700 mt-2">
+            <p className="text-3xl font-black text-gray-900 mb-1">{nextPayoutLabel}</p>
+            <p className="text-xs text-gray-500">
               {lang === 'en' ? 'When you receive payout' : 'ክፍሌ የሚገኙበት ጊዜ'}
             </p>
           </div>
         </div>
 
         {/* Three Main Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             {/* My Equbs */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
+                <h2 className="text-xl font-black text-gray-900 flex items-center gap-2">
                    {lang === 'en' ? 'My Equbs' : 'የእኔ Equbs'}
                 </h2>
-                <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">
+                <span className="px-3 py-1 bg-teal-50 text-teal-700 text-xs font-bold rounded-full">
                   {t('Monthly commitment', 'ወርሃዊ ግዴታ')}: ETB {monthlyCommitment.toLocaleString()}
                 </span>
               </div>
 
               {dashboard.equbs.length === 0 ? (
                 <div className="text-center py-12">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center">
+                    <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <circle cx="12" cy="12" r="5" />
+                      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+                    </svg>
+                  </div>
                   <p className="text-gray-600 mb-4">
                     {lang === 'en' ? 'You haven\'t joined any Equb yet' : 'አሁንም Equb ተጠምዱ አልነበሩም'}
                   </p>
                   <button
                     onClick={() => router.push('/join-equb')}
-                    className="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all"
+                    className="px-6 py-2.5 bg-teal-600 text-white font-bold rounded-xl hover:bg-teal-700 transition-all"
                   >
                     {lang === 'en' ? 'Join an Equb' : 'Equb ተጠምዱ'}
                   </button>
@@ -586,71 +625,76 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                   {dashboard.equbs.map((equb) => (
                     <div
                       key={equb.id}
-                      className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-all"
+                      className="group bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-2xl p-5 hover:shadow-lg transition-all"
                     >
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h3 className="font-bold text-gray-900 text-lg">{equb.name}</h3>
-                          <p className="text-sm text-gray-600">
-                            {equb.members} {lang === 'en' ? 'members' : 'አባላት'}
-                            {equb.category ? ` · ${equb.category}` : ''}
-                          </p>
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-teal-500 to-teal-700 text-white flex items-center justify-center font-black text-lg flex-shrink-0">
+                            {equb.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <h3 className="font-black text-gray-900">{equb.name}</h3>
+                            <p className="text-xs text-gray-500">
+                              {equb.members} {lang === 'en' ? 'members' : 'አባላት'}
+                              {equb.category ? ` · ${equb.category}` : ''}
+                            </p>
+                          </div>
                         </div>
                         <div className="flex items-center gap-2">
                           {equb.manager && (
-                            <span className="px-3 py-1 bg-blue-100 text-blue-800 font-bold text-xs rounded-full">
-                               Manager
+                            <span className="px-2.5 py-1 bg-blue-100 text-blue-700 text-[11px] font-black rounded-full">
+                              {lang === 'en' ? 'Manager' : 'ማናጀር'}
                             </span>
                           )}
-                          <span className="px-3 py-1 bg-blue-100 text-blue-900 font-bold text-xs rounded-full">
-                             {lang === 'en' ? 'Active' : 'ንቅናቄ'}
+                          <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[11px] font-black rounded-full">
+                            {lang === 'en' ? 'Active' : 'ንቁ'}
                           </span>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
-                          <p className="text-xs text-gray-600 font-semibold">
+                          <p className="text-xs text-gray-500 font-semibold">
                             {lang === 'en' ? 'Your Position' : 'ቦታ'}
                           </p>
-                          <p className="text-xl font-bold text-gray-900">#{equb.position}</p>
+                          <p className="text-xl font-black text-gray-900">#{equb.position}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-600 font-semibold">
+                          <p className="text-xs text-gray-500 font-semibold">
                             {lang === 'en' ? 'Contribution' : 'አስተዋጽዖ'}
                           </p>
-                          <p className="text-xl font-bold text-gray-900">ETB {equb.contribution}</p>
+                          <p className="text-xl font-black text-gray-900">ETB {equb.contribution}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-600 font-semibold">
+                          <p className="text-xs text-gray-500 font-semibold">
                             {lang === 'en' ? 'Next Payment' : 'ቀጣይ ክፍያ'}
                           </p>
-                          <p className="text-xl font-bold text-orange-600">
+                          <p className="text-xl font-black text-orange-600">
                             {daysUntil(equb.nextPaymentDate, now) === 0
                               ? t('Today', 'ዛሬ')
                               : `${daysUntil(equb.nextPaymentDate, now)}d`}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-600 font-semibold">
+                          <p className="text-xs text-gray-500 font-semibold">
                             {lang === 'en' ? 'Your Payout' : 'ክፍሌ'}
                           </p>
-                          <p className="text-xl font-bold text-purple-600">{equb.nextPayout}</p>
+                          <p className="text-xl font-black text-purple-600">{equb.nextPayout}</p>
                         </div>
                       </div>
 
                       <div className="mt-4 grid grid-cols-2 gap-3">
                         <button
                           onClick={() => setSelectedEqub(equb)}
-                          className="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all text-sm"
+                          className="px-4 py-2 bg-gray-900 text-white font-bold rounded-xl hover:bg-gray-800 transition-all text-sm"
                         >
                           {lang === 'en' ? 'View Details' : 'ዝርዝር ይመልከቱ'}
                         </button>
                         <button
                           onClick={() => openPaymentFor(equb)}
-                          className="px-4 py-2 bg-blue-700 text-white font-bold rounded-lg hover:bg-blue-800 transition-all text-sm"
+                          className="px-4 py-2 bg-teal-600 text-white font-bold rounded-xl hover:bg-teal-700 transition-all text-sm"
                         >
-                           {lang === 'en' ? 'Make Payment' : 'ክፍያ ክፍል'}
+                           {lang === 'en' ? 'Make Payment' : 'ክፍያ ይክፈሉ'}
                         </button>
                       </div>
                     </div>
@@ -660,23 +704,36 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <h2 className="text-xl font-black text-gray-900 mb-5">
                  {lang === 'en' ? 'Quick Actions' : 'ፈጣን ድርጊቶች'}
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   onClick={() => router.push('/join-equb')}
-                  className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 rounded-lg font-bold hover:shadow-lg transition-all text-center"
+                  className="flex items-center gap-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-4 rounded-xl font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all text-left"
                 >
-                   {lang === 'en' ? 'Join an Equb' : 'Equb ተጠምዱ'}
+                  <span className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M19 8v6M22 11h-6" />
+                    </svg>
+                  </span>
+                  <span>{lang === 'en' ? 'Join an Equb' : 'Equb ተጠምዱ'}</span>
                 </button>
                 <button
                   onClick={() => setShowCreate(true)}
-                  className="bg-gradient-to-r from-blue-700 to-blue-800 text-white px-6 py-4 rounded-lg font-bold hover:shadow-lg transition-all text-center"
+                  className="flex items-center gap-3 bg-gradient-to-r from-teal-600 to-teal-700 text-white px-5 py-4 rounded-xl font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all text-left"
                 >
-                   {lang === 'en' ? 'Create an Equb' : 'Equb ፍጠር'}
+                  <span className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 8v8M8 12h8" />
+                    </svg>
+                  </span>
+                  <span>{lang === 'en' ? 'Create an Equb' : 'Equb ፍጠር'}</span>
                 </button>
                 <button
                   onClick={() => {
@@ -686,106 +743,167 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
                       toast.info('No Equbs', 'Join or create an Equb first.');
                     }
                   }}
-                  className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-4 rounded-lg font-bold hover:shadow-lg transition-all text-center"
+                  className="flex items-center gap-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white px-5 py-4 rounded-xl font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all text-left"
                 >
-                   {lang === 'en' ? 'Make Payment' : 'ክፍያ ክፍል'}
+                  <span className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="5" width="20" height="14" rx="2" />
+                      <path d="M2 10h20" />
+                    </svg>
+                  </span>
+                  <span>{lang === 'en' ? 'Make Payment' : 'ክፍያ ይክፈሉ'}</span>
                 </button>
                 <button
                   onClick={() => setShowInvite(true)}
-                  className="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-4 rounded-lg font-bold hover:shadow-lg transition-all text-center"
+                  className="flex items-center gap-3 bg-gradient-to-r from-orange-600 to-orange-700 text-white px-5 py-4 rounded-xl font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all text-left"
                 >
-                   {lang === 'en' ? 'Invite Friends' : 'ጓደኞቹን ጋብዝ'}
+                  <span className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 2 11 13" />
+                      <path d="M22 2 15 22l-4-9-9-4z" />
+                    </svg>
+                  </span>
+                  <span>{lang === 'en' ? 'Invite Friends' : 'ጓደኞችን ጋብዝ'}</span>
                 </button>
               </div>
             </div>
           </div>
 
           {/* Right column: Notifications & Activity */}
-          <div>
-            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <h2 className="text-lg font-black text-gray-900 mb-4 flex items-center gap-2">
+                <span className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                    <path d="M10 21a2 2 0 0 0 4 0" />
+                  </svg>
+                </span>
                  {lang === 'en' ? 'Notifications' : 'ማስታወቂያዎች'}
               </h2>
               <div className="space-y-3">
-                {dashboard.notifications.map((notif) => (
-                  <div
-                    key={notif.id}
-                    className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg p-3 hover:shadow-md transition-all"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="flex-1">
-                        <p className="font-bold text-gray-900 text-sm">{notif.title}</p>
-                        <p className="text-xs text-gray-600">{notif.time}</p>
+                {dashboard.notifications.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-6">
+                    {lang === 'en' ? 'No notifications yet' : 'እስካሁን ማስታወቂያ የለም'}
+                  </p>
+                ) : (
+                  dashboard.notifications.map((notif) => (
+                    <div
+                      key={notif.id}
+                      className="flex items-start gap-3 bg-gray-50 border border-gray-100 rounded-xl p-3 hover:shadow-md transition-all"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                          <path d="M10 21a2 2 0 0 0 4 0" />
+                        </svg>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-gray-900 text-sm truncate">{notif.title}</p>
+                        <p className="text-xs text-gray-500">{notif.time}</p>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <h2 className="text-lg font-black text-gray-900 mb-4 flex items-center gap-2">
+                <span className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" />
+                  </svg>
+                </span>
                  {lang === 'en' ? 'Recent Activity' : 'ቅርብ ጊዜ ሕይወት'}
               </h2>
               <div className="space-y-3">
-                {dashboard.activity.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg p-3 hover:shadow-md transition-all"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="flex-1">
+                {dashboard.activity.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-6">
+                    {lang === 'en' ? 'No recent activity' : 'ቅርብ ጊዜ እንቅስቃሴ የለም'}
+                  </p>
+                ) : (
+                  dashboard.activity.map((activity) => (
+                    <div
+                      key={activity.id}
+                      className="flex items-start gap-3 bg-gray-50 border border-gray-100 rounded-xl p-3 hover:shadow-md transition-all"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M12 6v6l4 2" />
+                        </svg>
+                      </div>
+                      <div className="flex-1 min-w-0">
                         <p className="font-bold text-gray-900 text-sm">{activity.action}</p>
-                        <p className="text-xs text-gray-600">{activity.time}</p>
+                        <p className="text-xs text-gray-500">{activity.time}</p>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </div>
         </div>
 
         {/* Support Section */}
-        <div className="mt-12 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            {lang === 'en' ? 'Need Help?' : 'እርዳታ ያስፈልገ?'}
+        <div className="mt-12 bg-gradient-to-r from-teal-50 to-purple-50 border border-teal-100 rounded-2xl p-8 text-center">
+          <h2 className="text-2xl font-black text-gray-900 mb-2">
+            {lang === 'en' ? 'Need Help?' : 'እርዳታ ያስፈልግዎታል?'}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <p className="text-sm text-gray-500 mb-6">
+            {lang === 'en'
+              ? 'Our team is ready to assist you anytime.'
+              : 'ቡድናችን በማንኛውም ጊዜ ሊረዳዎ ዝግጁ ነው።'}
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
             <button
               onClick={() => router.push('/docs')}
-              className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all"
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-teal-600 text-white font-bold rounded-xl hover:bg-teal-700 transition-all"
             >
-               {lang === 'en' ? 'Help Center' : 'ረዳት ማእከል'}
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M9 9a3 3 0 1 1 4 2.8c-.6.3-1 .8-1 1.7" />
+                <circle cx="12" cy="17" r="0.5" fill="currentColor" />
+              </svg>
+              {lang === 'en' ? 'Help Center' : 'ረዳት ማእከል'}
             </button>
             <button
               onClick={() => {
                 setSupportCategory(lang === 'en' ? 'Live Chat' : 'ቀጥታ ውይይት');
                 setShowSupport(true);
               }}
-              className="px-6 py-3 bg-blue-700 text-white font-bold rounded-lg hover:bg-blue-800 transition-all"
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-700 text-white font-bold rounded-xl hover:bg-blue-800 transition-all"
             >
-               {lang === 'en' ? 'Live Chat' : 'ቀጥታ ውይይት'}
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+              {lang === 'en' ? 'Live Chat' : 'ቀጥታ ውይይት'}
             </button>
             <button
               onClick={() => {
                 setSupportCategory(lang === 'en' ? 'Report Issue' : 'ችግር ሪፖርት');
                 setShowSupport(true);
               }}
-              className="px-6 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-all"
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-all"
             >
-               {lang === 'en' ? 'Report Issue' : 'ችግር ሪፖርት'}
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7" />
+              </svg>
+              {lang === 'en' ? 'Report Issue' : 'ችግር ሪፖርት'}
             </button>
           </div>
         </div>
-      </div>
+          </div>
+        </div>
 
       <Footer lang={lang} />
 
       {/* ── Equb Detail Modal ─────────────────────────────────────────────── */}
       {selectedEqub && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedEqub(null)}>
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4">
               <h3 className="text-2xl font-black text-gray-900">{selectedEqub.name}</h3>
               <button onClick={() => setSelectedEqub(null)} className="text-2xl text-gray-400 hover:text-gray-600">
@@ -836,7 +954,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
       {/* ── Create Equb Modal ─────────────────────────────────────────────── */}
       {showCreate && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowCreate(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-6">
               <h3 className="text-2xl font-black text-gray-900">
                  {lang === 'en' ? 'Create an Equb' : 'Equb ፍጠር'}
@@ -924,7 +1042,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
       {/* ── Make Payment Modal ────────────────────────────────────────────── */}
       {showPayment && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowPayment(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-6">
               <h3 className="text-2xl font-black text-gray-900">
                  {lang === 'en' ? 'Make Payment' : 'ክፍያ ክፍል'}
@@ -1011,7 +1129,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
       {/* ── Deposit Modal ─────────────────────────────────────────────────── */}
       {showDeposit && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowDeposit(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-6">
               <h3 className="text-2xl font-black text-gray-900">
                  {lang === 'en' ? 'Deposit Funds' : 'ተወገዱ'}
@@ -1136,7 +1254,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
       {/* ── Invite Friends Modal ──────────────────────────────────────────── */}
       {showInvite && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowInvite(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-6">
               <h3 className="text-2xl font-black text-gray-900">
                  {lang === 'en' ? 'Invite Friends' : 'ጓደኞቹን ጋብዝ'}
@@ -1180,7 +1298,7 @@ function DashboardContent({ uid, lang, setLang, newUser, displayName }: Dashboar
       {/* ── Support Modal ─────────────────────────────────────────────────── */}
       {showSupport && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowSupport(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-6">
               <h3 className="text-2xl font-black text-gray-900">{supportCategory}</h3>
               <button onClick={() => setShowSupport(false)} className="text-2xl text-gray-400 hover:text-gray-600">
